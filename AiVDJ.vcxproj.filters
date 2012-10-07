@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClCompile Include="src\testApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Calibration.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\ContourFinder.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Distance.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Flow.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Helpers.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\RunningBackground.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Tracker.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Utilities.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Wrappers.cpp">
+			<Filter>addons\ofxCv\libs\ofxCv\src</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834f65-f3a9-211e-73b8-dc8563776aec}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv">
+			<UniqueIdentifier>{a9c1150b-c1cb-2bc0-0f32-ed3be4444391}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\src">
+			<UniqueIdentifier>{6b661273-844d-d754-f98d-c3b1e7b37b37}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\libs">
+			<UniqueIdentifier>{2d63e874-134a-c540-1157-c931ecb42e76}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\libs\ofxCv">
+			<UniqueIdentifier>{9104db86-fb76-46b8-7315-e1a9e701dbc2}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\libs\ofxCv\include">
+			<UniqueIdentifier>{80cebd8f-dc90-1d69-bbf7-093dbbb8989b}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\libs\ofxCv\include\ofxCv">
+			<UniqueIdentifier>{76e26063-b359-0a22-cc92-6f5b79573a49}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxCv\libs\ofxCv\src">
+			<UniqueIdentifier>{d4f40dfe-7bfe-9e37-3b94-006c2e0ac59d}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxUI">
+			<UniqueIdentifier>{b492c5b0-ff91-9c5a-638a-31420f9e8d66}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxUI\src">
+			<UniqueIdentifier>{a00c2d23-6c11-bc86-3993-2cf0e345f895}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\testApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\src\ofxCv.h">
+			<Filter>addons\ofxCv\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Calibration.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\ContourFinder.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Distance.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Flow.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Helpers.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\RunningBackground.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Tracker.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Utilities.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Wrappers.h">
+			<Filter>addons\ofxCv\libs\ofxCv\include\ofxCv</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUI.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUI2DPad.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIBiLabelSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIButton.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICanvas.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICircleSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICustomImageButton.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIDropDownList.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIEventArgs.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIFPS.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIFPSSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImage.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageButton.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageSampler.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageToggle.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabel.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabelButton.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabelToggle.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMinimalSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMovingGraph.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageButton.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageToggle.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUINumberDialer.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRadio.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRangeSlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRectangle.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRotarySlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIScrollableCanvas.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISlider.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISpacer.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISpectrum.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUITextInput.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIToggle.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIToggleMatrix.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWaveform.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWidget.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWidgetWithLabel.h">
+			<Filter>addons\ofxUI\src</Filter>
+		</ClInclude>
+	</ItemGroup>
+</Project>

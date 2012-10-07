@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|Win32">
+			<Configuration>Debug</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|Win32">
+			<Configuration>Release</Configuration>
+			<Platform>Win32</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
+		<RootNamespace>AiVDJ</RootNamespace>
+		<Keyword>Win32Proj</Keyword>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<CharacterSet>Unicode</CharacterSet>
+		<WholeProgramOptimization>true</WholeProgramOptimization>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+		<ConfigurationType>Application</ConfigurationType>
+		<CharacterSet>Unicode</CharacterSet>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings" />
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs2010\openFrameworksRelease.props" />
+	</ImportGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+		<Import Project="..\..\..\libs\openFrameworksCompiled\project\vs2010\openFrameworksDebug.props" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup>
+		<_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+		<OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bin\</OutDir>
+		<IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">obj\$(Configuration)\</IntDir>
+		<LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+		<GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+		<OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bin\</OutDir>
+		<IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">obj\$(Configuration)\</IntDir>
+		<LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+		<TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_debug</TargetName>
+		<TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+		<ClCompile>
+			<Optimization>Disabled</Optimization>
+			<MinimalRebuild>true</MinimalRebuild>
+			<BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+			<RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+			<PrecompiledHeader />
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\src;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\libs;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src</AdditionalIncludeDirectories>
+		</ClCompile>
+		<Link>
+			<OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<ProgramDatabaseFile>$(TargetDir)$(TargetName)_debugInfo.pdb</ProgramDatabaseFile>
+			<SubSystem>Console</SubSystem>
+			<RandomizedBaseAddress>false</RandomizedBaseAddress>
+			<DataExecutionPrevention />
+			<TargetMachine>MachineX86</TargetMachine>
+			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<PostBuildEvent />
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+		<ClCompile>
+			<WholeProgramOptimization>false</WholeProgramOptimization>
+			<PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+			<PrecompiledHeader />
+			<WarningLevel>Level3</WarningLevel>
+			<DebugInformationFormat />
+			<AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\src;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\libs;..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src</AdditionalIncludeDirectories>
+		</ClCompile>
+		<Link>
+			<IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+			<GenerateDebugInformation>false</GenerateDebugInformation>
+			<SubSystem>Console</SubSystem>
+			<OptimizeReferences>true</OptimizeReferences>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<RandomizedBaseAddress>false</RandomizedBaseAddress>
+			<DataExecutionPrevention />
+			<TargetMachine>MachineX86</TargetMachine>
+			<LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		</Link>
+		<PostBuildEvent />
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClCompile Include="src\main.cpp" />
+		<ClCompile Include="src\testApp.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Calibration.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\ContourFinder.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Distance.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Flow.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Helpers.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\RunningBackground.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Tracker.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Utilities.cpp" />
+		<ClCompile Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\src\Wrappers.cpp" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\testApp.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\src\ofxCv.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Calibration.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\ContourFinder.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Distance.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Flow.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Helpers.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\RunningBackground.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Tracker.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Utilities.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxCv\libs\ofxCv\include\ofxCv\Wrappers.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUI.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUI2DPad.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIBiLabelSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIButton.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICanvas.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICircleSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUICustomImageButton.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIDropDownList.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIEventArgs.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIFPS.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIFPSSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImage.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageButton.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageSampler.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIImageToggle.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabel.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabelButton.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUILabelToggle.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMinimalSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMovingGraph.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageButton.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIMultiImageToggle.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUINumberDialer.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRadio.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRangeSlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRectangle.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIRotarySlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIScrollableCanvas.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISlider.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISpacer.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUISpectrum.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUITextInput.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIToggle.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIToggleMatrix.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWaveform.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWidget.h" />
+		<ClInclude Include="..\..\..\of_v0071_vs2010_release\of_v0071_vs2010_release\addons\ofxUI\src\ofxUIWidgetWithLabel.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\libs\openFrameworksCompiled\project\vs2010\openframeworksLib.vcxproj">
+			<Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
+		</ProjectReference>
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets" />
+</Project>
