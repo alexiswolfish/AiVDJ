@@ -1,4 +1,4 @@
 AiVDJ
 =====
 
-intelligent generative sudio/visual system.
+intelligent generative audio/visual system.
