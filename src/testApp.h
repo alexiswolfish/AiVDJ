@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "alex/physicsMode.h"
 
 class testApp : public ofBaseApp{
 
