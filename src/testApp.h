@@ -21,5 +21,5 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 		/*-----------Test Variables-----------*/
-		int r,g,b;
+	int r,g,b;
 };
