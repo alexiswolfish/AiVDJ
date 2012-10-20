@@ -13,8 +13,4 @@ class physicsMode{
 
 		void update();
 		void render();
-<<<<<<< HEAD
-}
-=======
-};
->>>>>>> 6cb4f8ea56e3997f7ef6e3c623c7b93e0c1a7d1e
+

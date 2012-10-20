@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "alex/physicsMode.h"
+#include "jake/djMode.h"
 
 class testApp : public ofBaseApp{
 
