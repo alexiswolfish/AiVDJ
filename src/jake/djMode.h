@@ -7,10 +7,12 @@
 // uncomment this to read from two kinects simultaneously
 //#define USE_TWO_KINECTS
 
+
 class djMode {
 public:
 	djMode();
 	~djMode();
+
 	
 	void setup();
 	void update();
@@ -18,9 +20,10 @@ public:
 	void exit();
 	
 	void drawPointCloud();
-	
+
 	ofxKinect kinect;
 	
+
 	ofxCvColorImage colorImg;
 	
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
