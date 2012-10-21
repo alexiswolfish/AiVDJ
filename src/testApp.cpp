@@ -68,28 +68,38 @@ void testApp::mouseReleased(int x, int y, int button){
 void testApp::initRects(){
 	float kinectWidth = ofGetWidth()/3;
 	float kinectHeight = ofGetHeight()/3 * (480.0/640.0);
-
+	djRect = ofRectangle(0,0,kinectWidth, kinectHeight);
+	audRect = ofRectangle(0,0,kinectWidth, kinectHeight);
 }
 
 void testApp::guiColors(ofxUIWidget *w){
 	w->setColorBack(ccomp1);
 	w->setColorFill(ccomp2);
 	w->setColorFillHighlight(ccomp4);
+	w->setColorOutline(ccomp2);
 }
 
 void testApp::guiSetup(){
 
     float dim = 16;
 	float labelOffset = 20;
-	guiWidth = 400;
+	guiWidth = 700;
+	int guiHeight =300;
 	ofxUIWidget *w;
+
+	vector<string> names;
+    names.push_back("physics mode");
+    names.push_back("dJGod mode");
+	names.push_back("video mashup");
+	names.push_back("audience mode");
 
     //ofxUi doesn't update your variables for you, so if you add any extra toggles,
     //make sure to add the corresponding vars to the gui catch all function below.  
-    gui = new ofxUICanvas(0,0,guiWidth, ofGetHeight());
+    gui = new ofxUICanvas(0,0,guiWidth, guiHeight);
 
 	w = gui->addWidgetDown(new ofxUILabel("AiVDJ", OFX_UI_FONT_LARGE)); guiColors(w);
 	gui->addWidgetDown(new ofxUISpacer(guiWidth - labelOffset, 2)); 
+	w = gui->addWidgetDown(new ofxUIRadio("MODES", names, OFX_UI_ORIENTATION_HORIZONTAL,dim*2,dim*2,0,-100) ); guiColors(w);
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim)); guiColors(w);
     
     //Sliders for style
@@ -98,7 +108,7 @@ void testApp::guiSetup(){
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDj, dim, dim),"Style2"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAud, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", 250, dim*2),"AUDIENCE"); guiColors(w);
-	
+
   
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
    
@@ -120,10 +130,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
         drawAud= toggle->getValue();
     }
-   /* else if(name == "max number of features"){
-        ofxUIRotarySlider *slider = (ofxUIRotarySlider *) e.widget;
-        featureMax = slider->getScaledValue();
-    }*/
     else if(name == "Style1")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
@@ -134,6 +140,13 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}    
+}
+
+//--------------------------------------------------------------
+void testApp::exit()
+{
+    gui->saveSettings("GUI/guiSettings.xml");     
+    delete gui; 
 }
 
 //--------------------------------------------------------------

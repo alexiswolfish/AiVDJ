@@ -27,6 +27,7 @@ class testApp : public ofBaseApp{
 		void guiColors(ofxUIWidget *w);
 		void guiEvent(ofxUIEventArgs &e);
 		void initRects();
+		void exit();
 
 		ofxUICanvas *gui;
 		float guiWidth;
@@ -34,6 +35,8 @@ class testApp : public ofBaseApp{
 		bool drawDj, drawAud, drawDisplay;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5;
 		ofRectangle displayRect, djRect, audRect, guiRect;
+
+		//int nearThresh, int farThresh;
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;
