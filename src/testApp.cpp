@@ -12,7 +12,7 @@ void testApp::setup(){
 	ccomp4.set(130,255,255); //highlight blue
 	ccomp5.setHex(0x5f5f5f); //dark grey
 
-	drawDj = false;
+	drawDJ = false;
 	drawAud = false;
 	drawDisplay = true;
 	
@@ -27,12 +27,17 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-
+	if(drawDJ){
+		DJ.update();
+	}
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
 	ofBackground(cmain);
+	if(drawDJ){
+		DJ.draw();
+	}
 }
 
 //--------------------------------------------------------------
@@ -105,7 +110,7 @@ void testApp::guiSetup(){
     //Sliders for style
 	w = gui->addWidgetEastOf(new ofxUISlider(300, dim, 0,255, slider1, "Style1"),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUISlider(300, dim, 0,255, slider2, "Style2"),"Style1"); guiColors(w);
-	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDj, dim, dim),"Style2"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJ, dim, dim),"Style2"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAud, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", 250, dim*2),"AUDIENCE"); guiColors(w);
 
@@ -124,7 +129,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
     if(name == "DJ"){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawDj= toggle->getValue();
+        drawDJ= toggle->getValue();
     }
 	if(name == "AUDIENCE"){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
@@ -140,6 +145,11 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}    
+	else if(name == "dJGod mode")
+	{
+		drawDJ = true;
+		DJ.setup();
+	}
 }
 
 //--------------------------------------------------------------
@@ -147,6 +157,8 @@ void testApp::exit()
 {
     gui->saveSettings("GUI/guiSettings.xml");     
     delete gui; 
+
+	DJ.exit();
 }
 
 //--------------------------------------------------------------
