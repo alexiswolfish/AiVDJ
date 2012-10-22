@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "alex/physicsMode.h"
+#include "ofxKinect.h"
 
 class testApp : public ofBaseApp{
 
