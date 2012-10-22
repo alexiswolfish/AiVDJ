@@ -4,7 +4,7 @@
 #include "ofxUI.h"
 
 #include "alex/physicsMode.h"
-//#include "jake/djMode.h"
+#include "jake/djMode.h"
 
 class testApp : public ofBaseApp{
 
