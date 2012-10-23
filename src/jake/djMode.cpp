@@ -120,7 +120,7 @@ void djMode::draw() {
 	}
 	
 	// draw instructions
-	ofSetColor(255, 255, 255);
+	ofSetColor(0, 255, 0);
 	stringstream reportStream;
 	reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
 	<< ofToString(kinect.getMksAccel().y, 2) << " / "
