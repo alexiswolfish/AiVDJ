@@ -23,6 +23,9 @@ void testApp::setup(){
 	guiSetup();
 	ofEnableSmoothing();
 
+	/*-------Jake-------*/
+	DJ.setup();
+
 }
 
 //--------------------------------------------------------------
@@ -39,7 +42,7 @@ void testApp::draw(){
 	if(drawDJ){
 		ofPushStyle();
 		ofSetColor(ccomp5);
-		
+		ofRect(djRect);
 		DJ.draw();
 		ofPopStyle();
 	}
@@ -102,7 +105,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	if(name == "dJGod mode")
 	{
 		drawDJ = true;
-		DJ.setup();
 	}
 	else if(name == "physics mode")
 	{
