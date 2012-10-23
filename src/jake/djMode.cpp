@@ -170,8 +170,8 @@ void djMode::exit() {
 #endif
 }
 
-/*//--------------------------------------------------------------
-void djMode::keyPressed (int key) {
+//--------------------------------------------------------------
+void djMode::DJkeyPressed (int key) {
 	switch (key) {
 		case ' ':
 			bThreshWithOpenCV = !bThreshWithOpenCV;
@@ -232,18 +232,17 @@ void djMode::keyPressed (int key) {
 }
 
 //--------------------------------------------------------------
-void djMode::mouseDragged(int x, int y, int button)
+void djMode::DJmouseDragged(int x, int y, int button)
 {}
 
 //--------------------------------------------------------------
-void djMode::mousePressed(int x, int y, int button)
+void djMode::DJmousePressed(int x, int y, int button)
 {}
 
 //--------------------------------------------------------------
-void djMode::mouseReleased(int x, int y, int button)
+void djMode::DJmouseReleased(int x, int y, int button)
 {}
 
 //--------------------------------------------------------------
-void djMode::windowResized(int w, int h)
+void djMode::DJwindowResized(int w, int h)
 {}
-*/

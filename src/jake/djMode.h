@@ -18,6 +18,13 @@ public:
 	void exit();
 	
 	void drawPointCloud();
+
+	void DJkeyPressed(int);
+	void DJmouseDragged(int, int, int);
+	void DJmousePressed(int, int, int);
+	void DJmouseReleased(int, int, int);
+	void DJwindowResized(int, int);
+
 	
 	ofxKinect kinect;
 	
