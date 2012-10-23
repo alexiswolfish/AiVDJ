@@ -35,8 +35,13 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 	ofBackground(cmain);
+
 	if(drawDJ){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
 		DJ.draw();
+		ofPopStyle();
 	}
 }
 
@@ -84,6 +89,59 @@ void testApp::guiColors(ofxUIWidget *w){
 	w->setColorOutline(ccomp2);
 }
 
+void testApp::guiEvent(ofxUIEventArgs &e){
+    string name = e.widget->getName(); 
+	int kind = e.widget->getKind(); 
+    
+	
+	/*---------------------------------*
+	These functions control the 4 big buttons up top.
+	Update all of the booleans and make sure to call
+	your setup functions below
+	*---------------------------------*/
+	if(name == "dJGod mode")
+	{
+		drawDJ = true;
+		DJ.setup();
+	}
+	else if(name == "physics mode")
+	{
+		drawDJ = false;
+	}
+	else if(name == "audience mode")
+	{
+		drawDJ = false;
+	}
+	else if(name == "physics mashup")
+	{
+		drawDJ = false;
+	}
+	/*---------------------------------*/
+
+    if(name == "RENDER"){
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        drawDisplay = toggle->getValue();
+    }
+    if(name == "DJ"){
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        drawDJ= toggle->getValue();
+    }
+	if(name == "AUDIENCE"){
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+        drawAud= toggle->getValue();
+    }
+    else if(name == "Style1")
+	{
+		ofxUISlider *slider = (ofxUISlider *) e.widget; 
+		slider1 = slider->getScaledValue(); 
+	}
+    else if(name == "Style2")
+	{
+		ofxUISlider *slider = (ofxUISlider *) e.widget; 
+		slider2 = slider->getScaledValue(); 
+	}   
+}
+
 void testApp::guiSetup(){
 
     float dim = 16;
@@ -118,40 +176,6 @@ void testApp::guiSetup(){
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
    
 }
-
-void testApp::guiEvent(ofxUIEventArgs &e){
-    string name = e.widget->getName(); 
-	int kind = e.widget->getKind(); 
-    
-    if(name == "RENDER"){
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawDisplay = toggle->getValue();
-    }
-    if(name == "DJ"){
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawDJ= toggle->getValue();
-    }
-	if(name == "AUDIENCE"){
-        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawAud= toggle->getValue();
-    }
-    else if(name == "Style1")
-	{
-		ofxUISlider *slider = (ofxUISlider *) e.widget; 
-		slider1 = slider->getScaledValue(); 
-	}
-    else if(name == "Style2")
-	{
-		ofxUISlider *slider = (ofxUISlider *) e.widget; 
-		slider2 = slider->getScaledValue(); 
-	}    
-	else if(name == "dJGod mode")
-	{
-		drawDJ = true;
-		DJ.setup();
-	}
-}
-
 //--------------------------------------------------------------
 void testApp::exit()
 {
