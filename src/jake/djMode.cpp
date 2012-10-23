@@ -5,7 +5,6 @@
 
 
 
-
 //--------------------------------------------------------------
 djMode::djMode(){
 
@@ -14,7 +13,6 @@ djMode::djMode(){
 djMode::~djMode(){
 
 }
-
 
 
 void djMode::setup() {
@@ -31,7 +29,6 @@ void djMode::setup() {
 	//kinect.open(1);	// open a kinect by id, starting with 0 (sorted by serial # lexicographically))
 	//kinect.open("A00362A08602047A");	// open a kinect using it's unique serial #
 	
-
 	colorImg.allocate(kinect.width, kinect.height);
 	grayImage.allocate(kinect.width, kinect.height);
 	grayThreshNear.allocate(kinect.width, kinect.height);
@@ -123,7 +120,7 @@ void djMode::draw() {
 	}
 	
 	// draw instructions
-	ofSetColor(255, 255, 255);
+	ofSetColor(0, 255, 0);
 	stringstream reportStream;
 	reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
 	<< ofToString(kinect.getMksAccel().y, 2) << " / "
@@ -173,4 +170,79 @@ void djMode::exit() {
 #endif
 }
 
+//--------------------------------------------------------------
+void djMode::DJkeyPressed (int key) {
+	switch (key) {
+		case ' ':
+			bThreshWithOpenCV = !bThreshWithOpenCV;
+			break;
+			
+		case'p':
+			bDrawPointCloud = !bDrawPointCloud;			break;
+			
+		case '>':
+		case '.':
+			farThreshold ++;
+			if (farThreshold > 255) farThreshold = 255;
+			break;
+			
+		case '<':
+		case ',':
+			farThreshold --;
+			if (farThreshold < 0) farThreshold = 0;
+			break;
+			
+		case '+':
+		case '=':
+			nearThreshold ++;
+			if (nearThreshold > 255) nearThreshold = 255;
+			break;
+			
+		case '-':
+			nearThreshold --;
+			if (nearThreshold < 0) nearThreshold = 0;
+			break;
+			
+		case 'w':
+			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
+			break;
+			
+		case 'o':
+			kinect.setCameraTiltAngle(angle); // go back to prev tilt
+			kinect.open();
+			break;
+			
+		case 'c':
+			kinect.setCameraTiltAngle(0); // zero the tilt
+			kinect.close();
+			break;
+			
+		case OF_KEY_UP:
+			angle++;
+			if(angle>30) angle=30;
+			kinect.setCameraTiltAngle(angle);
+			break;
+			
+		case OF_KEY_DOWN:
+			angle--;
+			if(angle<-30) angle=-30;
+			kinect.setCameraTiltAngle(angle);
+			break;
+	}
+}
 
+//--------------------------------------------------------------
+void djMode::DJmouseDragged(int x, int y, int button)
+{}
+
+//--------------------------------------------------------------
+void djMode::DJmousePressed(int x, int y, int button)
+{}
+
+//--------------------------------------------------------------
+void djMode::DJmouseReleased(int x, int y, int button)
+{}
+
+//--------------------------------------------------------------
+void djMode::DJwindowResized(int w, int h)
+{}
