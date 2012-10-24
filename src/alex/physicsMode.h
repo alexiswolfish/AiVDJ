@@ -10,7 +10,7 @@ class physicsMode{
 	public:
 		class particle{
 			public:
-				ofVec3f loc, vel, acc;
+				ofVec3f pLoc, loc, vel, acc;
 				float mass, magnitude, angle;
 				float maxSpeed, death, deathThresh;
 				int age, lifespan;
@@ -19,11 +19,13 @@ class physicsMode{
 				ofColor col;
 
 				particle(ofVec3f _loc, float m, int life);
+
 				particle();
 				~particle();
 
 				void update();
 				void render();
+				void applyForce(ofVec3f sLoc, float sMass, bool repel);
 				float findAngle(float x, float y);
 		};
 
@@ -42,7 +44,7 @@ class physicsMode{
 				source(ofVec3f initPos, Type type);
 				void render();
 				void update();
-				void applyForce(particle p, source s);
+				void applyForce(particle &p, source s);
 				void addParticles(int amt);	
 		};
 
