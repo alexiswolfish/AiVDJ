@@ -38,7 +38,7 @@ class testApp : public ofBaseApp{
 		void exit();
 
 		ofxUICanvas *gui;
-		float guiWidth;
+		float guiWidth, guiHeight;
 		float slider1, slider2; //change these after you decide what they're for
 		bool drawDJ, drawAud, drawDisplay;
 		bool drawDJKinect, drawAudKinect;
@@ -47,8 +47,29 @@ class testApp : public ofBaseApp{
 
 		MODE mode;
 		//int nearThresh, int farThresh;
+		/*-----------Alex-----------*/
+		physicsMode physics;
+		physicsMode::source::Type sourceType;
+		int numParticles;
 		/*-----------Jake-----------*/
 //		djMode DJ;
+
+		/*-----------Sound-----------*/
+		void audioIn(float * input, int bufferSize, int nChannels); 
+	
+		vector <float> left;
+		vector <float> right;
+		vector <float> volHistory;
+		
+		int 	bufferCounter;
+		int 	drawCounter;
+		
+		float smoothedVol;
+		float scaledVol;
+		
+		ofSoundStream soundStream;
+
+		ofxUIMovingGraph *audio;
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;
