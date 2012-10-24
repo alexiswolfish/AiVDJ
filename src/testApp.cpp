@@ -63,6 +63,7 @@ void testApp::update(){
 	//if we are bigger the the size we want to record - lets drop the oldest value
 	if( volHistory.size() >= 400 ){
 		volHistory.erase(volHistory.begin(), volHistory.begin()+1);
+
 	}
 
 	/*-------Modes-----*/
@@ -71,6 +72,7 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
+				Aud.update();
 			break;
 		default:
 		case PHYSICS:
@@ -129,13 +131,22 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
+	} else if(drawAud){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
+		Aud.draw();
+		ofPopStyle();
 	}
+	
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
+	} else if (drawAud) {
+		Aud.AudkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();
