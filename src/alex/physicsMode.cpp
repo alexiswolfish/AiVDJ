@@ -1,33 +1,45 @@
 #include "physicsMode.h"
 
 physicsMode::physicsMode(){
-	birthRate = 100;
+	birthRate = 50;
+}
+
+void physicsMode::mousePressed(source::Type t, ofVec3f pos){
+	sources.push_back(source(pos, t));
 }
 
 void physicsMode::setup(){
-	emitters.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::EMIT));
-	sinks.push_back(source(ofVec3f(ofGetWidth()/2+200, ofGetHeight()/2+400, 0), source::SINK));
+	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::ORBIT));
+	addParticles(1000);
+	printf("%d", particles.size());
+}
+
+void physicsMode::addParticles(int amt){
+	for(int i=0; i<amt; i++)
+		particles.push_back(particle());
 }
 
 void physicsMode::update(){
-	for(int i=0; i<emitters.size(); i++){
-		emitters[i].addParticles(birthRate);
-		for(int p=0; p<emitters[i].particles.size(); p++){
-			for(int j=0; j<sinks.size(); j++){
-				emitters[i].applyForce(emitters[i].particles[p], sinks[j]);
-			}
-			emitters[i].particles[p].update();
+	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
+		for(vector<particle>::iterator p = particles.begin(); p != particles.end(); ++p){
+			p->applyForce(*e,400);
+			p->update();
 		}
+	}
+	for(vector<particle>::iterator p = particles.begin(); p != particles.end();){
+		if(p->isDead)
+			p = particles.erase(p);
+		else
+			p++;
 	}
 }
 
 void physicsMode::render(){
-	for(int i=0; i<emitters.size(); i++){
-		emitters[i].render();
-		for(int p=0; p<emitters[i].particles.size(); p++){
-			emitters[i].particles[p].render();
-		}
+	for(vector<source>::iterator e = sources.begin(); e != sources.end(); e++){
+		e->render();
 	}
+	for(vector<particle>::iterator p = particles.begin(); p != particles.end(); p++)
+		p->render();
 }
 
 /*--------------------------------*
@@ -37,134 +49,111 @@ void physicsMode::render(){
 physicsMode::source::source(ofVec3f initPos, Type _type){
 	loc = initPos;
 	radius = 15;
-	mass = 1;
+	mass = 50;
 	type = _type;
 	life = 1000;
 }
-void physicsMode::source::addParticles(int amt){
-	for(int i=0; i<amt; i++){
-		particles.push_back( particle(loc, mass, life));
-	}
-}
+
 void physicsMode::source::update(){
-	if(type == EMIT){
-		for(std::vector<particle>::iterator p = particles.begin(); p != particles.end(); ){
-			if(p->isDead){
-				p = particles.erase(p);
-			}
-			else{
-				p->update();
-				++p;
-			}
-		}
-	}
 }
 
 void physicsMode::source::render(){
+	ofPushStyle();
+	if(type == EMIT)
+		ofSetColor(0,255,255);
+	else
+		ofSetColor(255,0,20);
 	ofEllipse(loc.x, loc.y, 10, 10);
+	ofPopStyle();
 }
 
 /*--------------------------------*
 	Particle Class
  *--------------------------------*/
 physicsMode::particle::particle(){
-	loc = ofVec3f(0,0,0);
-	mass = 1;
-	maxSpeed = 30;
+	loc = ofVec3f(ofRandom(0,ofGetWidth()),ofRandom(0,ofGetHeight()),0);
+	mass = ofRandom(1,5);
+	maxSpeed = 200;
 	magnitude = 0;
 	angle = 0;
-	death = 0.1;
+	death = 0.8;
 	age = 0;
 	lifespan = 1000;
 	isDead = false;
+	vel = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
+	acc = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
 }
 physicsMode::particle::~particle(){
 }
 physicsMode::particle::particle(ofVec3f _loc, float m, int life){
 	loc = _loc;
-	mass =m;
-	maxSpeed = 30;
+	mass = m;
+	maxSpeed = 200;
 	magnitude = 0;
 	angle = 0;
-	death = 0.1;
+	death = 0.9;
 	age = 0;
 	lifespan = life;
 	isDead = false;
 
-	vel = ofVec3f(0,0,0);
-	acc = ofVec3f(0,0,0);
+	vel = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
+	acc = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
 }
 
 
 void physicsMode::particle::update(){
+	pLoc = loc;
 	vel = vel+acc;
 	vel.limit(maxSpeed);
 	loc = loc + acc;
 	acc = acc * death;
-
 	age++;
 	if(age > lifespan)
 		isDead = true;
 }
 
-void physicsMode::source::applyForce(particle p, source s){
+
+void physicsMode::particle::applyForce(source a, float range){
 	ofVec3f m = ofVec3f(0,0,0);
-	ofVec3f dirToPull = ofVec3f(p.loc.x, p.loc.y, 0);
+    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
+    dirToPull = dirToPull - a.loc;
+    float distToPull = dirToPull.length();
 
-	dirToPull = dirToPull - s.loc;
-	float distToPull = dirToPull.length();
-	if(distToPull > p.deathThresh){
-		float theta, F;
-		F = s.mass * s.mass;
-		m.x = (p.mass*p.loc.x + s.mass*s.loc.x)/(p.mass+s.mass);
-		m.y = (p.mass*p.loc.y + s.mass*s.loc.y)/(p.mass+s.mass);
+	if(distToPull < range){
+		float deathThresh = (range - distToPull) / range;
+		deathThresh = deathThresh * deathThresh;
+		if(deathThresh > 0.95){
+			isDead = true; //possibly respawn?
+		}
+		if((a.type == source::EMIT) || a.type == source::SINK){
+			//straight up attraction/repuslion forces
+			float theta, F;
+			F = mass * a.mass;
+			m.x = (mass*loc.x + a.mass*a.loc.x)/(mass+a.mass);
+			m.y = (mass*loc.y + a.mass*a.loc.y)/(mass+a.mass);
 
-		//attract
-		if(s.type == source::SINK)
-			theta = p.findAngle( m.x - p.loc.x, m.y - p.loc.y );
-		else
-			theta = p.findAngle( m.x - loc.x, m.y - s.loc.y );
-
-		m.x = (F*cos(theta)) / distToPull;
-		m.y = (F*sin(theta)) / distToPull;
-      
-		p.angle = p.findAngle(m.x, m.y);
-		p.acc.x = p.acc.x + (m.length() * cos(p.angle));
-		p.acc.y = p.acc.y + (m.length() * sin(p.angle)); 
-	}
-	else
-		p.isDead = true;
-}
-
-/*
-void physicsMode::particle::applyForce(source s, bool repel){
-	ofVec3f m = ofVec3f(0,0,0);
-	ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-
-	dirToPull = dirToPull - s.loc;
-	float distToPull = dirToPull.length();
-	if(distToPull > deathThresh){
-		float theta, F;
-		F = mass * s.mass;
-		m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
-		m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
-
-		if(repel)
-			theta = findAngle( loc.x - m.x, loc.y -m.y);
-		else
-			theta = findAngle( m.x - loc.x, m.y - loc.y );
+			if(a.type == source::EMIT)
+				theta = findAngle( loc.x - m.x, loc.y -m.y);
+			else if(a.type == source::SINK)
+				 theta = findAngle( m.x - loc.x, m.y - loc.y );
     
-		m.x = (F*cos(theta)) / distToPull;
-		m.y = (F*sin(theta)) / distToPull;
-      
-		angle = findAngle(m.x, m.y);
-		acc.x = acc.x + (m.length() * cos(angle));
-		acc.y = acc.y + (m.length() * sin(angle)); 
+			m.x = (F*cos(theta)) / distToPull;
+			m.y = (F*sin(theta)) / distToPull;
+    
+			angle = findAngle(m.x, m.y);
+			acc.x += (m.length() * cos(angle));
+			acc.y += (m.length() * sin(angle)); 
+		}
+		else{
+			//orbit
+			dirToPull = dirToPull.normalize();
+			ofVec3f tanForce = ofVec3f(dirToPull.y, - dirToPull.x, 0);
+			tanForce = tanForce * (deathThresh*10);
+			acc = (acc + tanForce);
+		}
 	}
-	else
-		isDead = true;
 }
-*/
+
 
 float physicsMode::particle::findAngle(float x, float y){
   float theta;
@@ -188,5 +177,9 @@ float physicsMode::particle::findAngle(float x, float y){
 }
 
 void physicsMode::particle::render(){
-	ofEllipse(loc.x, loc.y, 3,3);
+	ofPushStyle();
+	ofSetColor(255,0,255);
+	ofEllipse(loc.x, loc.y, 2,2);
+	ofLine(pLoc, loc);
+	ofPopStyle();
 }

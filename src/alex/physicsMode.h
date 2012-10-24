@@ -8,43 +8,45 @@
 
 class physicsMode{
 	public:
+		class source{
+			public:
+				enum Type{
+					EMIT,
+					SINK,
+					ORBIT
+				};
+				ofVec3f loc;
+				float radius, mass, life;
+				Type type;
+				ofColor col;
+
+				source(ofVec3f initPos, Type type);
+				void render();
+				void update();
+		};
+
 		class particle{
 			public:
-				ofVec3f loc, vel, acc;
+				ofVec3f pLoc, loc, vel, acc;
 				float mass, magnitude, angle;
-				float maxSpeed, death, deathThresh;
+				float maxSpeed, death;
 				int age, lifespan;
 				bool isDead;
 
 				ofColor col;
 
 				particle(ofVec3f _loc, float m, int life);
+
 				particle();
 				~particle();
 
 				void update();
 				void render();
+				void pullToCenter(ofVec3f center);
+				void applyForce(source a, float range);
 				float findAngle(float x, float y);
 		};
 
-		class source{
-			public:
-				enum Type{
-					EMIT,
-					SINK
-				};
-				ofVec3f loc;
-				float radius, mass, life;
-				Type type;
-				ofColor col;
-				std::vector<particle> particles;
-
-				source(ofVec3f initPos, Type type);
-				void render();
-				void update();
-				void applyForce(particle p, source s);
-				void addParticles(int amt);	
-		};
 
 		physicsMode();
 
@@ -52,8 +54,10 @@ class physicsMode{
 		void update();
 		void render();
 
-		vector<source> emitters;
-		vector<source> sinks;
+		void addParticles(int amt);	
 
+		void mousePressed(source::Type t, ofVec3f loc);
+		vector<source> sources;
+		vector<particle> particles;
 		int birthRate;
 	};
