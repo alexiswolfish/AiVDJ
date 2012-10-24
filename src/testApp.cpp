@@ -176,8 +176,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
     else if(name == "dJ depth threshold")
 	{
-		ofxUISlider *slider = (ofxUISlider *) e.widget; 
-		slider1 = slider->getScaledValue(); 
+		ofxUIRangeSlider *slider = (ofxUIRangeSlider *) e.widget; 
+		slider1 = slider->getScaledValueHigh(); 
 	}
     else if(name == "aud depth threshold")
 	{
