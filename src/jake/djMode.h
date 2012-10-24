@@ -13,19 +13,35 @@ public:
 	~djMode();
 	
 	void setup();
-	void update();
+	void update(float depthLow, float depthHigh);
 	void draw();
 	void exit();
 	
 	void drawPointCloud();
+	void drawMeshCloud();
+	void testDraw();
 
-	void DJkeyPressed(int);
-	void DJmouseDragged(int, int, int);
-	void DJmousePressed(int, int, int);
-	void DJmouseReleased(int, int, int);
-	void DJwindowResized(int, int);
+	void DJkeyPressed(int key);
+	void DJmouseDragged(int x, int y, int button);
+	void DJmousePressed(int x, int y, int button);
+	void DJmouseReleased(int x, int y, int button);
+	void DJwindowResized(int w, int h);
 
-	
+	struct DJpoint {
+		int x;
+		int y;
+		int z;
+		ofVec3f location;
+		ofColor color;
+	};
+	vector<DJpoint>DJpoints;
+
+	float Zlow, Zhigh;
+	int scaleX;
+	int scaleY;
+	ofVec3f maxY;
+	int middleX;
+
 	ofxKinect kinect;
 	
 	ofxCvColorImage colorImg;
@@ -38,12 +54,11 @@ public:
 	
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
-	
-	int nearThreshold;
-	int farThreshold;
-	
+	bool bDrawMeshCloud;
+
 	int angle;
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
 };
+

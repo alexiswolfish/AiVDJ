@@ -18,8 +18,7 @@ void testApp::setup(){
 	drawDisplay = true;
 	mode = PHYSICS;
 	
-	DjDepthSliderLow = 0;
-	DjDepthSliderHigh = 1450;
+	slider1 = 80;
 	slider2 = 200;
 
 	guiSetup();
@@ -27,30 +26,15 @@ void testApp::setup(){
 	ofEnableSmoothing();
 
 	/*-------Jake-------*/
-	DJMODE.setup();
+//	DJ.setup();
 
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-	switch(mode){
-		case DJ:
-			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
-			break;
-		case AUD:
-			{
-			}
-			break;
-		case VID:
-			{
-			}
-			break;
-		default:
-		case PHYSICS:
-			{
-			}
-			break;
-		}
+	if(drawDJ){
+//		DJ.update();
+	}
 }
 
 //--------------------------------------------------------------
@@ -60,7 +44,8 @@ void testApp::draw(){
 	if(drawDisplay){
 		switch(mode){
 		case DJ:
-			DJMODE.draw();
+			{
+			}
 			break;
 		case AUD:
 			{
@@ -86,14 +71,10 @@ void testApp::draw(){
 	}
 
 	if(drawDJKinect){
-		ofPushMatrix();
-		ofRect(djRect);
-		ofTranslate(djRect.x, djRect.y);
 		ofPushStyle();
-		DJMODE.kinect.drawDepth(0, 0, djRect.width, djRect.height);
-		DJMODE.kinect.draw(0, 0, djRect.width, djRect.height);
+		ofSetColor(white);
+		ofRect(djRect);
 		ofPopStyle();
-		ofPopMatrix();
 	}
 	if(drawAudKinect){
 		ofPushStyle();
@@ -106,7 +87,7 @@ void testApp::draw(){
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
-		DJMODE.DJkeyPressed(key);
+//		DJ.DJkeyPressed(key);
 	}
 }
 
@@ -195,15 +176,14 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
     else if(name == "dJ depth threshold")
 	{
-		ofxUIRangeSlider *slider = (ofxUIRangeSlider *) e.widget; 
-		DjDepthSliderHigh = slider->getScaledValueHigh(); 
-		DjDepthSliderLow = slider->getScaledValueLow(); 
+		ofxUISlider *slider = (ofxUISlider *) e.widget; 
+		slider1 = slider->getScaledValue(); 
 	}
     else if(name == "aud depth threshold")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
-	}     
+	}   
 }
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
@@ -236,13 +216,11 @@ void testApp::guiSetup(){
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 440, 2000, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 440, 1400, dim*25, dim),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
-	// add slider for title angle (up/down)
-	// add something to control viewing angle 
 
   
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
