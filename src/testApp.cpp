@@ -18,7 +18,7 @@ void testApp::setup(){
 	
 	slider1 = 80;
 	slider2 = 200;
-	DjDepthSlider = 1500;
+	DjDepthSlider = 1350;
 
 	initRects();
 	guiSetup();

@@ -39,6 +39,8 @@ void djMode::setup(float depth) {
 	bThreshWithOpenCV = true;
 	Zdepth = depth;
 
+	scaleX = 1024/640;
+	scaleY = 768/480;
 	
 	ofSetFrameRate(60);
 	
@@ -47,7 +49,8 @@ void djMode::setup(float depth) {
 	kinect.setCameraTiltAngle(angle);
 	
 	// start from the front
-	bDrawPointCloud = true;
+	bDrawMeshCloud = true;
+	bDrawPointCloud = false;
 	
 }
 
@@ -104,17 +107,20 @@ void djMode::update(float depth) {
 
 //--------------------------------------------------------------
 void djMode::draw() {
-	maxY=0;
 	middleX = 320;
 	
 	ofSetColor(255, 255, 255);
 	
 	if(bDrawPointCloud) {
 		easyCam.begin();
-		//drawPointCloud();
 		testDraw();
 		easyCam.end();
-	} else {
+	} 
+	else if(bDrawMeshCloud) {
+		easyCam.begin();
+		drawPointCloud();
+		easyCam.end();
+	}else {
 		// draw from the live kinect
 		kinect.drawDepth(10, 10, 400, 300);
 		kinect.draw(420, 10, 400, 300);
@@ -127,58 +133,62 @@ void djMode::draw() {
 #endif
 	}
 	
-	// draw instructions
-	ofSetColor(0, 255, 0);   //green
-	stringstream reportStream;
-	reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
-	<< ofToString(kinect.getMksAccel().y, 2) << " / "
-	<< ofToString(kinect.getMksAccel().z, 2) << endl
-	<< "press p to switch between images and point cloud, rotate the point cloud with the mouse" << endl
-	<< "using opencv threshold = " << bThreshWithOpenCV <<" (press spacebar)" << endl
-	<< "set near threshold " << nearThreshold << " (press: + -)" << endl
-	<< "set far threshold " << farThreshold << " (press: < >) num blobs found " << contourFinder.nBlobs
-	<< ", fps: " << ofGetFrameRate() << endl
-	<< "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl
-	//<< "min Z: " << minZ << " max Z: " << maxZ << "max Y: " << maxY << endl
-	<< "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl;
-	ofDrawBitmapString(reportStream.str(),20,652);
+	if (!bDrawMeshCloud && !bDrawPointCloud){
+		//draw instructions
+		ofSetColor(0, 255, 0);   //green
+		stringstream reportStream;
+		reportStream << "accel is: " << ofToString(kinect.getMksAccel().x, 2) << " / "
+		<< ofToString(kinect.getMksAccel().y, 2) << " / "
+		<< ofToString(kinect.getMksAccel().z, 2) << endl
+		<< "press i to enter intialize kinect mode" << endl
+		<< "press p to switch between point cloud modes" << endl
+		<< "using opencv threshold = " << bThreshWithOpenCV <<" (press spacebar)" << endl
+		<< "set near threshold " << nearThreshold << " (press: + -)" << endl
+		<< "set far threshold " << farThreshold << " (press: < >) num blobs found " << contourFinder.nBlobs
+		<< ", fps: " << ofGetFrameRate() << endl
+		<< "press c to close the connection and o to open it again, connection is: " << kinect.isConnected() << endl
+		<< "max Y: " << maxY.y << endl
+		<< "press UP and DOWN to change the tilt angle: " << angle << " degrees" << endl;
+		ofDrawBitmapString(reportStream.str(),20,652);
+	}
+
 }
 
 void djMode::testDraw() {
-	int w = 640;
-	int h = 480;
-	int step = 20;
-	
+	maxY = ofVec3f(0,0,0);
 	ofBackground(95, 100);
-	//ofPushStyle();
-	//ofSetColor(0,255,0);
-	//ofSphere(5, 475, 100, 5.0);
-	//ofSphere(635, 475, 100, 5.0);
-	//ofSphere(5, 5, 100, 5.0);
-	//ofSphere(635, 5, 100, 5.0);
-	//ofPopStyle();
 
 	//easyCam.setDistance(100);
 	ofPushStyle();
 	ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));
-	//ofSetCurveResolution(20);
-	for(int y = 0; y < h; y += step) {
-		for(int x = 0; x < w; x += step) {
+	int w = 640;
+	int h = 480;
+	int step = 10;
+	for(int y = ofRandom(0, 10); y < h; y += step) {
+		for(int x = ofRandom(0, 10); x < w; x += step) {
 			if(kinect.getDistanceAt(x, y) > 0) {
 				if (kinect.getWorldCoordinateAt(x, y).z < Zdepth){	
-					ofSphere(kinect.getWorldCoordinateAt(x, y).x, -kinect.getWorldCoordinateAt(x, y).y, -kinect.getWorldCoordinateAt(x, y).z, 10);
-					if (y > maxY){maxY= y;}
+					if (kinect.getWorldCoordinateAt(x, y).y > maxY.y){maxY= kinect.getWorldCoordinateAt(x, y);}
 					
 					DJpoint newpoint;
-					newpoint.x = kinect.getWorldCoordinateAt(x, y).x;
-					newpoint.y = kinect.getWorldCoordinateAt(x, y).y;
-					newpoint.z = kinect.getWorldCoordinateAt(x, y).z;
+					newpoint.x = kinect.getWorldCoordinateAt(x, y).x * scaleX;
+					newpoint.y = -kinect.getWorldCoordinateAt(x, y).y * scaleY;
+					newpoint.z = -kinect.getWorldCoordinateAt(x, y).z;
 					DJpoints.push_back(newpoint);
+					ofSphere(newpoint.x, newpoint.y, newpoint.z, 10);
 				}
 			}
 		}
 	}
-	ofPopStyle();
+	//ofSetColor(0,255,255);
+	//ofSphere(maxY.x, -maxY.y, -maxY.z, 50);
+	
+	//for (int i=0; i < DJpoints.size(); i++){
+	//	if(i != 0 && DJpoints[i].y == DJpoints[i-1].y){
+	//		ofSetLineWidth(5);
+	//		ofLine(DJpoints[i].x,DJpoints[i].y,DJpoints[i].z,DJpoints[i-1].x,DJpoints[i-1].y,DJpoints[i-1].z);
+	//	}
+	//}
 
 	//if (maxY >= 320 && maxY < 480){
 		//easyCam.tilt(0);
@@ -186,9 +196,8 @@ void djMode::testDraw() {
 		//return -maxY-320/3.55;
 	//}
 	//else return 0.0;
-
-
-
+	ofPopStyle();
+	DJpoints.clear();
 }
 
 void djMode::drawPointCloud() {
@@ -197,16 +206,18 @@ void djMode::drawPointCloud() {
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
 	int step = 2;
+	ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
 			if(kinect.getDistanceAt(x, y) > 0) {
 				if (kinect.getWorldCoordinateAt(x, y).z < Zdepth){
-					mesh.addColor(kinect.getColorAt(x,y));
+					mesh.addColor(meshColor);
 					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
 				}
 			}
 		}
 	}
+
 
 	glPointSize(3);
 	ofPushMatrix();
@@ -214,8 +225,6 @@ void djMode::drawPointCloud() {
 	ofScale(1, -1, -1);
 	ofTranslate(0, 0, -1000); // center the points a bit
 	glEnable(GL_DEPTH_TEST);
-	//ofSetColor(255, 0, 255);
-	ofSetColor(ofRandom(128, 255),0,ofRandom(128, 255));
 	mesh.drawVertices();
 	glDisable(GL_DEPTH_TEST);
 	ofPopMatrix();
@@ -238,8 +247,14 @@ void djMode::DJkeyPressed (int key) {
 			bThreshWithOpenCV = !bThreshWithOpenCV;
 			break;
 			
+		case'i':
+			bDrawPointCloud = false;			
+			bDrawMeshCloud = false;						break;
+
 		case'p':
-			bDrawPointCloud = !bDrawPointCloud;			break;
+			if (bDrawPointCloud == bDrawMeshCloud){bDrawPointCloud=true;}
+			bDrawPointCloud = !bDrawPointCloud;			
+			bDrawMeshCloud = !bDrawMeshCloud;			break;
 			
 		case '>':
 		case '.':

@@ -36,7 +36,9 @@ public:
 	vector<DJpoint>DJpoints;
 
 	float Zdepth;
-	int maxY;
+	int scaleX;
+	int scaleY;
+	ofVec3f maxY;
 	int middleX;
 
 	ofxKinect kinect;
@@ -51,6 +53,7 @@ public:
 	
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
+	bool bDrawMeshCloud;
 	
 	int nearThreshold;
 	int farThreshold;
