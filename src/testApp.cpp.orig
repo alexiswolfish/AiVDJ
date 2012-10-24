@@ -53,6 +53,24 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
+<<<<<<< HEAD
+	switch(mode){
+		case DJ:
+			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+			break;
+		case AUD:
+			{
+			}
+			break;
+		case VID:
+			{
+			}
+			break;
+		default:
+		case PHYSICS:
+			{
+			}
+=======
 	/*-------Sound------*/
 	//lets scale the vol up to a 0-1 range 
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
@@ -63,28 +81,13 @@ void testApp::update(){
 	//if we are bigger the the size we want to record - lets drop the oldest value
 	if( volHistory.size() >= 400 ){
 		volHistory.erase(volHistory.begin(), volHistory.begin()+1);
-
 	}
 
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
-			{
-				Aud.update();
-			}
-			break;
-		case VID:
-			{
-			}
-			break;
-		default:
-		case PHYSICS:
-			{
-			}
-			break;
 			break;
 		case PHYSICS:
 			physics.addParticles(numParticles);
@@ -93,6 +96,7 @@ void testApp::update(){
 		case VID:
 			break;
 		default:
+>>>>>>> 8e35e10222f60f341be9adeebdee8b6de9f12540
 			break;
 		}
 }
@@ -144,22 +148,13 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
-	} else if(drawAud){
-		ofPushStyle();
-		ofSetColor(ccomp5);
-		
-		Aud.draw();
-		ofPopStyle();
 	}
-	
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
-	} else if (drawAud) {
-		Aud.AudkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();
@@ -295,7 +290,10 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
+<<<<<<< HEAD
 	}     
+=======
+	}   
 	/*----Particle Sliders-----*/
 	else if (name == "particle rebirth")
 	{
@@ -308,6 +306,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		sourceType = physicsMode::source::SINK;
 	else if (name == "orbit")
 		sourceType = physicsMode::source::ORBIT;
+>>>>>>> 8e35e10222f60f341be9adeebdee8b6de9f12540
 }
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
@@ -350,9 +349,16 @@ void testApp::guiSetup(){
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
+<<<<<<< HEAD
+	// add slider for title angle (up/down)
+	// add something to control viewing angle 
+
+  
+=======
 	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 200, numParticles, "particle rebirth"),"input");guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
    //audio = (ofxUIMovingGraph *) gui->addWidgetWestOf(new ofxUIMovingGraph(dim*10, 64, volHistory, 400, -1000, 1000, "Volume"),"particle rebirth"); 
+>>>>>>> 8e35e10222f60f341be9adeebdee8b6de9f12540
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
    
 }
