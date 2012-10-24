@@ -12,12 +12,13 @@ public:
 	djMode();
 	~djMode();
 	
-	void setup(float depth);
-	void update(float depth);
+	void setup();
+	void update(float depthLow, float depthHigh);
 	void draw();
 	void exit();
 	
 	void drawPointCloud();
+	void drawMeshCloud();
 	void testDraw();
 
 	void DJkeyPressed(int key);
@@ -35,7 +36,7 @@ public:
 	};
 	vector<DJpoint>DJpoints;
 
-	float Zdepth;
+	float Zlow, Zhigh;
 	int scaleX;
 	int scaleY;
 	ofVec3f maxY;
@@ -54,10 +55,7 @@ public:
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
-	
-	int nearThreshold;
-	int farThreshold;
-	
+
 	int angle;
 	
 	// used for viewing the point cloud
