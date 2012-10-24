@@ -5,6 +5,7 @@
 
 #include "alex/physicsMode.h"
 #include "jake/djMode.h"
+#include "melissa/audMode.h"
 
 class testApp : public ofBaseApp{
 
@@ -43,4 +44,7 @@ class testApp : public ofBaseApp{
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;
+	
+		/*-----------Melissa-----------*/
+	audMode Aud;
 };

@@ -29,6 +29,8 @@ void testApp::setup(){
 void testApp::update(){
 	if(drawDJ){
 		DJ.update();
+	} else if(drawAud) {
+		Aud.update();
 	}
 }
 
@@ -42,13 +44,22 @@ void testApp::draw(){
 		
 		DJ.draw();
 		ofPopStyle();
+	} else if(drawAud){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
+		Aud.draw();
+		ofPopStyle();
 	}
+	
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJ.DJkeyPressed(key);
+	} else if (drawAud) {
+		Aud.AudkeyPressed(key);
 	}
 }
 
@@ -104,19 +115,24 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	if(name == "dJGod mode")
 	{
 		drawDJ = true;
+		drawAud = false;
 		DJ.setup();
 	}
 	else if(name == "physics mode")
 	{
 		drawDJ = false;
+		drawAud = false;
 	}
 	else if(name == "audience mode")
 	{
 		drawDJ = false;
+		drawAud = true;
+		Aud.setup();
 	}
 	else if(name == "physics mashup")
 	{
 		drawDJ = false;
+		drawAud = false;
 	}
 	/*---------------------------------*/
 
