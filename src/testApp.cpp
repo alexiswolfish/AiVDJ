@@ -18,6 +18,7 @@ void testApp::setup(){
 	
 	slider1 = 80;
 	slider2 = 200;
+	DjDepthSlider = 1500;
 
 	initRects();
 	guiSetup();
@@ -28,7 +29,7 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 	if(drawDJ){
-		DJ.update();
+		DJ.update(DjDepthSlider);
 	}
 }
 
@@ -104,7 +105,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	if(name == "dJGod mode")
 	{
 		drawDJ = true;
-		DJ.setup();
+		DJ.setup(DjDepthSlider);
 	}
 	else if(name == "physics mode")
 	{
@@ -142,6 +143,11 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}   
+	else if(name == "Depth")
+	{
+		ofxUISlider *slider = (ofxUISlider *) e.widget; 
+		DjDepthSlider = slider->getScaledValue(); 
+	}  
 }
 
 void testApp::guiSetup(){
@@ -170,7 +176,8 @@ void testApp::guiSetup(){
     //Sliders for style
 	w = gui->addWidgetEastOf(new ofxUISlider(300, dim, 0,255, slider1, "Style1"),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUISlider(300, dim, 0,255, slider2, "Style2"),"Style1"); guiColors(w);
-	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJ, dim, dim),"Style2"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUISlider(300, dim, 440,4500, DjDepthSlider, "Depth"),"Style2"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJ, dim, dim),"Depth"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAud, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", 250, dim*2),"AUDIENCE"); guiColors(w);
 
