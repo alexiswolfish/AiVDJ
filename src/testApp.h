@@ -5,7 +5,7 @@
 
 #include "alex/physicsMode.h"
 #include "jake/djMode.h"
-#include "melissa/audMode.h"
+//#include "melissa/audMode.h"
 
 class testApp : public ofBaseApp{
 
