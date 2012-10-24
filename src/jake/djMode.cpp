@@ -30,9 +30,6 @@ void djMode::setup() {
 	//kinect.open("A00362A08602047A");	// open a kinect using it's unique serial #
 	
 	colorImg.allocate(kinect.width, kinect.height);
-
-	scaleX = 1024/640;
-	scaleY = 768/480;
 	
 	ofSetFrameRate(60);
 	
@@ -82,7 +79,9 @@ void djMode::drawPointCloud() {
 	//easyCam.setDistance(100);
 	ofPushStyle();
 	
-	ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));	
+	//ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));	
+	int rand1 = ofRandom(128, 255);
+	int rand2 = ofRandom(128, 255);
 
 	int w = 640;
 	int h = 480;
@@ -96,6 +95,8 @@ void djMode::drawPointCloud() {
 						// the projected points are 'upside down' and 'backwards' 
 						ofScale(1, -1, -1);
 						ofTranslate(0, 0, -1000); // center the points a bit
+						ofSetColor(rand1, rand2, kinect.getWorldCoordinateAt(x, y).z / (Zhigh/255));
+
 						DJpoint newpoint;
 						newpoint.x = kinect.getWorldCoordinateAt(x, y).x;
 						newpoint.y = kinect.getWorldCoordinateAt(x, y).y;
@@ -135,12 +136,13 @@ void djMode::drawMeshCloud() {
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
 	int step = 2;
-	ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
+	//ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
+	int rand1 = ofRandom(128.0, 255.0);
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
 			if(kinect.getDistanceAt(x, y) > 0) {
 				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					mesh.addColor(meshColor);
+					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
 					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
 				}
 			}

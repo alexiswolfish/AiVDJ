@@ -37,8 +37,6 @@ public:
 	vector<DJpoint>DJpoints;
 
 	float Zlow, Zhigh;
-	int scaleX;
-	int scaleY;
 	ofVec3f maxY;
 	int middleX;
 
