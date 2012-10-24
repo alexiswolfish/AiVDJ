@@ -4,7 +4,7 @@
 #include "ofxUI.h"
 
 #include "alex/physicsMode.h"
-#include "jake/djMode.h"
+//#include "jake/djMode.h"
 
 class testApp : public ofBaseApp{
 
@@ -24,6 +24,13 @@ class testApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 		/*-----------gui-----------*/
+		enum MODE{
+			DJ,
+			AUD,
+			PHYSICS,
+			VID
+		};
+
 		void guiSetup();
 		void guiColors(ofxUIWidget *w);
 		void guiEvent(ofxUIEventArgs &e);
@@ -34,12 +41,14 @@ class testApp : public ofBaseApp{
 		float guiWidth;
 		float slider1, slider2; //change these after you decide what they're for
 		bool drawDJ, drawAud, drawDisplay;
-		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5;
+		bool drawDJKinect, drawAudKinect;
+		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;
 		ofRectangle displayRect, djRect, audRect, guiRect;
 
+		MODE mode;
 		//int nearThresh, int farThresh;
 		/*-----------Jake-----------*/
-		djMode DJ;
+//		djMode DJ;
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;

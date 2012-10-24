@@ -11,27 +11,29 @@ void testApp::setup(){
 	ccomp3.setHex(0xf56494); //accent pink   
 	ccomp4.set(130,255,255); //highlight blue
 	ccomp5.setHex(0x5f5f5f); //dark grey
+	white = ofColor(255,255,255);
 
-	drawDJ = false;
-	drawAud = false;
+	drawDJKinect = false;
+	drawAudKinect = false;
 	drawDisplay = true;
+	mode = PHYSICS;
 	
 	slider1 = 80;
 	slider2 = 200;
 
-	initRects();
 	guiSetup();
+	initRects();
 	ofEnableSmoothing();
 
 	/*-------Jake-------*/
-	DJ.setup();
+//	DJ.setup();
 
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
 	if(drawDJ){
-		DJ.update();
+//		DJ.update();
 	}
 }
 
@@ -39,11 +41,45 @@ void testApp::update(){
 void testApp::draw(){
 	ofBackground(cmain);
 
-	if(drawDJ){
+	if(drawDisplay){
+		switch(mode){
+		case DJ:
+			{
+			}
+			break;
+		case AUD:
+			{
+			}
+			break;
+		case PHYSICS:
+			{
+			}
+			break;
+		case VID:
+			{
+			}
+			break;
+		default:
+			{
+				ofPushStyle();
+				ofSetColor(white);
+				ofRect(displayRect);
+				ofPopStyle();
+			}
+			break;
+		}
+	}
+
+	if(drawDJKinect){
 		ofPushStyle();
-		ofSetColor(ccomp5);
+		ofSetColor(white);
 		ofRect(djRect);
-		DJ.draw();
+		ofPopStyle();
+	}
+	if(drawAudKinect){
+		ofPushStyle();
+		ofSetColor(white);
+		ofRect(audRect);
 		ofPopStyle();
 	}
 }
@@ -51,7 +87,7 @@ void testApp::draw(){
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
-		DJ.DJkeyPressed(key);
+//		DJ.DJkeyPressed(key);
 	}
 }
 
@@ -81,17 +117,21 @@ void testApp::mouseReleased(int x, int y, int button){
 }
 
 void testApp::initRects(){
-	float kinectWidth = ofGetWidth()/3;
-	float kinectHeight = ofGetHeight()/3 * (480.0/640.0);
-	djRect = ofRectangle(0,0,kinectWidth, kinectHeight);
-	audRect = ofRectangle(0,0,kinectWidth, kinectHeight);
-}
+	float spacer = 16;
 
-void testApp::guiColors(ofxUIWidget *w){
-	w->setColorBack(ccomp1);
-	w->setColorFill(ccomp2);
-	w->setColorFillHighlight(ccomp4);
-	w->setColorOutline(ccomp2);
+	//vertical
+	float kinectHeight = (ofGetHeight() - 300)/2 - spacer*3;
+	float kinectWidth = kinectHeight*(640.0/480.0);
+	djRect = ofRectangle(spacer, 300+spacer, kinectWidth, kinectHeight);
+	audRect = ofRectangle(spacer, djRect.getMaxY() + spacer, kinectWidth, kinectHeight);
+
+	//horizontal
+
+	//float kinectWidth = (ofGetWidth() - guiWidth)/2 - spacer*3;
+	//float kinectHeight = kinectWidth * (480.0/640.0);
+	//djRect = ofRectangle(guiWidth + spacer, spacer, kinectWidth, kinectHeight);
+	//audRect = ofRectangle(djRect.getMaxX() + spacer, spacer,kinectWidth, kinectHeight);
+
 }
 
 void testApp::guiEvent(ofxUIEventArgs &e){
@@ -106,19 +146,19 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	*---------------------------------*/
 	if(name == "dJGod mode")
 	{
-		drawDJ = true;
+		mode = DJ;
 	}
 	else if(name == "physics mode")
 	{
-		drawDJ = false;
+		mode = PHYSICS;
 	}
 	else if(name == "audience mode")
 	{
-		drawDJ = false;
+		mode = AUD;
 	}
-	else if(name == "physics mashup")
+	else if(name == "video mashup")
 	{
-		drawDJ = false;
+		mode = VID;
 	}
 	/*---------------------------------*/
 
@@ -128,29 +168,34 @@ void testApp::guiEvent(ofxUIEventArgs &e){
     }
     if(name == "DJ"){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawDJ= toggle->getValue();
+        drawDJKinect = toggle->getValue();
     }
 	if(name == "AUDIENCE"){
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
-        drawAud= toggle->getValue();
+        drawAudKinect = toggle->getValue();
     }
-    else if(name == "Style1")
+    else if(name == "dJ depth threshold")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider1 = slider->getScaledValue(); 
 	}
-    else if(name == "Style2")
+    else if(name == "aud depth threshold")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}   
 }
-
+void testApp::guiColors(ofxUIWidget *w){
+	/*w->setColorBack(ccomp1);
+	w->setColorFill(ccomp2);
+	w->setColorFillHighlight(ccomp4);
+	w->setColorOutline(ccomp2);*/
+}
 void testApp::guiSetup(){
 
     float dim = 16;
 	float labelOffset = 20;
-	guiWidth = 700;
+	guiWidth = 600;
 	int guiHeight =300;
 	ofxUIWidget *w;
 
@@ -163,18 +208,19 @@ void testApp::guiSetup(){
     //ofxUi doesn't update your variables for you, so if you add any extra toggles,
     //make sure to add the corresponding vars to the gui catch all function below.  
     gui = new ofxUICanvas(0,0,guiWidth, guiHeight);
+	gui->setTheme(OFX_UI_THEME_ZOOLANDER);
 
 	w = gui->addWidgetDown(new ofxUILabel("AiVDJ", OFX_UI_FONT_LARGE)); guiColors(w);
-	gui->addWidgetDown(new ofxUISpacer(guiWidth - labelOffset, 2)); 
-	w = gui->addWidgetDown(new ofxUIRadio("MODES", names, OFX_UI_ORIENTATION_HORIZONTAL,dim*2,dim*2,0,-100) ); guiColors(w);
-    w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim)); guiColors(w);
+	w = gui->addWidgetDown(new ofxUISpacer(guiWidth - labelOffset, 2)); w->setColorFill(white);
+	w = gui->addWidgetDown(new ofxUIRadio("MODES", names, OFX_UI_ORIENTATION_HORIZONTAL,dim*2,dim*2,0,-100) );guiColors(w); 
+    w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUISlider(300, dim, 0,255, slider1, "Style1"),"RENDER"); guiColors(w);
-	w = gui->addWidgetSouthOf(new ofxUISlider(300, dim, 0,255, slider2, "Style2"),"Style1"); guiColors(w);
-	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJ, dim, dim),"Style2"); guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAud, dim, dim), "DJ"); guiColors(w);
-	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", 250, dim*2),"AUDIENCE"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 440, 1400, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
+	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
 
   
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
@@ -186,7 +232,7 @@ void testApp::exit()
     gui->saveSettings("GUI/guiSettings.xml");     
     delete gui; 
 
-	DJ.exit();
+	//DJ.exit();
 }
 
 //--------------------------------------------------------------

@@ -9,7 +9,6 @@
 class physicsMode{
 	public:
 		physicsMode();
-		~physicsMode();
 
 		void update();
 		void render();
@@ -21,7 +20,6 @@ class physicsMode{
 				ofColor col;
 
 				source();
-				~source();
 		};
 		class particle{
 			public:
@@ -31,7 +29,6 @@ class physicsMode{
 				ofColor col;
 
 				particle(ofVec3f _loc, float m);
-				~particle();
 
 				void update();
 				void repel(source s);

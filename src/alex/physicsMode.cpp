@@ -4,9 +4,6 @@
 physicsMode::physicsMode(){
 }
 
-physicsMode::~physicsMode(){
-}
-
 physicsMode::particle::particle(ofVec3f _loc, float m){
 	loc = _loc;
 	mass =m;
@@ -19,8 +16,6 @@ physicsMode::particle::particle(ofVec3f _loc, float m){
 	acc = ofVec3f(0,0,0);
 }
 
-physicsMode::particle::~particle(){
-}
 
 void physicsMode::particle::update(){
 	vel = vel+acc;
