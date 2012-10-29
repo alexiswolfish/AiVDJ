@@ -72,19 +72,10 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
-			{
 				Aud.update();
-			}
-			break;
-		case VID:
-			{
-			}
 			break;
 		default:
 		case PHYSICS:
-			{
-			}
-			break;
 		}
 }
 
