@@ -85,15 +85,6 @@ void testApp::update(){
 			{
 			}
 			break;
-			break;
-		case PHYSICS:
-			physics.addParticles(numParticles);
-			physics.update();
-			break;
-		case VID:
-			break;
-		default:
-			break;
 		}
 }
 
@@ -108,9 +99,11 @@ void testApp::draw(){
 			break;
 		case AUD:
 			{
+				Aud.draw();
 			}
 			break;
-		case PHYSICS:{
+		case PHYSICS:
+			{
 			physics.render();
 			}
 			break;
@@ -160,6 +153,7 @@ void testApp::keyPressed(int key){
 		DJMODE.DJkeyPressed(key);
 	} else if (drawAud) {
 		Aud.AudkeyPressed(key);
+		DJMODE.DJkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();
@@ -224,8 +218,9 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 	smoothedVol += 0.07 * curVol;
 	
 	bufferCounter++;
+	}
 	
-}
+
 
 void testApp::initRects(){
 	float spacer = 16;
@@ -314,6 +309,8 @@ void testApp::guiColors(ofxUIWidget *w){
 	w->setColorFill(ccomp2);
 	w->setColorFillHighlight(ccomp4);
 	w->setColorOutline(ccomp2);*/
+}
+
 }
 void testApp::guiSetup(){
 
