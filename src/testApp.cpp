@@ -63,6 +63,7 @@ void testApp::update(){
 	//if we are bigger the the size we want to record - lets drop the oldest value
 	if( volHistory.size() >= 400 ){
 		volHistory.erase(volHistory.begin(), volHistory.begin()+1);
+
 	}
 
 	/*-------Modes-----*/
@@ -71,14 +72,10 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
+				Aud.update();
 			break;
 		default:
 		case PHYSICS:
-			physics.addParticles(numParticles);
-			physics.update();
-			break;
-		case VID:
-			break;
 		}
 }
 
@@ -93,9 +90,11 @@ void testApp::draw(){
 			break;
 		case AUD:
 			{
+				Aud.draw();
 			}
 			break;
-		case PHYSICS:{
+		case PHYSICS:
+			{
 			physics.render();
 			}
 			break;
@@ -129,12 +128,22 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
+	} else if(drawAud){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
+		Aud.draw();
+		ofPopStyle();
 	}
+	
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
+		DJMODE.DJkeyPressed(key);
+	} else if (drawAud) {
+		Aud.AudkeyPressed(key);
 		DJMODE.DJkeyPressed(key);
 	}
 	if( key == 's' ){
@@ -200,8 +209,9 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 	smoothedVol += 0.07 * curVol;
 	
 	bufferCounter++;
+	}
 	
-}
+
 
 void testApp::initRects(){
 	float spacer = 16;
@@ -290,6 +300,8 @@ void testApp::guiColors(ofxUIWidget *w){
 	w->setColorFill(ccomp2);
 	w->setColorFillHighlight(ccomp4);
 	w->setColorOutline(ccomp2);*/
+}
+
 }
 void testApp::guiSetup(){
 
