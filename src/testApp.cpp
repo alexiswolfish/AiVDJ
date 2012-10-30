@@ -74,8 +74,6 @@ void testApp::update(){
 		case AUD:
 				Aud.update();
 			break;
-		case VID:
-			break;
 		default:
 		case PHYSICS:
 			physics.addParticles(numParticles);
