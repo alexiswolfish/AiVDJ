@@ -72,27 +72,14 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
-			{
 				Aud.update();
-			}
 			break;
 		case VID:
-			{
-			}
 			break;
 		default:
-		case PHYSICS:
-			{
-			}
-			break;
-			break;
 		case PHYSICS:
 			physics.addParticles(numParticles);
 			physics.update();
-			break;
-		case VID:
-			break;
-		default:
 			break;
 		}
 }
@@ -107,8 +94,7 @@ void testApp::draw(){
 			DJMODE.draw();
 			break;
 		case AUD:
-			{
-			}
+				Aud.draw();
 			break;
 		case PHYSICS:{
 			physics.render();
