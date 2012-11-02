@@ -49,6 +49,8 @@ void testApp::setup(){
 	scaledVol		= 0.0;
 
 	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+
+
 }
 
 //--------------------------------------------------------------
@@ -125,10 +127,14 @@ void testApp::draw(){
 		ofPopMatrix();
 	}
 	if(drawAudKinect){
-		ofPushStyle();
-		ofSetColor(white);
+		ofPushMatrix();
 		ofRect(audRect);
+		ofTranslate(audRect.x, audRect.y);
+		ofPushStyle();
+		DJMODE.kinect.drawDepth(0, 0, audRect.width, audRect.height);
+		DJMODE.kinect.draw(0, 0, audRect.width, audRect.height);
 		ofPopStyle();
+		ofPopMatrix();
 	}
 }
 
@@ -338,7 +344,8 @@ void testApp::exit()
     gui->saveSettings("GUI/guiSettings.xml");     
     delete gui; 
 
-	//DJ.exit();
+	DJMODE.exit();
+	//aud.exit();
 }
 
 //--------------------------------------------------------------

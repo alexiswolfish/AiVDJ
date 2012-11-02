@@ -25,21 +25,22 @@ void djMode::setup() {
 	kinect.init(true); // shows infrared instead of RGB video image
 	kinect.init(false, false); // disable video image (faster fps)
 	
-	kinect.open();		// opens first available kinect
+	//kinect.open();		// opens first available kinect
 	//kinect.open(1);	// open a kinect by id, starting with 0 (sorted by serial # lexicographically))
-	//kinect.open("A00362A08602047A");	// open a kinect using it's unique serial #
+	kinect.open("B00363262039047B");	// open a kinect using it's unique serial #
 	
 	colorImg.allocate(kinect.width, kinect.height);
 	
 	ofSetFrameRate(60);
 	
 	// zero the tilt on startup
-	angle = 0;
+	angle = 20;
 	kinect.setCameraTiltAngle(angle);
 	
 	// start from the front
 	bDrawMeshCloud = true;
 	bDrawPointCloud = false;
+	printf("serial:'%s'", kinect.getSerial());
 	
 }
 
@@ -59,16 +60,14 @@ void djMode::update(float depthLow, float depthHigh) {
 void djMode::draw() {
 	middleX = 320;
 	
+	easyCam.begin();
 	if(bDrawPointCloud) {
-		easyCam.begin();
 		drawPointCloud();
-		easyCam.end();
 	} 
 	else{
-		easyCam.begin();
 		drawMeshCloud();
-		easyCam.end();
 	}
+	easyCam.end();
 
 }
 
