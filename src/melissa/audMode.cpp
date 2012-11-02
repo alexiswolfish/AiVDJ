@@ -88,8 +88,10 @@ void audMode::draw() {
 	ofDisableAlphaBlending();
 	
 	easyCam.begin();
+	ofSetColor(0,255,255);
 	drawPointCloud();
 	easyCam.end();
+	
 	
 }
 
@@ -108,6 +110,8 @@ void audMode::drawPointCloud() {
 				mesh_r.addVertex(kinect.getWorldCoordinateAt(x, y));
 				mesh.addColor(ofColor(230, 230, 230, alpha));
 				mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+				ofVec3f tmp = kinect.getWorldCoordinateAt(x, y);
+				printf("%d %d %d\n", tmp.x, tmp.y, tmp.z );
 			}
 		}
 	}
@@ -135,6 +139,7 @@ void audMode::drawPointCloud() {
 	//mesh_r.drawFaces ();
 	glDisable(GL_DEPTH_TEST);
 	ofPopMatrix(); 
+
 }
 
 ofColor audMode::getColor(int x) {
