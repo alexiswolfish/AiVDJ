@@ -49,8 +49,29 @@ void testApp::setup(){
 	numParticles = 10;
 	/*-------Jake-------*/
 	DJMODE.setup();
+<<<<<<< HEAD
+=======
 	/*-----Melissa-----*/
 	Aud.setup();
+
+	/*-------Sound------*/
+	ofSetVerticalSync(true);
+	ofSetCircleResolution(80);
+	soundStream.listDevices();
+
+	int bufferSize = 256;
+
+	left.assign(bufferSize, 0.0);
+	right.assign(bufferSize, 0.0);
+	volHistory.assign(400, 0.0);
+	
+	bufferCounter	= 0;
+	drawCounter		= 0;
+	smoothedVol     = 0.0;
+	scaledVol		= 0.0;
+
+	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+>>>>>>> Melissa/master
 }
 
 
@@ -59,8 +80,19 @@ void testApp::update(){
 	/*-------Sound------*/
 	//lets scale the vol up to a 0-1 range 
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
+<<<<<<< HEAD
 	audio->addPoint(scaledVol*100);
+=======
 
+	//lets record the volume into an array
+	volHistory.push_back( scaledVol );
+	
+	//if we are bigger the the size we want to record - lets drop the oldest value
+	if( volHistory.size() >= 400 ){
+		volHistory.erase(volHistory.begin(), volHistory.begin()+1);
+
+	}
+>>>>>>> Melissa/master
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -124,7 +156,13 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
-	}
+	}/* else if(drawAud){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
+		Aud.draw();
+		ofPopStyle();
+	}*/
 	
 }
 
