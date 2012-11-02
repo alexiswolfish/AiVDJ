@@ -55,7 +55,7 @@ void audMode::setup() {
 //--------------------------------------------------------------
 void audMode::update() {
 	
-	//ofBackground(100, 100, 100);
+	ofBackground(100, 100, 100);
 	
 	kinect.update();
 	
@@ -83,6 +83,10 @@ void audMode::update() {
 
 //--------------------------------------------------------------
 void audMode::draw() {
+	ofEnableAlphaBlending();
+	ofBackground(50,1);
+	ofDisableAlphaBlending();
+	
 	easyCam.begin();
 	drawPointCloud();
 	easyCam.end();
@@ -100,9 +104,9 @@ void audMode::drawPointCloud() {
 	for(int y = 0; y < h; y += step) {
 		for(int x = 0; x < w; x += step) {
 			if(kinect.getDistanceAt(x, y) > 0) {
-				mesh_r.addColor(ofColor(0, 0, 0));
+				mesh_r.addColor(ofColor(255, 255, 255, alpha));
 				mesh_r.addVertex(kinect.getWorldCoordinateAt(x, y));
-				mesh.addColor(ofColor(0, 0, 0));
+				mesh.addColor(ofColor(230, 230, 230, alpha));
 				mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
 			}
 		}
@@ -111,8 +115,8 @@ void audMode::drawPointCloud() {
 	ofPushMatrix();
 	// the projected points are 'upside down' and 'backwards' 
 	ofScale(-1, -1, -1);
-	//ofTranslate(w/2, 0, -1000); // center the points a bit
-	ofTranslate(0, 0, -1000); // center the points a bit
+	ofTranslate(w/2, 0, -1000); // center the points a bit
+	//ofTranslate(0, 0, -1000); // center the points a bit
 	glEnable(GL_DEPTH_TEST);
 	int counter = 0;
 	mesh.drawVertices(); 
@@ -120,16 +124,17 @@ void audMode::drawPointCloud() {
 	glDisable(GL_DEPTH_TEST);
 	ofPopMatrix();
 	
-	/*
+	
 	glPointSize(1);
 	ofPushMatrix();
 	// the projected points are 'upside down' and 'backwards' 
 	ofScale(1, -1, -1);
 	ofTranslate(-w/2, 0, -1000); // center the points a bit
+	glEnable(GL_DEPTH_TEST);
 	mesh_r.drawVertices();
 	//mesh_r.drawFaces ();
 	glDisable(GL_DEPTH_TEST);
-	ofPopMatrix(); */
+	ofPopMatrix(); 
 }
 
 ofColor audMode::getColor(int x) {

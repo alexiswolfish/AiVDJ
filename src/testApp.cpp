@@ -130,13 +130,13 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
-	} else if(drawAud){
+	}/* else if(drawAud){
 		ofPushStyle();
 		ofSetColor(ccomp5);
 		
 		Aud.draw();
 		ofPopStyle();
-	}
+	}*/
 	
 }
 
