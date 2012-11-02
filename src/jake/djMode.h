@@ -54,8 +54,6 @@ public:
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 
-	int nearThreshold;
-	int farThreshold;
 	
 	int angle;
 	

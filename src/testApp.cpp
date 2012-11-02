@@ -31,6 +31,8 @@ void testApp::setup(){
 	numParticles = 10;
 	/*-------Jake-------*/
 	DJMODE.setup();
+	/*-----Melissa-----*/
+	Aud.setup();
 
 	/*-------Sound------*/
 	ofSetVerticalSync(true);
@@ -72,7 +74,7 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
-				Aud.update();
+			Aud.update();
 			break;
 		default:
 		case PHYSICS:
@@ -92,7 +94,7 @@ void testApp::draw(){
 			DJMODE.draw();
 			break;
 		case AUD:
-				Aud.draw();
+			Aud.draw();
 			break;
 		case PHYSICS:{
 			physics.render();
