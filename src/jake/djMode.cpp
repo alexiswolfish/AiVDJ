@@ -135,7 +135,7 @@ void djMode::drawMeshCloud() {
 	int h = 480;
 	ofMesh mesh;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 2;
+	int step = 2; // try higher steps 
 	//ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
 	int rand1 = ofRandom(128.0, 255.0);
 	for(int y = 0; y < h; y += step) {
