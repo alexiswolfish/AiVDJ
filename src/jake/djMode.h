@@ -54,6 +54,7 @@ public:
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 
+	
 	int angle;
 	
 	// used for viewing the point cloud
