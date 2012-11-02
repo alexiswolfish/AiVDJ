@@ -49,6 +49,8 @@ void testApp::setup(){
 	numParticles = 10;
 	/*-------Jake-------*/
 	DJMODE.setup();
+	/*-----Melissa-----*/
+	Aud.setup();
 }
 
 
@@ -59,19 +61,19 @@ void testApp::update(){
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
 	audio->addPoint(scaledVol*100);
 
+
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
+			Aud.update();
 			break;
 		default:
 		case PHYSICS:
 			physics.addParticles(numParticles);
 			physics.update();
-			break;
-		case VID:
 			break;
 		}
 }
@@ -86,8 +88,7 @@ void testApp::draw(){
 			DJMODE.draw();
 			break;
 		case AUD:
-			{
-			}
+			Aud.draw();
 			break;
 		case PHYSICS:{
 			physics.render();
@@ -123,13 +124,22 @@ void testApp::draw(){
 		ofSetColor(white);
 		ofRect(audRect);
 		ofPopStyle();
-	}
+	}/* else if(drawAud){
+		ofPushStyle();
+		ofSetColor(ccomp5);
+		
+		Aud.draw();
+		ofPopStyle();
+	}*/
+	
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
+	} else if (drawAud) {
+		Aud.AudkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();

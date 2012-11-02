@@ -53,6 +53,7 @@ void djMode::update(float depthLow, float depthHigh) {
 	Zlow = depthLow;
 	Zhigh = depthHigh;
 	
+
 }
 
 //--------------------------------------------------------------

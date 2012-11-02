@@ -5,6 +5,7 @@
 
 #include "alex/physicsMode.h"
 #include "jake/djMode.h"
+#include "melissa/audMode.h"
 
 class testApp : public ofBaseApp{
 
@@ -53,6 +54,9 @@ class testApp : public ofBaseApp{
 		int numParticles;
 		/*-----------Jake-----------*/
 		djMode DJMODE;
+		/*-----------Melissa-----------*/
+		audMode Aud;
+
 
 		/*-----------Sound-----------*/
 		void audioIn(float * input, int bufferSize, int nChannels); 
@@ -73,4 +77,5 @@ class testApp : public ofBaseApp{
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;
+	
 };
