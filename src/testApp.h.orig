@@ -38,8 +38,13 @@ class testApp : public ofBaseApp{
 		void exit();
 
 		ofxUICanvas *gui;
-		float guiWidth, guiHeight;
+<<<<<<< HEAD
+		float guiWidth;
 		float slider2, DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
+=======
+		float guiWidth, guiHeight;
+		float slider1, slider2; //change these after you decide what they're for
+>>>>>>> 8e35e10222f60f341be9adeebdee8b6de9f12540
 		bool drawDJ, drawAud, drawDisplay;
 		bool drawDJKinect, drawAudKinect;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;

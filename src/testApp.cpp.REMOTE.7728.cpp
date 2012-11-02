@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
+	/*--------GUI-----------*/
 	//init color palette
 	cmain.setHex(0xe6e6e6); //background grey
 	ccomp1.setHex(0xd4ddd4); //highlight green
@@ -12,25 +13,6 @@ void testApp::setup(){
 	ccomp5.setHex(0x5f5f5f); //dark grey
 	white = ofColor(255,255,255);
 
-	/*-------Sound------*/
-	ofSetVerticalSync(true);
-	ofSetCircleResolution(80);
-	soundStream.listDevices();
-
-	int bufferSize = 256;
-
-	left.assign(bufferSize, 0.0);
-	right.assign(bufferSize, 0.0);
-	//volHistory.assign(400, 0.0);
-
-	bufferCounter	= 0;
-	drawCounter		= 0;
-	smoothedVol     = 0.0;
-	scaledVol		= 0.0;
-
-	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
-
-	/*--------GUI-----------*/
 	drawDJKinect = false;
 	drawAudKinect = false;
 	drawDisplay = true;
@@ -44,34 +26,29 @@ void testApp::setup(){
 	initRects();
 	ofEnableSmoothing();
 
-	/*-------Alex------*/
-	physics.setup();
-	numParticles = 10;
 	/*-------Jake-------*/
 	DJMODE.setup();
-}
 
+}
 
 //--------------------------------------------------------------
 void testApp::update(){
-	/*-------Sound------*/
-	//lets scale the vol up to a 0-1 range 
-	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
-	audio->addPoint(scaledVol*100);
-
-	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
+			{
+			}
+			break;
+		case VID:
+			{
+			}
 			break;
 		default:
 		case PHYSICS:
-			physics.addParticles(numParticles);
-			physics.update();
-			break;
-		case VID:
+			{
+			}
 			break;
 		}
 }
@@ -89,8 +66,8 @@ void testApp::draw(){
 			{
 			}
 			break;
-		case PHYSICS:{
-			physics.render();
+		case PHYSICS:
+			{
 			}
 			break;
 		case VID:
@@ -131,13 +108,6 @@ void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
 	}
-	if( key == 's' ){
-		soundStream.start();
-	}
-	
-	if( key == 'e' ){
-		soundStream.stop();
-	}
 }
 
 //--------------------------------------------------------------
@@ -162,48 +132,16 @@ void testApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
-	ofRectangle guiRect = ofRectangle(0,0,guiWidth, guiHeight);
-	if(!guiRect.inside(ofVec2f(x,y)))
-		physics.mousePressed( sourceType, ofVec3f(x,y,0));
-}
 
-void testApp::audioIn(float * input, int bufferSize, int nChannels){	
-	
-	float curVol = 0.0;
-	
-	// samples are "interleaved"
-	int numCounted = 0;	
-
-	//lets go through each sample and calculate the root mean square which is a rough way to calculate volume	
-	for (int i = 0; i < bufferSize; i++){
-		left[i]		= input[i*2]*0.5;
-		right[i]	= input[i*2+1]*0.5;
-
-		curVol += left[i] * left[i];
-		curVol += right[i] * right[i];
-		numCounted+=2;
-	}
-	
-	//this is how we get the mean of rms :) 
-	curVol /= (float)numCounted;
-	
-	// this is how we get the root of rms :) 
-	curVol = sqrt( curVol );
-	
-	smoothedVol *= 0.93;
-	smoothedVol += 0.07 * curVol;
-	
-	bufferCounter++;
-	
 }
 
 void testApp::initRects(){
 	float spacer = 16;
 
 	//vertical
-	float kinectHeight = (ofGetHeight() - guiHeight)/2 - spacer*3;
+	float kinectHeight = (ofGetHeight() - 300)/2 - spacer*3;
 	float kinectWidth = kinectHeight*(640.0/480.0);
-	djRect = ofRectangle(spacer, guiHeight+spacer, kinectWidth, kinectHeight);
+	djRect = ofRectangle(spacer, 300+spacer, kinectWidth, kinectHeight);
 	audRect = ofRectangle(spacer, djRect.getMaxY() + spacer, kinectWidth, kinectHeight);
 
 	//horizontal
@@ -266,18 +204,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}     
-	/*----Particle Sliders-----*/
-	else if (name == "particle rebirth")
-	{
-		ofxUIRotarySlider *r = (ofxUIRotarySlider *)e.widget;
-		numParticles = r->getScaledValue();
-	}
-	else if (name == "emit")
-		sourceType = physicsMode::source::EMIT;
-	else if (name == "sink")
-		sourceType = physicsMode::source::SINK;
-	else if (name == "orbit")
-		sourceType = physicsMode::source::ORBIT;
 }
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
@@ -290,7 +216,7 @@ void testApp::guiSetup(){
     float dim = 16;
 	float labelOffset = 20;
 	guiWidth = 600;
-	guiHeight = 400;
+	int guiHeight =300;
 	ofxUIWidget *w;
 
 	vector<string> names;
@@ -298,15 +224,6 @@ void testApp::guiSetup(){
     names.push_back("dJGod mode");
 	names.push_back("video mashup");
 	names.push_back("audience mode");
-
-	vector<string> particleModes;
-	particleModes.push_back("emit");
-	particleModes.push_back("sink");
-	particleModes.push_back("orbit");
-
-	int buffersize = 400;
-	for(int i=0; i<buffersize; i++)
-		volHistory.push_back(0);
 
     //ofxUi doesn't update your variables for you, so if you add any extra toggles,
     //make sure to add the corresponding vars to the gui catch all function below.  
@@ -324,10 +241,12 @@ void testApp::guiSetup(){
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 200, numParticles, "particle rebirth"),"input");guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
-    audio = (ofxUIMovingGraph *) gui->addWidgetSouthOf(new ofxUIMovingGraph(dim*12, 64, volHistory, buffersize, -100, 100, "Volume"),"input"); 
+	// add slider for title angle (up/down)
+	// add something to control viewing angle 
+
+  
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
+   
 }
 //--------------------------------------------------------------
 void testApp::exit()
