@@ -3,7 +3,6 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 
-	/*--------GUI-----------*/
 	//init color palette
 	cmain.setHex(0xe6e6e6); //background grey
 	ccomp1.setHex(0xd4ddd4); //highlight green
@@ -13,6 +12,25 @@ void testApp::setup(){
 	ccomp5.setHex(0x5f5f5f); //dark grey
 	white = ofColor(255,255,255);
 
+	/*-------Sound------*/
+	ofSetVerticalSync(true);
+	ofSetCircleResolution(80);
+	soundStream.listDevices();
+
+	int bufferSize = 256;
+
+	left.assign(bufferSize, 0.0);
+	right.assign(bufferSize, 0.0);
+	//volHistory.assign(400, 0.0);
+
+	bufferCounter	= 0;
+	drawCounter		= 0;
+	smoothedVol     = 0.0;
+	scaledVol		= 0.0;
+
+	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+
+	/*--------GUI-----------*/
 	drawDJKinect = false;
 	drawAudKinect = false;
 	drawDisplay = true;
@@ -50,22 +68,19 @@ void testApp::setup(){
 
 	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
 
+	/*-----Melissa-----*/
+	Aud.setup();
 
 }
+
 
 //--------------------------------------------------------------
 void testApp::update(){
 	/*-------Sound------*/
 	//lets scale the vol up to a 0-1 range 
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
+	audio->addPoint(scaledVol*100);
 
-	//lets record the volume into an array
-	volHistory.push_back( scaledVol );
-	
-	//if we are bigger the the size we want to record - lets drop the oldest value
-	if( volHistory.size() >= 400 ){
-		volHistory.erase(volHistory.begin(), volHistory.begin()+1);
-	}
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -73,13 +88,12 @@ void testApp::update(){
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
 			break;
 		case AUD:
+			Aud.update();
 			break;
 		default:
 		case PHYSICS:
 			physics.addParticles(numParticles);
 			physics.update();
-			break;
-		case VID:
 			break;
 		}
 }
@@ -94,8 +108,7 @@ void testApp::draw(){
 			DJMODE.draw();
 			break;
 		case AUD:
-			{
-			}
+			Aud.draw();
 			break;
 		case PHYSICS:{
 			physics.render();
@@ -136,12 +149,15 @@ void testApp::draw(){
 		ofPopStyle();
 		ofPopMatrix();
 	}
+
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
+	} else if (drawAud) {
+		Aud.AudkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();
@@ -316,6 +332,10 @@ void testApp::guiSetup(){
 	particleModes.push_back("sink");
 	particleModes.push_back("orbit");
 
+	int buffersize = 400;
+	for(int i=0; i<buffersize; i++)
+		volHistory.push_back(0);
+
     //ofxUi doesn't update your variables for you, so if you add any extra toggles,
     //make sure to add the corresponding vars to the gui catch all function below.  
     gui = new ofxUICanvas(0,0,guiWidth, guiHeight);
@@ -334,9 +354,8 @@ void testApp::guiSetup(){
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 200, numParticles, "particle rebirth"),"input");guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
-   //audio = (ofxUIMovingGraph *) gui->addWidgetWestOf(new ofxUIMovingGraph(dim*10, 64, volHistory, 400, -1000, 1000, "Volume"),"particle rebirth"); 
+    audio = (ofxUIMovingGraph *) gui->addWidgetSouthOf(new ofxUIMovingGraph(dim*12, 64, volHistory, buffersize, -100, 100, "Volume"),"input"); 
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
-   
 }
 //--------------------------------------------------------------
 void testApp::exit()
@@ -345,7 +364,7 @@ void testApp::exit()
     delete gui; 
 
 	DJMODE.exit();
-	//aud.exit();
+	Aud.exit();
 }
 
 //--------------------------------------------------------------
