@@ -68,6 +68,13 @@ void testApp::update(){
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
 	audio->addPoint(scaledVol*100);
 
+	/*-------kinect side displays------*/
+	if(drawDJKinect){
+		DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+	}
+	if(drawAudKinect){
+		Aud.update();
+	}
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -82,7 +89,7 @@ void testApp::update(){
 			physics.addParticles(numParticles);
 			physics.update();
 			break;
-		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -135,8 +142,8 @@ void testApp::draw(){
 		ofRect(audRect);
 		ofTranslate(audRect.x, audRect.y);
 		ofPushStyle();
-		DJMODE.kinect.drawDepth(0, 0, audRect.width, audRect.height);
-		DJMODE.kinect.draw(0, 0, audRect.width, audRect.height);
+		Aud.kinect.drawDepth(0, 0, audRect.width, audRect.height);
+		Aud.kinect.draw(0, 0, audRect.width, audRect.height);
 		ofPopStyle();
 		ofPopMatrix();
 	}
