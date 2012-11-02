@@ -17,6 +17,12 @@ void testApp::setup(){
 	ofSetCircleResolution(80);
 	soundStream.listDevices();
 
+	// 0 output channels, 
+	// 2 input channels
+	// 44100 samples per second
+	// 256 samples per buffer
+	// 4 num buffers (latency)
+
 	int bufferSize = 256;
 
 	left.assign(bufferSize, 0.0);
@@ -45,7 +51,7 @@ void testApp::setup(){
 
 	/*-------Alex------*/
 	physics.setup();
-	numParticles = 10;
+	numParticles = 0;
 	/*-------Jake-------*/
 //	DJ.setup();
 }
@@ -79,6 +85,9 @@ void testApp::update(){
 void testApp::draw(){
 	ofBackground(cmain);
 
+	//sound
+	drawVolGraphs();
+	//modes
 	if(drawDisplay){
 		switch(mode){
 		case DJ:
@@ -122,6 +131,52 @@ void testApp::draw(){
 	}
 }
 
+void testApp::drawVolGraphs(){
+	// draw the left channel:
+	float rectWidth = 512;
+	float rectHeight = 150;
+	float spacer = 16;
+
+	ofPushStyle();
+		ofPushMatrix();
+		ofNoFill();
+		ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*2 + spacer*2), 0);
+			
+		ofSetColor(white);
+		ofDrawBitmapString("Left Channel", 4, 18);
+		
+		ofSetLineWidth(1);	
+		ofRect(0, 0, rectWidth, rectHeight);
+
+		ofSetColor(245, 58, 135);
+		ofSetLineWidth(3);
+					
+			ofBeginShape();
+			for (int i = 0; i < left.size(); i++){
+				ofVertex(i*2, 100 -left[i]*180.0f);
+			}
+			ofEndShape(false);
+
+		ofTranslate(0, rectHeight + spacer, 0);
+			
+		ofSetColor(white);
+		ofDrawBitmapString("Right Channel", 4, 18);
+		
+		ofSetLineWidth(1);	
+		ofRect(0, 0, rectWidth, rectHeight);
+
+		ofSetColor(245, 58, 135);
+		ofSetLineWidth(3);
+					
+			ofBeginShape();
+			for (int i = 0; i < right.size(); i++){
+				ofVertex(i*2, 100 -right[i]*180.0f);
+			}
+			ofEndShape(false);
+			
+		ofPopMatrix();
+	ofPopStyle();
+}
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(drawDJ){
