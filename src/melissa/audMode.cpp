@@ -24,13 +24,13 @@ void audMode::setup() {
 	//c5.setHex(0xC8C8A9); //Timothy Hay
 	alpha = 255;
 	
-	
-	// enable depth->video image calibration
-	kinect.setRegistration(true);
-    
-	kinect.init();
-	kinect.init(true); // shows infrared instead of RGB video image
-	kinect.init(false, false); // disable video image (faster fps)
+	//
+	//// enable depth->video image calibration
+	//kinect.setRegistration(true);
+ //   
+	//kinect.init();
+	//kinect.init(true); // shows infrared instead of RGB video image
+	//kinect.init(false, false); // disable video image (faster fps)
 	
 	kinect.open();		// opens first available kinect
 	

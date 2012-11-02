@@ -49,25 +49,6 @@ void testApp::setup(){
 	numParticles = 10;
 	/*-------Jake-------*/
 	DJMODE.setup();
-
-	/*-------Sound------*/
-	ofSetVerticalSync(true);
-	ofSetCircleResolution(80);
-	soundStream.listDevices();
-
-	int bufferSize = 256;
-
-	left.assign(bufferSize, 0.0);
-	right.assign(bufferSize, 0.0);
-	volHistory.assign(400, 0.0);
-	
-	bufferCounter	= 0;
-	drawCounter		= 0;
-	smoothedVol     = 0.0;
-	scaledVol		= 0.0;
-
-	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
-
 	/*-----Melissa-----*/
 	Aud.setup();
 
