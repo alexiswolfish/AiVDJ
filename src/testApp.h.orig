@@ -4,7 +4,8 @@
 #include "ofxUI.h"
 
 #include "alex/physicsMode.h"
-//#include "jake/djMode.h"
+#include "jake/djMode.h"
+#include "melissa/audMode.h"
 
 class testApp : public ofBaseApp{
 
@@ -39,7 +40,7 @@ class testApp : public ofBaseApp{
 
 		ofxUICanvas *gui;
 		float guiWidth, guiHeight;
-		float slider1, slider2; //change these after you decide what they're for
+		float slider2, DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
 		bool drawDJ, drawAud, drawDisplay;
 		bool drawDJKinect, drawAudKinect;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;
@@ -51,20 +52,14 @@ class testApp : public ofBaseApp{
 		/*-----------Alex-----------*/
 		physicsMode physics;
 		physicsMode::source::Type sourceType;
-
+		int numParticles;
 		/*-----------Jake-----------*/
-//		djMode DJ;
+		djMode DJMODE;
+		/*-----------Melissa-----------*/
+		audMode Aud;
+
 
 		/*-----------Sound-----------*/
-		/*
-			sub bass : 0 > 100hz
-			mid bass : 80 > 500hz
-			mid range: 400 > 2khz
-			upper mid: 1k > 6khz
-			high freq: 4k > 12khz
-			Very high freq: 10k > 20khz and above
-		*/
-
 		void audioIn(float * input, int bufferSize, int nChannels); 
 		void drawVolGraphs();
 
@@ -82,4 +77,10 @@ class testApp : public ofBaseApp{
 
 		ofxUIMovingGraph *audio;
 
+<<<<<<< HEAD
+		/*-----------Test Variables-----------*/
+	int r,g,b;
+	
+=======
+>>>>>>> noKinect
 };

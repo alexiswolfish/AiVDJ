@@ -41,9 +41,6 @@ void testApp::setup(){
 	drawAudKinect = false;
 	drawDisplay = true;
 	mode = PHYSICS;
-	
-	slider1 = 80;
-	slider2 = 200;
 
 	guiSetup();
 	initRects();
@@ -72,6 +69,7 @@ void testApp::update(){
 			break;
 		case PHYSICS:
 			physics.addParticles(numParticles);
+			physics.updateSources(scaledVol * 190.0f);
 			physics.update();
 			break;
 		case VID:

@@ -2,6 +2,7 @@
 
 physicsMode::physicsMode(){
 	birthRate = 50;
+	maxParticles = 1000;
 }
 
 void physicsMode::mousePressed(source::Type t, ofVec3f pos){
@@ -10,19 +11,20 @@ void physicsMode::mousePressed(source::Type t, ofVec3f pos){
 
 void physicsMode::setup(){
 	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::ORBIT));
+	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::SINK));
 	addParticles(1000);
-	printf("%d", particles.size());
 }
 
 void physicsMode::addParticles(int amt){
+	if(particles.size() < maxParticles){
 	for(int i=0; i<amt; i++)
-		particles.push_back(particle());
+		particles.push_back(particle());}
 }
 
 void physicsMode::update(){
 	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
 		for(vector<particle>::iterator p = particles.begin(); p != particles.end(); ++p){
-			p->applyForce(*e,400);
+			p->applyForce(*e, e->mass*10);
 			p->update();
 		}
 	}
@@ -40,6 +42,13 @@ void physicsMode::render(){
 	}
 	for(vector<particle>::iterator p = particles.begin(); p != particles.end(); p++)
 		p->render();
+}
+
+void physicsMode::updateSources(float vol){
+	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
+		e->radius = vol;
+		e->mass = vol;
+	}
 }
 
 /*--------------------------------*
@@ -62,8 +71,8 @@ void physicsMode::source::render(){
 	if(type == EMIT)
 		ofSetColor(0,255,255);
 	else
-		ofSetColor(255,0,20);
-	ofEllipse(loc.x, loc.y, 10, 10);
+		ofSetColor(255,0,255);
+	ofCircle(loc.x, loc.y, radius);
 	ofPopStyle();
 }
 
@@ -76,7 +85,7 @@ physicsMode::particle::particle(){
 	maxSpeed = 200;
 	magnitude = 0;
 	angle = 0;
-	death = 0.8;
+	death = 0.96;
 	age = 0;
 	lifespan = 1000;
 	isDead = false;
@@ -146,6 +155,7 @@ void physicsMode::particle::applyForce(source a, float range){
 		}
 		else{
 			//orbit
+			float F = mass * a.mass;
 			dirToPull = dirToPull.normalize();
 			ofVec3f tanForce = ofVec3f(dirToPull.y, - dirToPull.x, 0);
 			tanForce = tanForce * (deathThresh*10);

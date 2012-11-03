@@ -47,17 +47,18 @@ class physicsMode{
 				float findAngle(float x, float y);
 		};
 
+		vector<source> sources;
+		vector<particle> particles;
+		int birthRate, maxParticles;
 
 		physicsMode();
 
 		void setup();
 		void update();
 		void render();
+		void updateSources(float vol);
 
 		void addParticles(int amt);	
 
 		void mousePressed(source::Type t, ofVec3f loc);
-		vector<source> sources;
-		vector<particle> particles;
-		int birthRate;
 	};
