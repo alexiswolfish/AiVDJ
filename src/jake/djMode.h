@@ -13,7 +13,7 @@ public:
 	~djMode();
 	
 	void setup();
-	void update(float depthLow, float depthHigh);
+	void update(float depthLow, float depthHigh, float testVar);
 	void draw();
 	void exit();
 	
@@ -36,7 +36,7 @@ public:
 	};
 	vector<DJpoint>DJpoints;
 
-	float Zlow, Zhigh;
+	float Zlow, Zhigh, testVar;
 	ofVec3f maxY;
 	int middleX;
 
