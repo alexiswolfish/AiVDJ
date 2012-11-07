@@ -17,44 +17,62 @@ djMode::~djMode(){
 
 void djMode::setup() {
 	ofSetLogLevel(OF_LOG_VERBOSE);
-	
-	// enable depth->video image calibration
+	//
+	//// enable depth->video image calibration
 	kinect.setRegistration(true);
-    
+ //   
 	kinect.init();
-	kinect.init(true); // shows infrared instead of RGB video image
-	kinect.init(false, false); // disable video image (faster fps)
-	
-	//kinect.open();		// opens first available kinect
-	//kinect.open(1);	// open a kinect by id, starting with 0 (sorted by serial # lexicographically))
+	//kinect.init(true); // shows infrared instead of RGB video image
+	//kinect.init(false, false); // disable video image (faster fps)
+	//
+	////kinect.open();		// opens first available kinect
+	////kinect.open(1);	// open a kinect by id, starting with 0 (sorted by serial # lexicographically))
 	kinect.open();
-	//kinect.open("B00363262039047B");	// open a kinect using it's unique serial #
-	
-	//colorImg.allocate(kinect.width, kinect.height);
+	////kinect.open("B00363262039047B");	// open a kinect using it's unique serial #
+	//
+	////colorImg.allocate(kinect.width, kinect.height);
 
 	ofBackground(100, 100, 100);
-	
+	//
 	ofSetFrameRate(60);
-	
-	// zero the tilt on startup
-	angle = 20;
-	kinect.setCameraTiltAngle(angle);
-	
-	// start from the front
-	bDrawMeshCloud = false;
-	bDrawPointCloud = false;
-	//printf("serial:'%s'", kinect.getSerial());
-	//easyCam.tilt(20);
 
-	ofFbo::Settings s;
-	s.width = ofGetScreenWidth();
-	s.height = ofGetScreenHeight();
-	s.internalformat = GL_RGBA;
-	s.useDepth = true;
-	testfbo.allocate(s);
-	testfbo.begin();
-	ofClear(255,255,255, 0);
-	testfbo.end();
+	ofEnableSmoothing();
+
+	cols = 640 / CLOTH_RES;
+    rows = 480 / CLOTH_RES;
+    
+    controller.init(cols,rows);
+    controller.initMesh();
+ 
+    
+    oldMouseX = -999;
+    oldMouseY = -999;
+
+    tex.loadImage("texture-brick.png");
+    
+    shader.load("shader");
+    
+    directional.setDirectional();
+	//
+	//// zero the tilt on startup
+	//angle = 20;
+	//kinect.setCameraTiltAngle(angle);
+	//
+	//// start from the front
+	//bDrawMeshCloud = false;
+	//bDrawPointCloud = false;
+	////printf("serial:'%s'", kinect.getSerial());
+	////easyCam.tilt(20);
+
+	//ofFbo::Settings s;
+	//s.width = ofGetScreenWidth();
+	//s.height = ofGetScreenHeight();
+	//s.internalformat = GL_RGBA;
+	//s.useDepth = true;
+	//testfbo.allocate(s);
+	//testfbo.begin();
+	//ofClear(255,255,255, 0);
+	//testfbo.end();
 }
 
 //--------------------------------------------------------------
@@ -63,14 +81,38 @@ void djMode::update(float depthLow, float depthHigh, float newslider) {
 	
 	kinect.update();
 
-	Zlow = depthLow;
-	Zhigh = depthHigh;
-	testVar = newslider;
+	//Zlow = depthLow;
+	//Zhigh = depthHigh;
+	//testVar = newslider;
 
-	ofEnableAlphaBlending();
-	testfbo.begin();
-		makeFBO();
-	testfbo.end();
+	//ofEnableAlphaBlending();
+	//testfbo.begin();
+	//	makeFBO();
+	//testfbo.end();
+	for(int i=0;i<cols*rows;i++) {
+        
+        int x = int(i) % cols;
+        int y = int(i) / cols;
+        
+        if(y == cols-1) continue;
+              
+        float d = kinect.getDistanceAt(x*CLOTH_RES, y*CLOTH_RES);
+        
+        if(d >0 && d < 1000) {
+            
+            d = ofMap(d,0,4000,0,30);
+                            
+            ofVec3f ff = ofVec3f(0,0.0,d);
+            ff.normalize();
+            ff *= 3.0;
+                  
+            controller.particles[i]->addForce(ff);
+       }
+    }
+   
+    controller.update();
+    controller.updateMesh();
+    controller.updateMeshNormals();
 }
 
 //--------------------------------------------------------------
@@ -127,23 +169,34 @@ void djMode::makeFBO(){
 
 void djMode::draw() {
 	//middleX = 320;
-	ofBackground(95, 100);
-	
-	if(bDrawPointCloud) {
-		easyCam.begin();
-		drawPointCloud();
-		easyCam.end();
-	} 
-	else if (bDrawMeshCloud){
-		easyCam.begin();
-		drawMeshCloud();
-		easyCam.end();
-	}
-	else{
-		ofSetColor(255, 25, 255);
-		testfbo.draw(0,0);
-	}
-	
+	//ofBackground(95, 100);
+	//
+	//if(bDrawPointCloud) {
+	//	easyCam.begin();
+	//	drawPointCloud();
+	//	easyCam.end();
+	//} 
+	//else if (bDrawMeshCloud){
+	//	easyCam.begin();
+	//	drawMeshCloud();
+	//	easyCam.end();
+	//}
+	//else{
+	//	ofSetColor(255, 25, 255);
+	//	testfbo.draw(0,0);
+	//}
+	//
+	glEnable(GL_DEPTH_TEST);
+    ofEnableLighting();
+    directional.enable();
+    ofTranslate(ofGetWidth()/2-cols*CLOTH_RES/2, 100,0);
+    ofBackground(0);
+    shader.begin();
+    shader.setUniformTexture("tex", tex.getTextureReference(), 0);
+    controller.drawMesh();
+    shader.end();
+    directional.disable();
+    ofDisableLighting();
 
 }
 
@@ -318,7 +371,11 @@ void djMode::DJmouseDragged(int x, int y, int button)
 
 //--------------------------------------------------------------
 void djMode::DJmousePressed(int x, int y, int button)
-{}
+{
+    ofVec3f f = ofVec3f(0,0,50);
+    
+    controller.particles[200]->addForce(f);
+}
 
 //--------------------------------------------------------------
 void djMode::DJmouseReleased(int x, int y, int button)
@@ -327,3 +384,9 @@ void djMode::DJmouseReleased(int x, int y, int button)
 //--------------------------------------------------------------
 void djMode::DJwindowResized(int w, int h)
 {}
+
+void djMode::mouseMoved(int x, int y ){
+    directional.setPosition(x, y, 100);
+    
+}
+

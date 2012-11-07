@@ -220,7 +220,7 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
+	if(drawDJ){DJMODE.mouseMoved(x,y);}
 }
 
 //--------------------------------------------------------------
