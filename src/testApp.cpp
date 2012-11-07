@@ -73,7 +73,8 @@ void testApp::update(){
 			break;
 		case PHYSICS:
 			physics.addParticles(numParticles);
-			physics.updateSources(scaledVol * 190.0f);
+			//physics.updateSources(scaledVol * 190.0f);
+			physics.updateSources(left[4]*180.0f);
 			physics.update();
 			break;
 		case VID:
@@ -251,11 +252,13 @@ void testApp::mouseReleased(int x, int y, int button){
 }
 
 void testApp::audioReceived(float* input, int bufferSize, int nChannels) {
+
     bd.audioReceived(input, bufferSize);
+
 }
 
 void testApp::audioIn(float * input, int bufferSize, int nChannels){	
-	 bd.audioReceived(input, bufferSize);
+	// bd.audioReceived(input, bufferSize);
 
 	float curVol = 0.0;
 	int numCounted = 0;	
@@ -267,6 +270,7 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 		curVol += left[i] * left[i];
 		curVol += right[i] * right[i];
 		numCounted+=2;
+
 	}
 	//mean rms
 	curVol /= (float)numCounted;
@@ -277,7 +281,7 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 	bufferCounter++;
 	
 	/*------Beat Detection-------*/
-	//bd.audioReceived(input, bufferSize);
+	bd.audioReceived(input, bufferSize);
 }
 
 void testApp::initRects(){

@@ -122,7 +122,7 @@ void physicsMode::source::render(){
 		ofSetColor(255,0,255);
 	}
 	float imgRad = radius*2 +20;
-	//ofCircle(loc.x, loc.y, radius);
+//	ofCircle(loc.x, loc.y, 100);
 	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
 	ofPopStyle();
 }
