@@ -70,7 +70,7 @@ void testApp::update(){
 
 	/*-------kinect side displays------*/
 	if(drawDJKinect){
-		DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh, testItt);
+		DJMODE.update();
 	}
 	if(drawAudKinect){
 		Aud.update();
@@ -79,7 +79,7 @@ void testApp::update(){
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh, testItt);
+			DJMODE.update();
 			break;
 		case AUD:
 			Aud.update();
@@ -127,16 +127,16 @@ void testApp::draw(){
 	//sound
 	drawVolGraphs();
 
-	if(drawDJKinect){
-		ofPushMatrix();
-		ofRect(djRect);
-		ofTranslate(djRect.x, djRect.y);
-		ofPushStyle();
-		DJMODE.kinect.drawDepth(0, 0, djRect.width, djRect.height);
-		DJMODE.kinect.draw(0, 0, djRect.width, djRect.height);
-		ofPopStyle();
-		ofPopMatrix();
-	}
+	//if(drawDJKinect){
+	//	ofPushMatrix();
+	//	ofRect(djRect);
+	//	ofTranslate(djRect.x, djRect.y);
+	//	ofPushStyle();
+	//	DJMODE.kinect.drawDepth(0, 0, djRect.width, djRect.height);
+	//	DJMODE.kinect.draw(0, 0, djRect.width, djRect.height);
+	//	ofPopStyle();
+	//	ofPopMatrix();
+	//}
 	if(drawAudKinect){
 		ofPushMatrix();
 		ofRect(audRect);
@@ -220,7 +220,7 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
+	DJMODE.directional.setPosition(x, y, 100);
 }
 
 //--------------------------------------------------------------
@@ -230,7 +230,9 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-
+	ofVec3f f = ofVec3f(0,0,50);
+    
+    DJMODE.controller.particles[200]->addForce(f);
 }
 
 //--------------------------------------------------------------
@@ -300,6 +302,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	*---------------------------------*/
 	if(name == "dJGod mode")
 	{
+		gui->toggleVisible();
 		mode = DJ;
 	}
 	else if(name == "physics mode")

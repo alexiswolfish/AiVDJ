@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+#include "../cloth/ofxKCloth.h"
 
 // uncomment this to read from two kinects simultaneously
 //#define USE_TWO_KINECTS
@@ -12,9 +13,32 @@ public:
 	djMode();
 	~djMode();
 	
+	ClothController controller;
+    
+    float oldMouseX,oldMouseY;
+    
+    ofImage tex;
+    ofShader shader;
+    
+    int rows, cols;
+    
+    ofLight directional;
+
+	// void keyPressed  (int key);
+    //void keyReleased(int key);
+    //void mouseMoved(int x, int y );
+    //void mouseDragged(int x, int y, int button);
+    //void mousePressed(int x, int y, int button);
+    //void mouseReleased(int x, int y, int button);
+    //void windowResized(int w, int h);
+    //void dragEvent(ofDragInfo dragInfo);
+    //void gotMessage(ofMessage msg);
+    //void exit();
+
 	void setup();
-	void update(float depthLow, float depthHigh, float testVar);
+	void update();
 	void draw();
+
 	void exit();
 	void makeFBO();
 
