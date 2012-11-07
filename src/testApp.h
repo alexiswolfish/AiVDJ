@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxUI.h"
+#include "beatDetect.h"
 
 #include "alex/physicsMode.h"
 //#include "jake/djMode.h"
@@ -40,7 +41,7 @@ class testApp : public ofBaseApp{
 		ofxUICanvas *gui;
 		float guiWidth, guiHeight;
 		float slider1, slider2; //change these after you decide what they're for
-		bool drawDJ, drawAud, drawDisplay;
+		bool drawDJ, drawAud, drawDisplay, drawSound;
 		bool drawDJKinect, drawAudKinect;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;
 		ofRectangle displayRect, djRect, audRect, guiRect;
@@ -67,7 +68,10 @@ class testApp : public ofBaseApp{
 		*/
 
 		void audioIn(float * input, int bufferSize, int nChannels); 
+		void audioReceived(float* input, int bufferSize, int nChannels);
+
 		void drawVolGraphs();
+		void drawBeatBins();
 
 		vector <float> left;
 		vector <float> right;
@@ -82,5 +86,7 @@ class testApp : public ofBaseApp{
 		ofSoundStream soundStream;
 
 		ofxUIMovingGraph *audio;
+
+		beatDetect bd;
 
 };

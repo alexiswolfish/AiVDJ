@@ -23,7 +23,7 @@ void testApp::setup(){
 	// 256 samples per buffer
 	// 4 num buffers (latency)
 
-	int bufferSize = 256;
+	int bufferSize = 1024;
 
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
@@ -34,12 +34,14 @@ void testApp::setup(){
 	smoothedVol     = 0.0;
 	scaledVol		= 0.0;
 
-	soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+	//soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
+	ofSoundStreamSetup(0, 1, this, 44100, bufferSize, 4);
 
 	/*--------GUI-----------*/
 	drawDJKinect = false;
 	drawAudKinect = false;
 	drawDisplay = true;
+	drawSound = true;
 	mode = PHYSICS;
 
 	guiSetup();
@@ -60,6 +62,8 @@ void testApp::update(){
 	//lets scale the vol up to a 0-1 range 
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
 	audio->addPoint(scaledVol*100);
+
+	bd.updateFFT();
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -84,7 +88,10 @@ void testApp::draw(){
 	ofBackground(cmain);
 
 	//sound
-	drawVolGraphs();
+	if(drawSound){
+		drawVolGraphs();
+		drawBeatBins();
+	}
 	//modes
 	if(drawDisplay){
 		switch(mode){
@@ -127,6 +134,32 @@ void testApp::draw(){
 		ofRect(audRect);
 		ofPopStyle();
 	}
+}
+void testApp::drawBeatBins(){
+	float rectWidth = 512;
+	float rectHeight = 150;
+	float spacer = 16;
+	ofPushMatrix();
+	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*4 + spacer*4), 0);
+	ofSetColor(155,155,75);
+
+    for (int i = 1; i < (int)rectWidth; i++){
+        if(i % 16 == 0)
+            ofSetColor(200,0,0);
+        else
+            ofSetColor(155,155,75);
+		ofLine(10+(i*3),150,  10+(i*3),150-bd.magnitude[i]*10.0f);
+	}
+	//ofTranslate(0, rectHeight + spacer, 0);
+	    ofSetColor(134,113,89);
+	for (int i = 1; i < (int)rectWidth/2; i++){
+        if(i % 16 == 0)
+            ofSetColor(200,0,0);
+        else
+            ofSetColor(134,113,89);
+		ofLine(10+(i*3),300,  10+(i*3),300-bd.magnitude_average[i]*10.0f);
+	}
+	ofPopMatrix();
 }
 
 void testApp::drawVolGraphs(){
@@ -217,13 +250,15 @@ void testApp::mouseReleased(int x, int y, int button){
 		physics.mousePressed( sourceType, ofVec3f(x,y,0));
 }
 
-void testApp::audioIn(float * input, int bufferSize, int nChannels){	
-	
-	float curVol = 0.0;
-	
-	// samples are "interleaved"
-	int numCounted = 0;	
+void testApp::audioReceived(float* input, int bufferSize, int nChannels) {
+    bd.audioReceived(input, bufferSize);
+}
 
+void testApp::audioIn(float * input, int bufferSize, int nChannels){	
+	 bd.audioReceived(input, bufferSize);
+
+	float curVol = 0.0;
+	int numCounted = 0;	
 	//lets go through each sample and calculate the root mean square which is a rough way to calculate volume	
 	for (int i = 0; i < bufferSize; i++){
 		left[i]		= input[i*2]*0.5;
@@ -233,18 +268,16 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 		curVol += right[i] * right[i];
 		numCounted+=2;
 	}
-	
-	//this is how we get the mean of rms :) 
+	//mean rms
 	curVol /= (float)numCounted;
-	
-	// this is how we get the root of rms :) 
+	//root rms 
 	curVol = sqrt( curVol );
-	
 	smoothedVol *= 0.93;
 	smoothedVol += 0.07 * curVol;
-	
 	bufferCounter++;
 	
+	/*------Beat Detection-------*/
+	//bd.audioReceived(input, bufferSize);
 }
 
 void testApp::initRects(){
@@ -255,14 +288,6 @@ void testApp::initRects(){
 	float kinectWidth = kinectHeight*(640.0/480.0);
 	djRect = ofRectangle(spacer, guiHeight+spacer, kinectWidth, kinectHeight);
 	audRect = ofRectangle(spacer, djRect.getMaxY() + spacer, kinectWidth, kinectHeight);
-
-	//horizontal
-
-	//float kinectWidth = (ofGetWidth() - guiWidth)/2 - spacer*3;
-	//float kinectHeight = kinectWidth * (480.0/640.0);
-	//djRect = ofRectangle(guiWidth + spacer, spacer, kinectWidth, kinectHeight);
-	//audRect = ofRectangle(djRect.getMaxX() + spacer, spacer,kinectWidth, kinectHeight);
-
 }
 
 void testApp::guiEvent(ofxUIEventArgs &e){
@@ -315,6 +340,10 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
 		slider2 = slider->getScaledValue(); 
 	}   
+	else if(name == "beat debug"){
+		 ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+		 drawSound = toggle->getValue();
+	}
 	/*----Particle Sliders-----*/
 	else if (name == "particle rebirth")
 	{
@@ -376,6 +405,7 @@ void testApp::guiSetup(){
 	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 200, numParticles, "particle rebirth"),"input");guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
     audio = (ofxUIMovingGraph *) gui->addWidgetSouthOf(new ofxUIMovingGraph(dim*12, 64, volHistory, buffersize, -100, 100, "Volume"),"input"); 
+	w = gui->addWidgetSouthOf(new ofxUIToggle("beat debug", drawSound, dim, dim),"Volume");guiColors(w);
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
 //--------------------------------------------------------------

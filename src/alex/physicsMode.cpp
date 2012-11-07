@@ -12,7 +12,7 @@ void physicsMode::mousePressed(source::Type t, ofVec3f pos){
 
 void physicsMode::setup(){
 	srcImg.allocate(256, 256, OF_IMAGE_COLOR_ALPHA);
-    srcImg.loadImage("spark.png");
+    srcImg.loadImage("source.png");
 
 	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), source::ORBIT, srcImg));
 	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK, srcImg));
