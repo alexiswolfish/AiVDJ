@@ -5,6 +5,7 @@
 #include "ofxKinect.h"
 #include "../cloth/ofxKCloth.h"
 
+
 // uncomment this to read from two kinects simultaneously
 //#define USE_TWO_KINECTS
 
@@ -53,6 +54,7 @@ public:
 	void DJmousePressed(int x, int y, int button);
 	void DJmouseReleased(int x, int y, int button);
 	void DJwindowResized(int w, int h);
+	void mouseMoved(int w, int h );
 
 	struct DJpoint {
 		int x;
@@ -81,6 +83,16 @@ public:
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 
+	ClothController controller;
+    
+    float oldMouseX,oldMouseY;
+    
+    ofImage tex;
+    ofShader shader;
+    
+    int rows, cols;
+    
+    ofLight directional;
 	
 	int angle;
 	
