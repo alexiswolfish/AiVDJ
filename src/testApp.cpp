@@ -206,7 +206,8 @@ void testApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-
+	if(mode == PHYSICS)
+		physics.mousePressed(physicsMode::source::ORBIT, ofVec3f((float)x,(float)y,0));
 }
 
 //--------------------------------------------------------------

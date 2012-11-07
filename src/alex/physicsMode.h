@@ -15,14 +15,19 @@ class physicsMode{
 					SINK,
 					ORBIT
 				};
-				ofVec3f loc;
-				float radius, mass, life;
+				ofVec3f loc, vel, acc;
+				float radius, mass, energy, charge;
+				float p,f,theta;
 				Type type;
 				ofColor col;
 
 				source(ofVec3f initPos, Type type);
 				void render();
 				void update();
+				void attract(source s, float range);
+				void pullToCenter(float distThresh);
+				float findAngle(float x1, float y1, float x2, float y2);
+				float findAngle(float x, float y);
 		};
 
 		class particle{
@@ -57,6 +62,7 @@ class physicsMode{
 		void update();
 		void render();
 		void updateSources(float vol);
+		void repulseSources();
 
 		void addParticles(int amt);	
 

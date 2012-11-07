@@ -51,6 +51,7 @@ class testApp : public ofBaseApp{
 		/*-----------Alex-----------*/
 		physicsMode physics;
 		physicsMode::source::Type sourceType;
+		int numParticles;
 
 		/*-----------Jake-----------*/
 //		djMode DJ;

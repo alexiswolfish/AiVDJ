@@ -1,7 +1,7 @@
 #include "physicsMode.h"
 
 physicsMode::physicsMode(){
-	birthRate = 50;
+	birthRate = 0;
 	maxParticles = 1000;
 }
 
@@ -10,9 +10,9 @@ void physicsMode::mousePressed(source::Type t, ofVec3f pos){
 }
 
 void physicsMode::setup(){
-	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::ORBIT));
-	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::SINK));
-	addParticles(1000);
+	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), source::ORBIT));
+	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK));
+	//addParticles(1000);
 }
 
 void physicsMode::addParticles(int amt){
@@ -39,15 +39,43 @@ void physicsMode::update(){
 void physicsMode::render(){
 	for(vector<source>::iterator e = sources.begin(); e != sources.end(); e++){
 		e->render();
+		printf("type:%d: %d %d\n", e->type, e->loc.x, e->loc.y);
 	}
+	printf("\n");
 	for(vector<particle>::iterator p = particles.begin(); p != particles.end(); p++)
 		p->render();
 }
 
 void physicsMode::updateSources(float vol){
-	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
-		e->radius = vol;
-		e->mass = vol;
+	int distThresh = 51;
+
+		repulseSources();
+		for(vector<source>::iterator e1 = sources.begin(); e1 != sources.end(); ++e1){
+			e1->radius = vol;
+			e1->mass = vol;
+			/*for(vector<source>::iterator e2 = sources.begin(); e2 != sources.end(); ++e2){
+				e1->attract(*e2, 100);
+			}*/
+			e1->pullToCenter(vol*2);
+			e1->update();
+		}
+}
+
+void physicsMode::repulseSources(){
+	for(vector<source>::iterator e1 = sources.begin(); e1 != sources.end(); ++e1){
+		for(vector<source>::iterator e2 = sources.begin(); e2 != sources.end(); ++e2){
+			e1->attract(*e2,300);
+			ofVec3f dir = e1->loc - e2->loc;
+            float distSqrd = dir.lengthSquared();
+            
+            if( distSqrd > 0.0f ){
+                dir.normalize();
+                float F = 1.0f/distSqrd;
+                    
+                e1->acc += dir * ( F / e1->mass );
+                e2->acc -= dir * ( F / e2->mass );
+			}
+		}
 	}
 }
 
@@ -57,25 +85,115 @@ void physicsMode::updateSources(float vol){
 
 physicsMode::source::source(ofVec3f initPos, Type _type){
 	loc = initPos;
+	//vel = ofVec3f(ofRandom(-1.0, 1.0),ofRandom(-1.0, 1.0),0);
+	vel = ofVec3f(0,0,0);
+	acc = ofVec3f(0,0,0);
 	radius = 15;
 	mass = 50;
+	//acc = 0;
+
 	type = _type;
-	life = 1000;
+
+	charge = 10; //set to music
 }
 
 void physicsMode::source::update(){
+	vel = vel+acc;
+
+	/*float gravity = 0.1;
+	float gTheta = -(PI/180.0)*findAngle(loc.x,loc.y,ofGetWidth()/2, ofGetHeight()/2);
+	ofVec2f gVel = ofVec2f(cos(gTheta), sin(gTheta));
+	vel += gVel;*/
+
+	vel.limit(5); //BPM
+	loc = loc + vel;
+	vel = vel*.98;
+	//acc = acc * .1;
+	//vel = ofVec3f(0,0,0);
+	acc = ofVec3f(0,0,0);
 }
 
 void physicsMode::source::render(){
 	ofPushStyle();
-	if(type == EMIT)
+	if(type == EMIT){
 		ofSetColor(0,255,255);
-	else
+	}
+	else{
 		ofSetColor(255,0,255);
+	}
 	ofCircle(loc.x, loc.y, radius);
-	ofPopStyle();
 }
 
+void physicsMode::source::attract(source s, float range){
+	float maxDist = ofGetWidth()/2;
+	ofVec3f m = ofVec3f(0,0,0);
+    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
+    dirToPull = dirToPull - s.loc;
+    float distToPull = dirToPull.length();
+
+	if(distToPull > 1){
+			//straight up attraction/repuslion forces
+			float theta, F;
+			F = mass * s.mass;
+			m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
+			m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
+
+			if(distToPull < range){
+				theta = findAngle( loc.x - m.x, loc.y - m.y);
+			//if(distToPull > range)
+			//	 theta = findAngle( m.x - loc.x, m.y - loc.y );
+    
+			m.x = (F*cos(theta)) / distToPull;
+			m.y = (F*sin(theta)) / distToPull;
+    
+			theta = source::findAngle(m.x, m.y);
+			acc.x += (m.length() * cos(theta));
+			acc.y += (m.length() * sin(theta)); 
+			}
+	}
+}
+
+void physicsMode::source::pullToCenter(float distThresh)
+  {
+	ofVec3f center = ofVec3f(ofGetWidth()/2, ofGetHeight()/2);
+    ofVec3f dirToCenter = ofVec3f(loc.x, loc.y, loc.z);
+    dirToCenter= dirToCenter - center;
+	float distToCenter = dirToCenter.length();
+
+    
+    if(distToCenter >distThresh){
+      dirToCenter.normalize();
+      float pullStrength = 0.001f;
+      dirToCenter= dirToCenter*(((distToCenter -distThresh))*pullStrength);
+      vel= vel - (dirToCenter);
+    }
+  }
+
+float physicsMode::source::findAngle(float x1, float y1, float x2, float y2){
+  float xd = x1 - x2;
+  float yd = y1 - y2;
+
+  float t = atan2(yd,xd);
+  float a = (180 + (-(180 * t) / PI));
+  return a;
+}
+float physicsMode::source::findAngle(float x, float y){
+  float theta;
+  if(x == 0) {
+    if(y > 0) 
+      theta = PI/2.0;
+    else if(y < 0) 
+      theta = PI/2.0;
+    else 
+      theta = 0;
+  }
+  else {
+    theta = atan( y / x );
+    if(( x < 0 ) && ( y >= 0 )) { theta += PI; }
+    if(( x < 0 ) && ( y < 0 )) { theta -= PI; }
+  }
+  return theta;
+}
 /*--------------------------------*
 	Particle Class
  *--------------------------------*/
@@ -114,7 +232,7 @@ void physicsMode::particle::update(){
 	pLoc = loc;
 	vel = vel+acc;
 	vel.limit(maxSpeed);
-	loc = loc + acc;
+	loc = loc + vel;
 	acc = acc * death;
 	age++;
 	if(age > lifespan)
