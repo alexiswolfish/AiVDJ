@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxUI.h"
+#include "beatDetect.h"
 
 #include "alex/physicsMode.h"
 #include "jake/djMode.h"
@@ -40,8 +41,10 @@ class testApp : public ofBaseApp{
 
 		ofxUICanvas *gui;
 		float guiWidth, guiHeight;
-		float slider2, DjDepthSliderHigh, DjDepthSliderLow, testItt; //change these after you decide what they're for
-		bool drawDJ, drawAud, drawDisplay;
+
+		float slider2, DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
+		bool drawDJ, drawAud, drawDisplay, drawSound;
+
 		bool drawDJKinect, drawAudKinect;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;
 		ofRectangle displayRect, djRect, audRect, guiRect;
@@ -53,6 +56,7 @@ class testApp : public ofBaseApp{
 		physicsMode physics;
 		physicsMode::source::Type sourceType;
 		int numParticles;
+
 		/*-----------Jake-----------*/
 		djMode DJMODE;
 		/*-----------Melissa-----------*/
@@ -60,8 +64,20 @@ class testApp : public ofBaseApp{
 
 
 		/*-----------Sound-----------*/
+		/*
+			sub bass : 0 > 100hz
+			mid bass : 80 > 500hz
+			mid range: 400 > 2khz
+			upper mid: 1k > 6khz
+			high freq: 4k > 12khz
+			Very high freq: 10k > 20khz and above
+		*/
+
 		void audioIn(float * input, int bufferSize, int nChannels); 
+		void audioReceived(float* input, int bufferSize, int nChannels);
+
 		void drawVolGraphs();
+		void drawBeatBins();
 
 		vector <float> left;
 		vector <float> right;
@@ -76,6 +92,8 @@ class testApp : public ofBaseApp{
 		ofSoundStream soundStream;
 
 		ofxUIMovingGraph *audio;
+
+		beatDetect bd;
 
 	
 };

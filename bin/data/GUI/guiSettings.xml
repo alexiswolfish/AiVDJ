@@ -6,7 +6,7 @@
 <Widget>
     <Kind>2</Kind>
     <Name>dJGod mode</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
@@ -38,7 +38,7 @@
 <Widget>
     <Kind>2</Kind>
     <Name>DJ</Name>
-    <Value>1</Value>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
@@ -69,4 +69,9 @@
     <Kind>2</Kind>
     <Name>orbit</Name>
     <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>beat debug</Name>
+    <Value>1</Value>
 </Widget>

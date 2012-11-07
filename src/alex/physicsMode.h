@@ -15,14 +15,21 @@ class physicsMode{
 					SINK,
 					ORBIT
 				};
-				ofVec3f loc;
-				float radius, mass, life;
+				ofVec3f loc, vel, acc;
+				float radius, mass, energy, charge;
+				float p,f,theta;
 				Type type;
 				ofColor col;
 
-				source(ofVec3f initPos, Type type);
+				source(ofVec3f initPos, Type type, ofImage s);
 				void render();
 				void update();
+				void attract(source s, float range);
+				void pullToCenter(float distThresh);
+				float findAngle(float x1, float y1, float x2, float y2);
+				float findAngle(float x, float y);
+
+				ofImage spark;
 		};
 
 		class particle{
@@ -47,17 +54,21 @@ class physicsMode{
 				float findAngle(float x, float y);
 		};
 
+		vector<source> sources;
+		vector<particle> particles;
+		int birthRate, maxParticles;
 
 		physicsMode();
 
 		void setup();
 		void update();
 		void render();
+		void updateSources(float vol);
+		void repulseSources();
 
 		void addParticles(int amt);	
 
 		void mousePressed(source::Type t, ofVec3f loc);
-		vector<source> sources;
-		vector<particle> particles;
-		int birthRate;
+		
+		ofImage srcImg;
 	};
