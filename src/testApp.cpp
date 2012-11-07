@@ -47,8 +47,18 @@ void testApp::setup(){
 	ofEnableSmoothing();
 
 	/*-------Alex------*/
+	//setting up particles
 	physics.setup();
 	numParticles = 0;
+	//Loading Shaders
+	updatePos.load("","shaders/posUpdate.frag");// shader for updating the texture that store the particles position on RG channels
+    updateVel.load("","shaders/velUpdate.frag");// shader for updating the texture that store the particles velocity on RG channels
+    updateRender.setGeometryInputType(GL_POINTS);
+	updateRender.setGeometryOutputType(GL_TRIANGLE_STRIP);
+	updateRender.setGeometryOutputCount(6);
+    updateRender.load("shaders/render.vert","shaders/render.frag","shaders/render.geom");
+    
+
 	/*-------Jake-------*/
 //	DJ.setup();
 }

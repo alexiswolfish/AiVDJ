@@ -10,6 +10,19 @@ void physicsMode::mousePressed(source::Type t, ofVec3f pos){
 }
 
 void physicsMode::setup(){
+	ofEnableAlphaBlending();
+	particleImg.loadImage("spark.png");
+
+	updatePos.load("","shaders/posUpdate.frag");// shader for updating the texture that store the particles position on RG channels
+    updateVel.load("","shaders/velUpdate.frag");// shader for updating the texture that store the particles velocity on RG channels
+    // Frag, Vert and Geo shaders for the rendering process of the spark image
+    updateRender.setGeometryInputType(GL_POINTS);
+	updateRender.setGeometryOutputType(GL_TRIANGLE_STRIP);
+	updateRender.setGeometryOutputCount(6);
+    updateRender.load("shaders/render.vert","shaders/render.frag","shaders/render.geom");
+    // Seting the textures where the information ( position and velocity ) will be
+
+	//adding sources
 	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::ORBIT));
 	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::SINK));
 	addParticles(1000);
