@@ -14,6 +14,9 @@ public:
 	djMode();
 	~djMode();
 	
+	bool WheresMyDj;
+	int noDJ;
+
 	ClothController controller;
     
     float oldMouseX,oldMouseY;
@@ -26,19 +29,8 @@ public:
     
     ofLight directional;
 
-	// void keyPressed  (int key);
-    //void keyReleased(int key);
-    //void mouseMoved(int x, int y );
-    //void mouseDragged(int x, int y, int button);
-    //void mousePressed(int x, int y, int button);
-    //void mouseReleased(int x, int y, int button);
-    //void windowResized(int w, int h);
-    //void dragEvent(ofDragInfo dragInfo);
-    //void gotMessage(ofMessage msg);
-    //void exit();
-
 	void setup();
-	void update();
+	void update(float depthLow, float depthHigh);
 	void draw();
 
 	void exit();
@@ -83,6 +75,7 @@ public:
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
+	bool bcloth;
 	
 	int angle;
 	

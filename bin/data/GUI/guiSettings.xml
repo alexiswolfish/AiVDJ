@@ -1,60 +1,72 @@
 <Widget>
     <Kind>2</Kind>
-    <Name>feature points</Name>
+    <Name>physics mode</Name>
     <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
-    <Name>tracker points</Name>
-    <Value>0</Value>
-</Widget>
-<Widget>
-    <Kind>17</Kind>
-    <Name>draw feature mesh</Name>
+    <Name>dJGod mode</Name>
     <Value>1</Value>
 </Widget>
 <Widget>
-    <Kind>17</Kind>
-    <Name>draw triangulation</Name>
+    <Kind>2</Kind>
+    <Name>video mashup</Name>
     <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>audience mode</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>RENDER</Name>
+    <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>6</Kind>
+    <Name>dJ depth threshold</Name>
+    <HighValue>1300</HighValue>
+    <LowValue>0</LowValue>
+</Widget>
+<Widget>
+    <Kind>6</Kind>
+    <Name>aud depth threshold</Name>
+    <HighValue>4000</HighValue>
+    <LowValue>440</LowValue>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>DJ</Name>
+    <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>AUDIENCE</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>12</Kind>
+    <Name>input</Name>
+    <Value>describe your set</Value>
 </Widget>
 <Widget>
     <Kind>21</Kind>
-    <Name>max number of features</Name>
-    <Value>1500</Value>
-</Widget>
-<Widget>
-    <Kind>4</Kind>
-    <Name>feature quality</Name>
-    <Value>0.001</Value>
-</Widget>
-<Widget>
-    <Kind>4</Kind>
-    <Name>feature distance</Name>
-    <Value>4</Value>
-</Widget>
-<Widget>
-    <Kind>17</Kind>
-    <Name>draw tracked points</Name>
+    <Name>particle rebirth</Name>
     <Value>0</Value>
 </Widget>
 <Widget>
-    <Kind>4</Kind>
-    <Name>max tracked distance</Name>
-    <Value>64</Value>
+    <Kind>2</Kind>
+    <Name>emit</Name>
+    <Value>0</Value>
 </Widget>
 <Widget>
-    <Kind>4</Kind>
-    <Name>tracked point persistance</Name>
-    <Value>15</Value>
+    <Kind>2</Kind>
+    <Name>sink</Name>
+    <Value>0</Value>
 </Widget>
 <Widget>
-    <Kind>4</Kind>
-    <Name> tracked point age</Name>
-    <Value>5</Value>
-</Widget>
-<Widget>
-    <Kind>17</Kind>
-    <Name>save frames</Name>
+    <Kind>2</Kind>
+    <Name>orbit</Name>
     <Value>0</Value>
 </Widget>
