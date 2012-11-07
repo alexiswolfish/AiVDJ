@@ -16,6 +16,9 @@ public:
 	void update(float depthLow, float depthHigh, float testVar);
 	void draw();
 	void exit();
+	void makeFBO();
+
+	ofFbo testfbo;
 	
 	void drawPointCloud();
 	void drawMeshCloud();
