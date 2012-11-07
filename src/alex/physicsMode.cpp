@@ -6,13 +6,18 @@ physicsMode::physicsMode(){
 }
 
 void physicsMode::mousePressed(source::Type t, ofVec3f pos){
-	sources.push_back(source(pos, t));
+	if(sources.size()<6)
+		sources.push_back(source(pos, t, srcImg));
 }
 
 void physicsMode::setup(){
-	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), source::ORBIT));
-	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK));
-	addParticles(800);
+	srcImg.allocate(256, 256, OF_IMAGE_COLOR_ALPHA);
+    srcImg.loadImage("spark.png");
+
+	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), source::ORBIT, srcImg));
+	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK, srcImg));
+	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::SINK, srcImg));
+	//addParticles(800);
 }
 
 void physicsMode::addParticles(int amt){
@@ -84,15 +89,14 @@ void physicsMode::repulseSources(){
 	Source Class
  *--------------------------------*/
 
-physicsMode::source::source(ofVec3f initPos, Type _type){
+physicsMode::source::source(ofVec3f initPos, Type _type, ofImage s){
 	loc = initPos;
-	//vel = ofVec3f(ofRandom(-1.0, 1.0),ofRandom(-1.0, 1.0),0);
 	vel = ofVec3f(0,0,0);
 	acc = ofVec3f(0,0,0);
 	radius = 15;
 	mass = 50;
 	//acc = 0;
-
+	spark = s;
 	type = _type;
 
 	charge = 10; //set to music
@@ -100,11 +104,6 @@ physicsMode::source::source(ofVec3f initPos, Type _type){
 
 void physicsMode::source::update(){
 	vel = vel+acc;
-
-	/*float gravity = 0.1;
-	float gTheta = -(PI/180.0)*findAngle(loc.x,loc.y,ofGetWidth()/2, ofGetHeight()/2);
-	ofVec2f gVel = ofVec2f(cos(gTheta), sin(gTheta));
-	vel += gVel;*/
 
 	vel.limit(5); //BPM
 	loc = loc + vel;
@@ -122,7 +121,10 @@ void physicsMode::source::render(){
 	else{
 		ofSetColor(255,0,255);
 	}
-	ofCircle(loc.x, loc.y, radius);
+	float imgRad = radius*2 +20;
+	//ofCircle(loc.x, loc.y, radius);
+	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
+	ofPopStyle();
 }
 
 void physicsMode::source::attract(source s, float range){
