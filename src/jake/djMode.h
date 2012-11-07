@@ -20,6 +20,7 @@ public:
     
     ofImage tex;
     ofShader shader;
+	ofShader myShader;
     
     int rows, cols;
     
@@ -82,17 +83,6 @@ public:
 	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
-
-	ClothController controller;
-    
-    float oldMouseX,oldMouseY;
-    
-    ofImage tex;
-    ofShader shader;
-    
-    int rows, cols;
-    
-    ofLight directional;
 	
 	int angle;
 	

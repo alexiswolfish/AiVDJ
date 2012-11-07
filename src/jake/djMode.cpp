@@ -51,6 +51,7 @@ void djMode::setup() {
     tex.loadImage("texture2.png");
     
     shader.load("shader");
+	myShader.load("myShader");
     
     //kinect.init();
     //kinect.open();
@@ -221,20 +222,23 @@ void djMode::draw() {
 	//}
 
 	 glEnable(GL_DEPTH_TEST);
-    ofEnableLighting();
-    directional.enable();
+    //ofEnableLighting();
+    //directional.enable();
     ofTranslate(ofGetWidth()/2-cols*CLOTH_RES/2, 100,0);
     //ofBackground(0);
 	ofBackground(95, 100);
 
-    shader.begin();
+    //shader.begin();
+	myShader.begin();
     shader.setUniformTexture("tex", tex.getTextureReference(), 0);
     controller.drawMesh();
-    shader.end();
-    directional.disable();
-    ofDisableLighting();
+	myShader.end();
+    //shader.end();
+	//shader.getUniformLocation();
+    //directional.disable();
+    //ofDisableLighting();
 
-	tex.draw(100, 100);
+	//tex.draw(100, 100);
     
 
 
