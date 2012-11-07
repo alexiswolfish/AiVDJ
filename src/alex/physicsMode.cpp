@@ -2,7 +2,7 @@
 
 physicsMode::physicsMode(){
 	birthRate = 0;
-	maxParticles = 1000;
+	maxParticles = 800;
 }
 
 void physicsMode::mousePressed(source::Type t, ofVec3f pos){
@@ -12,7 +12,7 @@ void physicsMode::mousePressed(source::Type t, ofVec3f pos){
 void physicsMode::setup(){
 	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), source::ORBIT));
 	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK));
-	//addParticles(1000);
+	addParticles(800);
 }
 
 void physicsMode::addParticles(int amt){
@@ -33,13 +33,14 @@ void physicsMode::update(){
 			p = particles.erase(p);
 		else
 			p++;
+		
 	}
+	printf("particle array size %d", particles.size());
 }
 
 void physicsMode::render(){
 	for(vector<source>::iterator e = sources.begin(); e != sources.end(); e++){
 		e->render();
-		printf("type:%d: %d %d\n", e->type, e->loc.x, e->loc.y);
 	}
 	printf("\n");
 	for(vector<particle>::iterator p = particles.begin(); p != particles.end(); p++)
@@ -200,22 +201,22 @@ float physicsMode::source::findAngle(float x, float y){
 physicsMode::particle::particle(){
 	loc = ofVec3f(ofRandom(0,ofGetWidth()),ofRandom(0,ofGetHeight()),0);
 	mass = ofRandom(1,5);
-	maxSpeed = 200;
+	maxSpeed = 5;
 	magnitude = 0;
 	angle = 0;
-	death = 0.96;
+	death = 0.9;
 	age = 0;
-	lifespan = 1000;
+	lifespan = 600;
 	isDead = false;
-	vel = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
-	acc = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
+	vel = ofVec3f(ofRandom(-3,3),ofRandom(-3,3),0);
+	acc = ofVec3f(ofRandom(-3,3),ofRandom(-3,3),0);
 }
 physicsMode::particle::~particle(){
 }
 physicsMode::particle::particle(ofVec3f _loc, float m, int life){
 	loc = _loc;
 	mass = m;
-	maxSpeed = 200;
+	maxSpeed = 4;
 	magnitude = 0;
 	angle = 0;
 	death = 0.9;
