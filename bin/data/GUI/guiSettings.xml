@@ -26,14 +26,14 @@
 <Widget>
     <Kind>6</Kind>
     <Name>dJ depth threshold</Name>
-    <HighValue>1400.000000000</HighValue>
-    <LowValue>440.000000000</LowValue>
+    <HighValue>1300</HighValue>
+    <LowValue>0</LowValue>
 </Widget>
 <Widget>
     <Kind>6</Kind>
     <Name>aud depth threshold</Name>
-    <HighValue>4000.000000000</HighValue>
-    <LowValue>440.000000000</LowValue>
+    <HighValue>4000</HighValue>
+    <LowValue>440</LowValue>
 </Widget>
 <Widget>
     <Kind>2</Kind>
@@ -53,7 +53,7 @@
 <Widget>
     <Kind>21</Kind>
     <Name>particle rebirth</Name>
-    <Value>0.000000000</Value>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
