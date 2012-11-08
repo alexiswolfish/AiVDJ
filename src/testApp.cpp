@@ -76,6 +76,7 @@ void testApp::update(){
 	}
 	if(drawAudKinect){
 		Aud.update();
+
 	}
 
 	bd.updateFFT();
@@ -94,7 +95,7 @@ void testApp::update(){
 		case PHYSICS:
 			physics.addParticles(numParticles);
 			//physics.updateSources(scaledVol * 190.0f);
-			physics.updateSources(left[4]*180.0f);
+			physics.updateSources(*bd.magnitude * 10);
 			physics.update();
 			break;
 	}
