@@ -5,11 +5,6 @@ physicsMode::physicsMode(){
 	maxParticles = 800;
 }
 
-void physicsMode::mousePressed(source::Type t, ofVec3f pos){
-	if(sources.size()<6)
-		sources.push_back(source(pos, t, srcImg));
-}
-
 void physicsMode::setup(){
 	srcImg.allocate(256, 256, OF_IMAGE_COLOR_ALPHA);
     srcImg.loadImage("source.png");
@@ -18,12 +13,6 @@ void physicsMode::setup(){
 	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), source::SINK, srcImg));
 	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), source::SINK, srcImg));
 	//addParticles(800);
-}
-
-void physicsMode::addParticles(int amt){
-	if(particles.size() < maxParticles){
-	for(int i=0; i<amt; i++)
-		particles.push_back(particle());}
 }
 
 void physicsMode::update(){
@@ -40,7 +29,7 @@ void physicsMode::update(){
 			p++;
 		
 	}
-	printf("particle array size %d", particles.size());
+	//printf("particle array size %d", particles.size());
 }
 
 void physicsMode::render(){
@@ -51,17 +40,21 @@ void physicsMode::render(){
 	for(vector<particle>::iterator p = particles.begin(); p != particles.end(); p++)
 		p->render();
 }
+/*--------------------------------------------------*
+Update Sources
 
-void physicsMode::updateSources(float vol){
+update the source particles with relevant data 
+from the main app
+ *--------------------------------------------------*/
+void physicsMode::updateSources(float vol, ofColor c, bool isChanged){
 	int distThresh = 51;
 
 		repulseSources();
 		for(vector<source>::iterator e1 = sources.begin(); e1 != sources.end(); ++e1){
+			if(isChanged)
+				e1->col = c;
 			e1->radius = vol;
 			e1->mass = vol;
-			/*for(vector<source>::iterator e2 = sources.begin(); e2 != sources.end(); ++e2){
-				e1->attract(*e2, 100);
-			}*/
 			e1->pullToCenter(vol*2);
 			e1->update();
 		}
@@ -85,6 +78,15 @@ void physicsMode::repulseSources(){
 	}
 }
 
+void physicsMode::mousePressed(source::Type t, ofVec3f pos){
+	if(sources.size()<6)
+		sources.push_back(source(pos, t, srcImg));
+}
+void physicsMode::addParticles(int amt){
+	if(particles.size() < maxParticles){
+	for(int i=0; i<amt; i++)
+		particles.push_back(particle());}
+}
 /*--------------------------------*
 	Source Class
  *--------------------------------*/
@@ -98,7 +100,7 @@ physicsMode::source::source(ofVec3f initPos, Type _type, ofImage s){
 	//acc = 0;
 	spark = s;
 	type = _type;
-
+	col = ofColor(255,0,255);
 	charge = 10; //set to music
 }
 
@@ -115,13 +117,8 @@ void physicsMode::source::update(){
 
 void physicsMode::source::render(){
 	ofPushStyle();
-	if(type == EMIT){
-		ofSetColor(0,255,255);
-	}
-	else{
-		ofSetColor(255,0,255);
-	}
-	float imgRad = radius*2 +20;
+	ofSetColor(col);
+	float imgRad = radius*5 +10;
 //	ofCircle(loc.x, loc.y, 100);
 	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
 	ofPopStyle();

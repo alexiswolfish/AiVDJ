@@ -63,7 +63,7 @@ class physicsMode{
 		void setup();
 		void update();
 		void render();
-		void updateSources(float vol);
+		void updateSources(float vol, ofColor c, bool isChanged);
 		void repulseSources();
 
 		void addParticles(int amt);	

@@ -6,8 +6,6 @@
 
 #include <list>
 
-//class LivePoet;
-
 #define FFT_BINS 512
 #define FFT_SUBBANDS 32
 #define ENERGY_HISTORY 43

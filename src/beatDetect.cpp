@@ -77,7 +77,7 @@ void beatDetect::updateFFT()
                     // [I * 8 + 1 ~ 8] -> in increments of 8, 7,8 - 0 to the sum in the sense> of 23 -> 15 and 16
                     fftSubbands[i] +=  in_fft[i*(fft_size/FFT_SUBBANDS)+b];
                 }
-                // After taking the sum of the values ​​of the sub-band, the average value obtained by adding the number of times I split
+				// After taking the sum of the values ​​of the sub-band, the average value obtained by adding the number of times I split
                 fftSubbands[i] = fftSubbands[i]*(float)FFT_SUBBANDS/(float)fft_size;
                 
                 // calc dispersion of sub-bands
@@ -169,4 +169,26 @@ bool beatDetect::isBeatRange(int low, int high, int threshold)
         if(isBeat(i)) 
             num++;
     return num > threshold;
+}
+
+void beatDetect::drawSubbands(){
+	ofPushMatrix();
+	int height = 75;
+	int width = FFT_SUBBANDS*3+10;
+	int spacer = 16;
+	ofDrawBitmapString("Fft Subbands", 0, 0);
+	for(int i=0; i<FFT_SUBBANDS; i++){
+		ofLine(10+(i*3),height,10+(i*3),height-fftSubbands[i]*20.0f);
+	}
+	ofTranslate(width+spacer,0,0);
+	ofDrawBitmapString("Average Energy", 0, 0);
+	for(int i=0; i<FFT_SUBBANDS; i++){
+		ofLine(10+(i*3),height,10+(i*3),height-averageEnergy[i]*20.0f);
+	}
+	ofTranslate(width+spacer,0,0);
+	ofDrawBitmapString("Fft Variance", 0, 0);
+	for(int i=0; i<FFT_SUBBANDS; i++){
+		ofLine(10+(i*3),height,10+(i*3),height-fftVariance[i]*20.0f);
+	}
+	ofPopMatrix();
 }
