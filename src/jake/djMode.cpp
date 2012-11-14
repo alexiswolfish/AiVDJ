@@ -40,9 +40,8 @@ void djMode::setup() {
     controller.initMesh(); 
     oldMouseX = -999;
     oldMouseY = -999;
-
-    //tex.loadImage("texture2.png");  
-	tex.loadImage("film.png"); 
+  
+	tex.loadImage("large_brown.png"); 
     shader.load("shader");
 	//myShader.load("myShader");   
     directional.setDirectional();
@@ -55,8 +54,9 @@ void djMode::setup() {
 	bDrawMeshCloud = false;
 	bDrawPointCloud = false;
 	bcloth = true;
+	test = false;
 	////printf("serial:'%s'", kinect.getSerial());
-	easyCam.tilt(20);
+	easyCam.tilt(15);
 
 	//ofFbo::Settings s;
 	//s.width = ofGetScreenWidth();
@@ -94,7 +94,7 @@ void djMode::update(float depthLow, float depthHigh) {
 			if(y == cols-1) continue;
               
 			float d = kinect.getDistanceAt(x*CLOTH_RES, y*CLOTH_RES);
-        
+
 			if(d >0 && d < 1000) {
             
 				d = ofMap(d,0,4000,0,30);
@@ -104,13 +104,23 @@ void djMode::update(float depthLow, float depthHigh) {
 				ff *= 3.0;
                   
 				controller.particles[i]->addForce(ff);
+				
 		   }
+				if (controller.particles.size() < 500){
+					noDJ++;
+					//printf("\nnodj %d\n", noDJ);
+				}
+				if (noDJ > 10){
+					WheresMyDj = false;
+					noDJ = 0;
+				}
 		}
    
 		controller.update();
 		controller.updateMesh();
 		controller.updateMeshNormals();
 	}
+
 
 
 }
@@ -181,6 +191,11 @@ void djMode::draw() {
 		drawMeshCloud();
 		easyCam.end();
 	}
+	else if(test){
+		easyCam.begin();
+		testDraw();
+		easyCam.end();
+	}
 	else if (bcloth){
 		ofPushMatrix();
 		glEnable(GL_DEPTH_TEST);
@@ -190,10 +205,10 @@ void djMode::draw() {
 		//ofBackground(0);
 		//ofBackground(95, 100);
 		shader.begin();
-		myShader.begin();
+		//myShader.begin();
 		shader.setUniformTexture("tex", tex.getTextureReference(), 0);
 		controller.drawMesh();
-		myShader.end();
+		//myShader.end();
 		shader.end();
 		//directional.disable();
 		//ofDisableLighting();
@@ -202,6 +217,51 @@ void djMode::draw() {
 		//ofSetColor(255, 25, 255);
 		//testfbo.draw(0,0);
 
+}
+
+void djMode::testDraw(){
+	ofPushStyle();	
+		int rand1 = ofRandom(128, 255);
+		int rand2 = ofRandom(128, 255);
+		ofPushMatrix();
+		ofScale(1, -1, -1);
+		ofTranslate(0, 0, -1000); // center the points a bit
+		struct DJpoint {
+			int x;
+			int y;
+			int z;
+		};
+		vector<vector<DJpoint>>Ypoints;
+
+		int w = 640;
+		int h = 480;
+		int step = 10;
+		for(int y = 0; y < h; y += step) {
+			for(int x = 0; x < w; x += step) {
+				if(kinect.getDistanceAt(x, y) > 0) {
+					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
+						//ofSetColor(rand1, rand2, kinect.getWorldCoordinateAt(x, y).z / (Zhigh-Zlow/255));
+						//ofSphere(kinect.getWorldCoordinateAt(x, y).x, kinect.getWorldCoordinateAt(x, y).y, kinect.getWorldCoordinateAt(x, y).z, 1);
+						DJpoint new_point;
+						new_point.x = kinect.getWorldCoordinateAt(x, y).x;
+						new_point.y = kinect.getWorldCoordinateAt(x, y).y;
+						new_point.z = kinect.getWorldCoordinateAt(x, y).z;
+						Ypoints[y].push_back(new_point);
+					}
+				}
+			}
+		}
+		ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));
+		for(int k=0; k<Ypoints.size();k+=step/2){
+			ofPolyline line;
+			for (int j=0; j<Ypoints[k].size(); j++){
+				line.addVertex(Ypoints[k][j].x, Ypoints[k][j].y, Ypoints[k][j].z);
+			}
+			line.close();
+			line.draw();		
+		}
+		ofPopMatrix();
+		ofPopStyle();
 }
 
 void djMode::drawPointCloud() {
@@ -267,7 +327,7 @@ void djMode::drawMeshCloud() {
 	float minX = 0;
 	float maxX = 0;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 5; // try higher steps 
+	int step = 2; // try higher steps 
 	//ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
 	int rand1 = ofRandom(128.0, 255.0);
 		//vector<ofVec3f>lastVert;
@@ -303,25 +363,29 @@ void djMode::drawMeshCloud() {
 	ofTranslate(0, 0, -1000); // center the points a bit
 	glEnable(GL_DEPTH_TEST);
 	mesh.drawVertices();
-	//mesh.drawWireframe();
-	if (mesh.getVertices().size() < 1500){
+	printf("size %d \n", mesh.getVertices().size());
+	if (mesh.getVertices().size() < 750){
 		noDJ++;
-		printf("\nnodj %d\n", noDJ);
+		//printf("\nnodj %d\n", noDJ);
 	}
 	if (noDJ > 10){
 		WheresMyDj = false;
 		noDJ = 0;
 	}
-	//vector<ofVec3f>printme = mesh.getVertices();
-	//for (int i =0; i<printme.size(); i++){
-	//	
-	//} 
+	struct iys{
+		int y;
+		vector<int>is;
+	};
+	vector<ofVec3f>printme = mesh.getVertices();
+	vector<iys>ys;
+
 	//maxY = printme[printme.size()-1].y;
 	//printf("--------------------");
-	//for (int i =0; i<printme.size(); i++){
-	//	printf("\ni%d x%4.2f y%4.2f z%4.2f", i, printme[i].x,printme[i].y, printme[i].z);
-	//	if (printme[i].y > maxY){maxY = printme[i].y;}
-	//}
+	for (int i =0; i<printme.size(); i++){
+
+		//printf("\ni%d x%4.2f y%4.2f z%4.2f", i, printme[i].x,printme[i].y, printme[i].z);
+		//if (printme[i].y > maxY){maxY = printme[i].y;}
+	}
 	//ofColor(255,255,0);
 	//ofSphere(0, maxY, 900, 10);
 	//printf("\n--------------------");
