@@ -36,7 +36,10 @@ void testApp::setup(){
 	mode = PHYSICS;
 
 	DjDepthSliderLow = 0;
-	DjDepthSliderHigh = 1450;
+
+	DjDepthSliderHigh = 1300;
+	//testItt = 40; 
+
 	guiSetup();
 	initRects();
 	ofEnableSmoothing();
@@ -57,6 +60,15 @@ void testApp::update(){
 	/*-------Sound------*/
 //	audio->addPoint(scaledVol*100);
 	//calculate average volume as a single float instead of per frequency
+	/*-------kinect side displays------*/
+	if(drawDJKinect){
+		DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+	}
+	if(drawAudKinect){
+		Aud.update();
+
+	}
+
 	bd.updateFFT();
 
 	bool isChanged = false;
@@ -75,6 +87,7 @@ void testApp::update(){
 	switch(mode){
 		case DJ:
 			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
 			Aud.update();
@@ -85,18 +98,20 @@ void testApp::update(){
 			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged);
 			physics.update();
 			break;
-		}
+	}
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
 	ofBackground(ccomp5);
 
+
 	//sound
 	if(drawSound){
 		drawVolGraphs();
 		drawBeatBins();
 	}
+
 	//modes
 	if(drawDisplay){
 		switch(mode){
@@ -136,12 +151,17 @@ void testApp::draw(){
 		ofPopMatrix();
 	}
 	if(drawAudKinect){
-		ofPushStyle();
-		ofSetColor(white);
+		ofPushMatrix();
 		ofRect(audRect);
+		ofTranslate(audRect.x, audRect.y);
+		ofPushStyle();
+		Aud.kinect.drawDepth(0, 0, audRect.width, audRect.height);
+		Aud.kinect.draw(0, 0, audRect.width, audRect.height);
 		ofPopStyle();
+		ofPopMatrix();
 	}
-	
+
+
 }
 
 /*--------------------------------------------------*
@@ -208,6 +228,9 @@ void testApp::drawVolGraphs(){
 //--------------------------------------------------------------
 
 
+
+
+
 void testApp::audioIn(float *input, int bufferSize, int nChannels){	
 	// bd.audioReceived(input, bufferSize);
 
@@ -245,6 +268,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 	*---------------------------------*/
 	if(name == "dJGod mode")
 	{
+		if (!DJMODE.WheresMyDj){DJMODE.WheresMyDj = true;}
 		mode = DJ;
 	}
 	else if(name == "physics mode")
@@ -279,6 +303,11 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		DjDepthSliderHigh = slider->getScaledValueHigh(); 
 		DjDepthSliderLow = slider->getScaledValueLow(); 
 	}
+ //   else if(name == "dJ testt")
+	//{
+	//	ofxUISlider *slider = (ofxUISlider *) e.widget; 
+	//	testItt = slider->getScaledValue(); 
+	//}
     else if(name == "aud depth threshold")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
@@ -341,8 +370,9 @@ void testApp::guiSetup(){
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 440, 2000, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1300, dim*25, dim),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
+	//w = gui->addWidgetSouthOf(new ofxUISlider("dJ testt", 1, 100, 40, dim*25, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
