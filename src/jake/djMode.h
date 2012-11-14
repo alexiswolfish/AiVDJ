@@ -49,15 +49,6 @@ public:
 	void DJwindowResized(int w, int h);
 	void mouseMoved(int w, int h );
 
-	struct DJpoint {
-		int x;
-		int y;
-		int z;
-		ofVec3f location;
-		ofColor color;
-	};
-	vector<DJpoint>DJpoints;
-
 	float Zlow, Zhigh, testVar;
 	ofVec3f maxY;
 	int middleX;
@@ -76,6 +67,7 @@ public:
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 	bool bcloth;
+	bool test;
 	
 	int angle;
 	

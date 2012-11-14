@@ -13,7 +13,7 @@
 #include "ofxKMesh.h"
 
 
-#define CLOTH_RES 20
+#define CLOTH_RES 15
 
 class ClothParticle {
 public:
