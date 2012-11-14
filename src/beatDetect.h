@@ -18,12 +18,12 @@ class beatDetect
 {
 protected:
     // fft & beat detection
-	float fftSmoothed[FFT_BINS]; // 平均化されたfft値を格納する配列
-	float fftSubbands[FFT_SUBBANDS]; // 各サブバンドの生の値
-	float averageEnergy[FFT_SUBBANDS]; // サブバンドの平均エネルギ
-    float fftVariance[FFT_SUBBANDS]; // 各サブバンドのエネルギの分散を格納する
-    float beatValueArray[FFT_SUBBANDS]; // 各サブバンドのビートディテクトに使われる定数Cを格納する
-	float energyHistory[FFT_SUBBANDS][ENERGY_HISTORY]; //32のサブバンドに42のエネルギヒストリ
+	float fftSmoothed[FFT_BINS]; // averaged fft
+	float fftSubbands[FFT_SUBBANDS]; // raw value of each subband
+	float averageEnergy[FFT_SUBBANDS]; // average energy of the subband
+    float fftVariance[FFT_SUBBANDS]; // variance of energy
+    float beatValueArray[FFT_SUBBANDS]; // constants used for beat detection
+	float energyHistory[FFT_SUBBANDS][ENERGY_HISTORY]; //history of the subband energy
 	float *in_fft;
 	float beatValue;
 	int historyPos;
@@ -55,13 +55,10 @@ public:
     bool isBeatRange(int low, int high, int threshold);
     void setBeatValue(float bv) {beatValue = bv;}
 
-    // fftオブジェクト用
+    // fft object
     float *magnitude, *phase, *power, *audio_input;
     float *magnitude_average, *magnitude_average_snapshot; 
-
 	bool bDetectBeat;
-
-    // fft object
     fft myfft;
     
 };

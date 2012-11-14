@@ -1,8 +1,8 @@
 #include "beatDetect.h"
 #include "fft.h"
 // FFT BIN = 256
-// サブバンド数 = FFT_SUBBANDS  32 -> subbands
-// ヒストリ数 = ENERGY_HISTORY  43 -> energyHistory
+// FFT_SUBBANDS  32 -> subbands
+// ENERGY_HISTORY  43 -> energyHistory
 
 
 int fft_size=512;
@@ -10,14 +10,10 @@ int buffer_size = 1024;
 
 beatDetect::beatDetect()
 {
-    //int fft_size=512;
-    //int buffer_size = 1024;
-    // 配列数は512 これを初期化
     for(int i = 0; i < fft_size; i++)
         fftSmoothed[i] = 0;
 
-    // 各周波数サブバンド32個には43個のエネルギーヒストリが含まれている
-    // もろもろの配列を初期化
+    // history of energy, 42 to 32 pieces each frequency subband
     for(int i = 0; i < FFT_SUBBANDS; i++)
     {
         for(int l = 0; l < ENERGY_HISTORY; l++){
@@ -29,12 +25,11 @@ beatDetect::beatDetect()
         beatValueArray[i] = 0;
     }
 
-    // fftオブジェクト用の配列を宣言
 	audio_input = new float[buffer_size];
 	magnitude = new float[fft_size];
 	phase = new float[fft_size];
 	power = new float[fft_size];
-	magnitude_average = new float[fft_size]; //FFTの配列の平均
+	magnitude_average = new float[fft_size];
 	magnitude_average_snapshot = new float[fft_size];
 
 	for (int i = 0; i < fft_size; i++) {
@@ -52,100 +47,94 @@ beatDetect::beatDetect()
     printf("beatDetect setup OK!! \n");
 }
 
-
-//void beatDetect::updateFFT(float* in_fft, int infft_size)
 void beatDetect::updateFFT()
 {
-    if(fftInit) //初期化済んでいれば真
+    if(fftInit)
     {
-        //fft = in_fft;
-        // audioReceivedで取得したmagnitude配列をfftへ渡す
+        // pass aray to fft mag obtained in audio recieved
         in_fft = magnitude;
         for (int i = 0; i < fft_size; i++)
         {
             // take the max, either the smoothed or the incoming:
-            // 0.9倍したものよりも大きければ値を更新する
+            // update the value is greater than 0.9 times the
             if (fftSmoothed[i] < in_fft[i]) 
                 fftSmoothed[i] = in_fft[i];
             // let the smoothed value sink to zero:
-            // 取得した周波数の振幅値に0.9倍にして、徐々に0に減らしていく
-            // (古い振幅値の影響をなくす)
+            // Set to 0.9 times the amplitude value of the acquired frequency, we gradually reduced to zero
+            // eliminate influence of old amp values
             fftSmoothed[i] *= 0.90f;
         }
 
-        if(bDetectBeat) //初期化が済んでいれば真
+        if(bDetectBeat) //only if initialized
         {
-            // サブバンドの計算
-            // このソースではサブバンド数は32 -> 32回loop
+            // calculate sub-band
+            // This source is the number of sub-bands in 32 -> loop 32 
             for(int i = 0; i < FFT_SUBBANDS; i++)
             {
                 fftSubbands[i] = 0;
-                // 256 / 32 = 8回のループ
+                // Loop 256/32 = 8
                 for(int b = 0; b < fft_size/FFT_SUBBANDS; b++) {
-                    //                 [i * 8 + 1~8] -> 8刻みで,0から7,8->15,16->23という感じで和をとる
+                    // [I * 8 + 1 ~ 8] -> in increments of 8, 7,8 - 0 to the sum in the sense> of 23 -> 15 and 16
                     fftSubbands[i] +=  in_fft[i*(fft_size/FFT_SUBBANDS)+b];
                 }
-                // サブバンド値の和をとった後, 加算した回数分割って平均値にする
+                // After taking the sum of the values ​​of the sub-band, the average value obtained by adding the number of times I split
                 fftSubbands[i] = fftSubbands[i]*(float)FFT_SUBBANDS/(float)fft_size;
                 
-                // サブバンドの分散値の計算
+                // calc dispersion of sub-bands
                 for(int b=0; b < fft_size/FFT_SUBBANDS; b++)
                     fftVariance[i] += pow(in_fft[i*(fft_size/FFT_SUBBANDS)+b] - fftSubbands[i], 2);
                 fftVariance[i] = fftVariance[i]*(float)FFT_SUBBANDS/(float)fft_size;
                 
-                //定数Cを分散値によって動的に変更する
+                //change the value dynamically, balance constant C
                 beatValueArray[i] = (-0.0025714*fftVariance[i])+1.35;
             }
 
-            // エネルギ平均の計算   32回loop
+            // average energy calculation
             for(int i = 0; i < FFT_SUBBANDS; i++) {
                 averageEnergy[i] = 0;
-                // 42回loop -> ヒストリ数だけ
                 for(int h = 0; h < ENERGY_HISTORY; h++) {
-                    // 全体のエネルギーの平均 += 各サブバンドのエネルギヒストリ
+                    // energy history is the average total of each subband
                     averageEnergy[i] += energyHistory[i][h];
                 }
-                // 総和をヒストリ数で割って加重平均にする
+                // weight the average
                 averageEnergy[i] /= ENERGY_HISTORY;
             }
 
             // put new values into energy history
             // 32回loop
             for(int i = 0; i < FFT_SUBBANDS; i++) {
-                // 算出したサブバンドをエネルギヒストリのhistoryPosの位置に追加
+                // add to the history of the energy position of the sub-band historyPos calculated
                 energyHistory[i][historyPos] = fftSubbands[i];
             }
-            // historyPos = (現在のpos+1)を43で割った余り
-            // 配列の添字がループすることによって擬似的な循環リストを表現している
+            // artificial circulation by subscript of the array
             historyPos = (historyPos+1) % ENERGY_HISTORY; // forward pointer and rotate if necessary
         }
     }
 }
 
-// 音声入力を受け取ったとき, FFT解析を行いmagnitude配列を更新
+//When you receive a voice input, update the array magnitude FFT analysis is performed
 void beatDetect::audioReceived(float* input, int bufferSize){
-	// 入力された音声シグナルを audio_input にコピー
 	memcpy(audio_input, input, sizeof(float) * bufferSize);
 	
 	float avg_power = 0.0f;
 	
-	// アドオンのFFTクラスを使ってスペクトルを解析、 magnitude が欲しかったFFT振幅の値になる。
+	//check specturm, value of the FFT amp wanted magnitude
 	myfft.powerSpectrum(0, (int)fft_size, audio_input, buffer_size, 
 						magnitude, phase, power, &avg_power);
 	
-	// 結果の値の大小が激しかったので平方根をとった
+	// tone down magnitude
 	for (int i = 0; i < fft_size; i++) {
 		magnitude[i] = powf(magnitude[i], 0.5);
 	}
 
-	// FFT振幅の平均値を計算
+	// calc average value of the FFt amplitude (volume)
 	for (int i = 0; i < fft_size; i++) {
 		float x = 0.085;
 		magnitude_average[i] = (magnitude[i] * x) + (magnitude_average[i] * (1 - x));
 	}
 }
 
-// ビートそのものがあったか
+// Beat itself
 bool beatDetect::isBeat(int subband)
 {
     return fftSubbands[subband] > averageEnergy[subband]*beatValueArray[subband];
@@ -172,7 +161,7 @@ bool beatDetect::isHat()
     return isBeatRange(low, hi, thresh);
 }
 
-// 検出に用いるサブバンド幅を指定するタイプ
+// decide the width of the sub bands used in the detection
 bool beatDetect::isBeatRange(int low, int high, int threshold)
 {
     int num = 0;

@@ -74,7 +74,7 @@ void testApp::update(){
 		case PHYSICS:
 			physics.addParticles(numParticles);
 			//physics.updateSources(scaledVol * 190.0f);
-			physics.updateSources(left[4]*180.0f);
+			physics.updateSources(*bd.magnitude_average *10);
 			physics.update();
 			break;
 		case VID:
@@ -86,7 +86,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBackground(cmain);
+	ofBackground(ccomp5);
 
 	//sound
 	if(drawSound){
@@ -146,18 +146,18 @@ void testApp::drawBeatBins(){
 
     for (int i = 1; i < (int)rectWidth; i++){
         if(i % 16 == 0)
-            ofSetColor(200,0,0);
+            ofSetColor(ccomp3);
         else
-            ofSetColor(155,155,75);
+            ofSetColor(white);
 		ofLine(10+(i*3),150,  10+(i*3),150-bd.magnitude[i]*10.0f);
 	}
 	//ofTranslate(0, rectHeight + spacer, 0);
 	    ofSetColor(134,113,89);
 	for (int i = 1; i < (int)rectWidth/2; i++){
         if(i % 16 == 0)
-            ofSetColor(200,0,0);
+            ofSetColor(ccomp3);
         else
-            ofSetColor(134,113,89);
+            ofSetColor(white);
 		ofLine(10+(i*3),300,  10+(i*3),300-bd.magnitude_average[i]*10.0f);
 	}
 	ofPopMatrix();
@@ -173,39 +173,30 @@ void testApp::drawVolGraphs(){
 		ofPushMatrix();
 		ofNoFill();
 		ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*2 + spacer*2), 0);
-			
 		ofSetColor(white);
-		ofDrawBitmapString("Left Channel", 4, 18);
-		
+		ofDrawBitmapString("Left Channel", 4, 18);	
 		ofSetLineWidth(1);	
 		ofRect(0, 0, rectWidth, rectHeight);
-
 		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);
-					
+		ofSetLineWidth(3);		
 			ofBeginShape();
 			for (int i = 0; i < left.size(); i++){
 				ofVertex(i*2, 100 -left[i]*180.0f);
 			}
 			ofEndShape(false);
 
-		ofTranslate(0, rectHeight + spacer, 0);
-			
+		ofTranslate(0, rectHeight + spacer, 0);			
 		ofSetColor(white);
-		ofDrawBitmapString("Right Channel", 4, 18);
-		
+		ofDrawBitmapString("Right Channel", 4, 18);		
 		ofSetLineWidth(1);	
 		ofRect(0, 0, rectWidth, rectHeight);
-
 		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);
-					
+		ofSetLineWidth(3);					
 			ofBeginShape();
 			for (int i = 0; i < right.size(); i++){
 				ofVertex(i*2, 100 -right[i]*180.0f);
 			}
-			ofEndShape(false);
-			
+			ofEndShape(false);			
 		ofPopMatrix();
 	ofPopStyle();
 }
@@ -257,7 +248,7 @@ void testApp::audioReceived(float* input, int bufferSize, int nChannels) {
 
 }
 
-void testApp::audioIn(float * input, int bufferSize, int nChannels){	
+void testApp::audioIn(float *input, int bufferSize, int nChannels){	
 	// bd.audioReceived(input, bufferSize);
 
 	float curVol = 0.0;
