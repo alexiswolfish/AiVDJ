@@ -15,7 +15,7 @@ audMode::~audMode(){
 
 
 void audMode::setup() {
-	ofSetLogLevel(OF_LOG_VERBOSE);
+	//ofSetLogLevel(OF_LOG_VERBOSE);
 	
 	c1.setHex(0xF9CDAD); //butternut squash
 	c2.setHex(0xFFD700); //cornucopia
@@ -24,7 +24,6 @@ void audMode::setup() {
 	//c5.setHex(0xC8C8A9); //Timothy Hay
 	alpha = 255;
 	
-	
 	// enable depth->video image calibration
 	kinect.setRegistration(true);
     
@@ -32,7 +31,8 @@ void audMode::setup() {
 	kinect.init(true); // shows infrared instead of RGB video image
 	kinect.init(false, false); // disable video image (faster fps)
 	
-	kinect.open();		// opens first available kinect
+	kinect.open();
+	//kinect.open("A00362A08602047A");		// opens kinect
 	
 	grayImage.allocate(kinect.width, kinect.height);
 	grayThreshNear.allocate(kinect.width, kinect.height);

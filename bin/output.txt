@@ -1,0 +1,33 @@
+device = 0 (Primary Sound Driver)
+maximum output channels = 2
+maximum input channels = 0
+-----------------------------------------
+device = 1 (Speakers (High Definition Audio Device))
+maximum output channels = 2
+maximum input channels = 0
+-----------------------------------------
+device = 2 (Primary Sound Capture Driver)
+----* default ----* 
+maximum output channels = 0
+maximum input channels = 2
+-----------------------------------------
+device = 3 (Microphone (High Definition Audio Device))
+maximum output channels = 0
+maximum input channels = 2
+-----------------------------------------
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+[warning] OFXUITOGGLE: DON'T USE THIS CONSTRUCTOR. THIS WILL BE REMOVED ON FUTURE RELEASES.
+1000[verbose] Creating GLSL Program
+[verbose] GL_VERTEX_SHADER shader compiled.
+[verbose] GL_FRAGMENT_SHADER shader compiled.
+[verbose] Attaching shader of type GL_FRAGMENT_SHADER
+[verbose] Attaching shader of type GL_VERTEX_SHADER
+[verbose] Program linked.
+[verbose] ofxKinect: Context inited
+[verbose] ofxKinect: 1 device found
+[verbose]     id: 0 serial: B00363262039047B
