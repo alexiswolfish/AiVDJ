@@ -17,25 +17,16 @@ void testApp::setup(){
 	ofSetCircleResolution(80);
 	soundStream.listDevices();
 
-	// 0 output channels, 
-	// 2 input channels
-	// 44100 samples per second
-	// 256 samples per buffer
-	// 4 num buffers (latency)
-
 	int bufferSize = 1024;
+	pVol = 0.0;
+	cVol = 0.0;
 
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
 	//volHistory.assign(400, 0.0);
 
-	bufferCounter	= 0;
-	drawCounter		= 0;
-	smoothedVol     = 0.0;
-	scaledVol		= 0.0;
-
 	//soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
-	ofSoundStreamSetup(0, 1, this, 44100, bufferSize, 4);
+	ofSoundStreamSetup(0, 2, this, 44100, bufferSize, 4);
 
 	/*--------GUI-----------*/
 	drawDJKinect = false;
@@ -52,6 +43,7 @@ void testApp::setup(){
 
 	/*-------Alex-------*/
 	physics.setup();
+	generateColors(ccomp3);
 	numParticles = 0;
 	/*-------Jake-------*/
 	DJMODE.setup();
@@ -63,11 +55,21 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 	/*-------Sound------*/
-	//lets scale the vol up to a 0-1 range 
-	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
-	audio->addPoint(scaledVol*100);
-
+//	audio->addPoint(scaledVol*100);
+	//calculate average volume as a single float instead of per frequency
 	bd.updateFFT();
+
+	bool isChanged = false;
+	float fft_bins = 512.0f; //this really should be a class constant
+	pVol = cVol;
+	cVol = 0;
+	for(int i=0; i<fft_bins; i++)
+		cVol += bd.magnitude_average[i];
+	cVol/=fft_bins;
+	printf("%f \n", abs(pVol - cVol)*100);
+	if(abs(pVol - cVol)*100>1){
+		isChanged = true;
+	}
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -80,8 +82,7 @@ void testApp::update(){
 		default:
 		case PHYSICS:
 			physics.addParticles(numParticles);
-			//physics.updateSources(scaledVol * 190.0f);
-			physics.updateSources(left[4]*180.0f);
+			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged);
 			physics.update();
 			break;
 		}
@@ -89,7 +90,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBackground(cmain);
+	ofBackground(ccomp5);
 
 	//sound
 	if(drawSound){
@@ -142,29 +143,27 @@ void testApp::draw(){
 	}
 	
 }
+
+/*--------------------------------------------------*
+Draw Beat Bins
+
+Draw smoothed and raw volume graphs for each bin
+ *--------------------------------------------------*/
 void testApp::drawBeatBins(){
 	float rectWidth = 512;
 	float rectHeight = 150;
 	float spacer = 16;
 	ofPushMatrix();
-	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*4 + spacer*4), 0);
-	ofSetColor(155,155,75);
-
-    for (int i = 1; i < (int)rectWidth; i++){
-        if(i % 16 == 0)
-            ofSetColor(200,0,0);
-        else
-            ofSetColor(155,155,75);
-		ofLine(10+(i*3),150,  10+(i*3),150-bd.magnitude[i]*10.0f);
-	}
+	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*3 + spacer*3), 0);
+	ofSetColor(white);
+	bd.drawSubbands();
 	//ofTranslate(0, rectHeight + spacer, 0);
-	    ofSetColor(134,113,89);
 	for (int i = 1; i < (int)rectWidth/2; i++){
         if(i % 16 == 0)
-            ofSetColor(200,0,0);
+            ofSetColor(ccomp3);
         else
-            ofSetColor(134,113,89);
-		ofLine(10+(i*3),300,  10+(i*3),300-bd.magnitude_average[i]*10.0f);
+            ofSetColor(white);
+		ofLine(10+(i*3), 150,  10+(i*3),150-bd.magnitude_average[i]*10.0f);
 	}
 	ofPopMatrix();
 }
@@ -179,93 +178,37 @@ void testApp::drawVolGraphs(){
 		ofPushMatrix();
 		ofNoFill();
 		ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*2 + spacer*2), 0);
-			
 		ofSetColor(white);
-		ofDrawBitmapString("Left Channel", 4, 18);
-		
+		ofDrawBitmapString("Left Channel", 4, 18);	
 		ofSetLineWidth(1);	
 		ofRect(0, 0, rectWidth, rectHeight);
-
 		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);
-					
+		ofSetLineWidth(3);		
 			ofBeginShape();
 			for (int i = 0; i < left.size(); i++){
 				ofVertex(i*2, 100 -left[i]*180.0f);
 			}
 			ofEndShape(false);
 
-		ofTranslate(0, rectHeight + spacer, 0);
-			
+		ofTranslate(0, rectHeight + spacer, 0);			
 		ofSetColor(white);
-		ofDrawBitmapString("Right Channel", 4, 18);
-		
+		ofDrawBitmapString("Right Channel", 4, 18);		
 		ofSetLineWidth(1);	
 		ofRect(0, 0, rectWidth, rectHeight);
-
 		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);
-					
+		ofSetLineWidth(3);					
 			ofBeginShape();
 			for (int i = 0; i < right.size(); i++){
 				ofVertex(i*2, 100 -right[i]*180.0f);
 			}
-			ofEndShape(false);
-			
+			ofEndShape(false);			
 		ofPopMatrix();
 	ofPopStyle();
 }
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
-	if(drawDJ){
-		DJMODE.DJkeyPressed(key);
-	} else if (drawAud) {
-		Aud.AudkeyPressed(key);
-	}
-	if( key == 's' ){
-		soundStream.start();
-	}
-	
-	if( key == 'e' ){
-		soundStream.stop();
-	}
-}
 
-//--------------------------------------------------------------
-void testApp::keyReleased(int key){
 
-}
-
-//--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
-
-}
-
-//--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
-
-}
-
-//--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
-	if(mode == PHYSICS)
-		physics.mousePressed(physicsMode::source::ORBIT, ofVec3f((float)x,(float)y,0));
-}
-
-//--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
-	ofRectangle guiRect = ofRectangle(0,0,guiWidth, guiHeight);
-	if(!guiRect.inside(ofVec2f(x,y)))
-		physics.mousePressed( sourceType, ofVec3f(x,y,0));
-}
-
-void testApp::audioReceived(float* input, int bufferSize, int nChannels) {
-
-    bd.audioReceived(input, bufferSize);
-
-}
-
-void testApp::audioIn(float * input, int bufferSize, int nChannels){	
+void testApp::audioIn(float *input, int bufferSize, int nChannels){	
 	// bd.audioReceived(input, bufferSize);
 
 	float curVol = 0.0;
@@ -274,20 +217,8 @@ void testApp::audioIn(float * input, int bufferSize, int nChannels){
 	for (int i = 0; i < bufferSize; i++){
 		left[i]		= input[i*2]*0.5;
 		right[i]	= input[i*2+1]*0.5;
-
-		curVol += left[i] * left[i];
-		curVol += right[i] * right[i];
-		numCounted+=2;
-
 	}
-	//mean rms
-	curVol /= (float)numCounted;
-	//root rms 
-	curVol = sqrt( curVol );
-	smoothedVol *= 0.93;
-	smoothedVol += 0.07 * curVol;
-	bufferCounter++;
-	
+
 	/*------Beat Detection-------*/
 	bd.audioReceived(input, bufferSize);
 }
@@ -422,6 +353,58 @@ void testApp::guiSetup(){
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
 //--------------------------------------------------------------
+void testApp::generateColors(ofColor seed){
+	colors = colorGen.createRangeFromLeftSplitComplementary(seed);
+}
+
+void testApp::keyPressed(int key){
+	if(drawDJ){
+//		DJ.DJkeyPressed(key);
+	}
+	if( key == 's' ){
+		soundStream.start();
+	}
+	
+	if( key == 'e' ){
+		soundStream.stop();
+	}
+	if(key == ' '){
+		ofColor r = ofColor(ofRandom(0,255),ofRandom(0,255),ofRandom(0,255));
+	//	ofColor r = colorGen.getColor(10, colorGen.getColourConstraints(CT_FRESH));
+		r.setBrightness(100);
+		generateColors(r);
+//		colorGen.
+	}
+}
+
+//--------------------------------------------------------------
+void testApp::keyReleased(int key){
+
+}
+
+//--------------------------------------------------------------
+void testApp::mouseMoved(int x, int y ){
+
+}
+
+//--------------------------------------------------------------
+void testApp::mouseDragged(int x, int y, int button){
+
+}
+
+//--------------------------------------------------------------
+void testApp::mousePressed(int x, int y, int button){
+	if(mode == PHYSICS)
+		physics.mousePressed(physicsMode::source::ORBIT, ofVec3f((float)x,(float)y,0));
+}
+
+//--------------------------------------------------------------
+void testApp::mouseReleased(int x, int y, int button){
+	ofRectangle guiRect = ofRectangle(0,0,guiWidth, guiHeight);
+	if(!guiRect.inside(ofVec2f(x,y)))
+		physics.mousePressed( sourceType, ofVec3f(x,y,0));
+}
+
 void testApp::exit()
 {
     gui->saveSettings("GUI/guiSettings.xml");     

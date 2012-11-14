@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxUI.h"
 #include "beatDetect.h"
+#include "ofxColourTheory.h"
 
 #include "alex/physicsMode.h"
 #include "jake/djMode.h"
@@ -55,6 +56,10 @@ class testApp : public ofBaseApp{
 		physicsMode::source::Type sourceType;
 		int numParticles;
 
+		vector<ofColor> colors;
+		ofxColourTheory colorGen;
+
+		void generateColors(ofColor seed);
 		/*-----------Jake-----------*/
 		djMode DJMODE;
 		/*-----------Melissa-----------*/
@@ -72,7 +77,6 @@ class testApp : public ofBaseApp{
 		*/
 
 		void audioIn(float * input, int bufferSize, int nChannels); 
-		void audioReceived(float* input, int bufferSize, int nChannels);
 
 		void drawVolGraphs();
 		void drawBeatBins();
@@ -81,17 +85,19 @@ class testApp : public ofBaseApp{
 		vector <float> right;
 		vector <float> volHistory;
 		
-		int 	bufferCounter;
-		int 	drawCounter;
-		
-		float smoothedVol;
-		float scaledVol;
-		
-		ofSoundStream soundStream;
+		float cVol;
+		float pVol;
 
+		ofSoundStream soundStream;
 		ofxUIMovingGraph *audio;
 
 		beatDetect bd;
+		
+	// 0 output channels, 
+	// 2 input channels
+	// 44100 samples per second
+	// 256 samples per buffer
+	// 4 num buffers (latency)
 
 	
 };
