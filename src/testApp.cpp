@@ -389,7 +389,7 @@ void testApp::generateColors(ofColor seed){
 
 void testApp::keyPressed(int key){
 	if(drawDJ){
-//		DJ.DJkeyPressed(key);
+		DJMODE.DJkeyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();
