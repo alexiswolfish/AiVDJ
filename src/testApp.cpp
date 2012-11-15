@@ -399,8 +399,8 @@ void testApp::keyPressed(int key){
 		soundStream.stop();
 	}
 	if(key == ' '){
-		ofColor r = ofColor(ofRandom(0,255),ofRandom(0,255),ofRandom(0,255));
-	//	ofColor r = colorGen.getColor(10, colorGen.getColourConstraints(CT_FRESH));
+	//	ofColor r = ofColor(ofRandom(0,255),ofRandom(0,255),ofRandom(0,255));
+		ofColor r = colorGen.getColor(10, colorGen.getColourConstraints(CT_FRESH));
 		r.setBrightness(100);
 		generateColors(r);
 //		colorGen.
