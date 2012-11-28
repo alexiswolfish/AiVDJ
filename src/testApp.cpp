@@ -95,7 +95,7 @@ void testApp::draw(){
 	ofSetBackgroundAuto(true);
 	//sound
 	if(drawSound){
-		drawVolGraphs();
+	//	drawVolGraphs();
 		drawBeatBins();
 		drawColorSwatches(guiWidth+10, 10);
 	}
@@ -148,7 +148,7 @@ void testApp::drawBeatBins(){
 	float rectHeight = 150;
 	float spacer = 16;
 	ofPushMatrix();
-	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*3 + spacer*3), 0);
+	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*1.5 + spacer), 0);
 	ofSetColor(white);
 	bd.drawSubbands();
 	//ofTranslate(0, rectHeight + spacer, 0);

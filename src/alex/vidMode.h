@@ -35,9 +35,15 @@ class vidMode{
 	};
 
 	vidMode();
-	//~vidMode();
+	~vidMode();
 	
 	ParticleController p;
+
+		ofVideoGrabber 		vidGrabber;
+		unsigned char * 	videoInverted;
+		ofTexture			videoTexture;
+		int 				camWidth;
+		int 				camHeight;
 
 	void setup();
 	void update(int x, int y);

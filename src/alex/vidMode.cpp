@@ -27,7 +27,8 @@
   {
 	ofPushStyle();
 	ofNoFill();
-    ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
+   // ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
+	// ofSetColor(x/1.5,y/1.5,ofRandom(0,255));
 	ofSetLineWidth(1.5);	
     ofLine(pos.x,pos.y,pos.x-vel.x,pos.y-vel.y);
 	ofPopStyle();
@@ -81,14 +82,29 @@ void vidMode::setup()
 {
   numParticles = 7000;
   p = ParticleController(numParticles);
+
+  	camWidth 		= 640;	// try to grab at this size. 
+	camHeight 		= 480;
+	
+	vidGrabber.setVerbose(true);
+	vidGrabber.initGrabber(camWidth,camHeight);
+
 }
 void vidMode::update(int x, int y)
 {
   p.update(x,y);
+
+  //camera garbage
+  vidGrabber.update();
+	//end camera garbage
 }
 
 void vidMode::draw(int x, int y)
 {
-  p.update(x,y);
   p.render(x,y);
+  ofSetHexColor(0xffffff);
+  vidGrabber.draw(20,20);
+  //camera garbage
+ 
+
 }
