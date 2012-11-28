@@ -41,7 +41,7 @@ void testApp::setup(){
 
 	/*-------Alex------*/
 	physics.setup();
-	generateColors(ccomp3);
+	generateColors(CT_FRESH);
 	numParticles = 0;
 	/*-------Jake-------*/
 //	DJ.setup();
@@ -62,7 +62,7 @@ void testApp::update(){
 	for(int i=0; i<fft_bins; i++)
 		cVol += bd.magnitude_average[i];
 	cVol/=fft_bins;
-	printf("%f \n", abs(pVol - cVol)*100);
+	//printf("%f \n", abs(pVol - cVol)*100);
 	if(abs(pVol - cVol)*100>1){
 		isChanged = true;
 	}
@@ -93,6 +93,7 @@ void testApp::draw(){
 	if(drawSound){
 		drawVolGraphs();
 		drawBeatBins();
+		drawColorSwatches(guiWidth+10, 10);
 	}
 	//modes
 	if(drawDisplay){
@@ -345,10 +346,27 @@ void testApp::guiSetup(){
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
 //--------------------------------------------------------------
-void testApp::generateColors(ofColor seed){
-	colors = colorGen.createRangeFromLeftSplitComplementary(seed);
-}
 
+/*-------------------------------------------------------------*
+Color Generation
+options: light,dark,bright,weak,neutral,fresh,soft,hard,warm,cool,intense
+ *-------------------------------------------------------------*/
+
+void testApp::generateColors(ColourShade cs){
+	colors.clear();
+	for(int i=0; i<100; i++){
+		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
+	}
+}
+void testApp::drawColorSwatches(int x, int y){
+	ofPushMatrix();
+	ofTranslate(x,y,0);
+	for(int i=0; i<colors.size(); i++){
+		ofSetColor(colors[i]);
+		ofRect(i*4,0,0,3,10);
+	}
+	ofPopMatrix();
+}
 void testApp::keyPressed(int key){
 	if(drawDJ){
 //		DJ.DJkeyPressed(key);
@@ -361,11 +379,8 @@ void testApp::keyPressed(int key){
 		soundStream.stop();
 	}
 	if(key == ' '){
-	//	ofColor r = ofColor(ofRandom(0,255),ofRandom(0,255),ofRandom(0,255));
-		ofColor r = colorGen.getColor(10, colorGen.getColourConstraints(CT_FRESH));
-		r.setBrightness(100);
-		generateColors(r);
-//		colorGen.
+		//change the color range
+		generateColors( (ColourShade) ((int)(ofRandom(0,10))) );
 	}
 }
 

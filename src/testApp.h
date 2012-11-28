@@ -55,10 +55,12 @@ class testApp : public ofBaseApp{
 		physicsMode::source::Type sourceType;
 		int numParticles;
 
+		//Color Stuff
 		vector<ofColor> colors;
 		ofxColourTheory colorGen;
 
-		void generateColors(ofColor seed);
+		void generateColors(ColourShade seed);
+		void drawColorSwatches(int x, int y);
 		/*-----------Jake-----------*/
 //		djMode DJ;
 
