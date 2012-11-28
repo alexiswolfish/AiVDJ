@@ -34,7 +34,7 @@ public:
 	void draw();
 
 	void exit();
-	void makeFBO();
+	void getLineData();
 
 	ofFbo testfbo;
 	
@@ -52,6 +52,9 @@ public:
 	float Zlow, Zhigh, testVar;
 	ofVec3f maxY;
 	int middleX;
+
+	vector<vector<ofVec3f>>lastY;
+	vector<int>sortedY;
 
 	ofxKinect kinect;
 	
