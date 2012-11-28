@@ -61,11 +61,10 @@ void testApp::update(){
 	//calculate average volume as a single float instead of per frequency
 	/*-------kinect side displays------*/
 	if(drawDJKinect){
-		DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+		DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
 	}
 	if(drawAudKinect){
 		Aud.update();
-
 	}
 
 	bd.updateFFT();
@@ -85,7 +84,8 @@ void testApp::update(){
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			DJMODE.update(DjDepthSliderLow, DjDepthSliderHigh);
+			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
+			DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
@@ -106,10 +106,10 @@ void testApp::draw(){
 
 
 	//sound
-	if(drawSound){
+	//if(drawSound){
 		drawVolGraphs();
 		drawBeatBins();
-	}
+	//}
 
 	//modes
 	if(drawDisplay){

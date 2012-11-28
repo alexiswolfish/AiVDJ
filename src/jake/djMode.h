@@ -4,6 +4,7 @@
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
 #include "../cloth/ofxKCloth.h"
+//#include "../testApp.h"
 
 
 // uncomment this to read from two kinects simultaneously
@@ -15,11 +16,12 @@ public:
 	~djMode();
 
 	void setup();
-	void update(float depthLow, float depthHigh);
+	void update(vector<float> &vol, float depthLow, float depthHigh);
 	void draw();
 	void exit();
 
 	void updatePoints();
+	void updateGlobals(ofColor c, bool changeColor);
 	void drawPointCloud();
 	void drawMeshCloud();
 	void clothShit();
@@ -35,6 +37,8 @@ public:
 	int noDJ;
 	float Zlow, Zhigh;
 	vector<ofPolyline> lines;
+	vector<float> volHist;
+	ofColor smartColor;
 
 	ofxKinect kinect;
 	

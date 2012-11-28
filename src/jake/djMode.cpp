@@ -31,7 +31,7 @@ void djMode::setup() {
 
 	kinect.open();
 	////kinect.open("B00363262039047B");	// open a kinect using it's unique serial #
-	ofBackground(100, 100, 100);
+	//ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
 	if (bcloth){
@@ -55,7 +55,7 @@ void djMode::setup() {
 }
 
 //--------------------------------------------------------------
-void djMode::update(float depthLow, float depthHigh) {
+void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 	//ofBackground(100, 100, 100);
 	
 	kinect.update();
@@ -63,16 +63,57 @@ void djMode::update(float depthLow, float depthHigh) {
 	Zlow = depthLow;
 	Zhigh = depthHigh;
 
-	if (bDrawPointCloud) updatePoints();
-	else if (bcloth) clothShit();
+	if (bcloth) clothShit();
+	else if (bDrawPointCloud){
+		int w = 640;
+		int h = 480;
+		int step = 5;
+		bool thresh = false;
+		int points = 0;
+		for(int y = 0; y < h; y += step) {
+			for(int x = 0; x < w; x += step) {
+				if(kinect.getDistanceAt(x, y) > 0) {
+					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
+						points++;
+						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
+						if (!thresh){
+							thresh = true;
+							ofPolyline p;
+							p.addVertex(vec.x, vec.y + (vol[x] * 1200.0f), vec.z);
+							lines.push_back(p);
+						}
+						else{
+							lines.back().addVertex(vec.x, vec.y + (vol[x] * 1200.0f), vec.z);
+						}
+					}
+					else{
+						thresh = false;
+					}
+				}
+			}
+		}
+		if (points < 750){
+			noDJ++;
+			//printf("\nnodj %d\n", noDJ);
+		}
+		if (noDJ > 10){
+			WheresMyDj = false;
+			noDJ = 0;
+		}
+	}
 
+}
+
+//--------------------------------------------------------------
+void djMode::updateGlobals(ofColor c, bool changeColor) {
+	if (changeColor)smartColor = c;
 }
 
 //--------------------------------------------------------------
 
 
 void djMode::draw() {
-	ofBackground(95, 100);
+	//ofBackground(95, 100);
 	
 	if(bDrawPointCloud) {
 		easyCam.begin();
@@ -96,51 +137,16 @@ void djMode::draw() {
 	}
 }
 
-void djMode::updatePoints(){
-	int w = 640;
-	int h = 480;
-	int step = 5;
-	bool thresh = false;
-	int points = 0;
-	for(int y = 0; y < h; y += step) {
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					points++;
-					if (!thresh){
-						thresh = true;
-						ofPolyline p;
-						p.addVertex(kinect.getWorldCoordinateAt(x, y));
-						lines.push_back(p);
-					}
-					else{
-						lines.back().addVertex(kinect.getWorldCoordinateAt(x, y));
-					}
-				}
-				else{
-					thresh = false;
-				}
-			}
-		}
-	}
-	if (points < 750){
-		noDJ++;
-		//printf("\nnodj %d\n", noDJ);
-	}
-	if (noDJ > 10){
-		WheresMyDj = false;
-		noDJ = 0;
-	}
-}
+
 
 void djMode::drawPointCloud() {
-	ofPushMatrix();
-	ofScale(1, -1, -1); // the projected points are 'upside down' and 'backwards' 
+	ofPushMatrix();  //comment out??
+	ofScale(1, -1, -1); 
 	ofTranslate(0, 0, -1000); // center the points a bit
 
 	ofBackground(95, 100);
 	ofPushStyle();
-	ofSetColor(155, 175, 200);
+	ofSetColor(smartColor);
 	for (int i=0; i<lines.size();i++){
 		lines[i].draw();
 	}
@@ -184,7 +190,6 @@ void djMode::drawMeshCloud() {
 	ofTranslate(0, 0, -1000); // center the points a bit
 	glEnable(GL_DEPTH_TEST);
 	mesh.drawVertices();
-	//printf("size %d \n", mesh.getVertices().size());
 	if (mesh.getVertices().size() < 750){
 		noDJ++;
 		//printf("\nnodj %d\n", noDJ);
