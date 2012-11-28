@@ -113,6 +113,7 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 //--------------------------------------------------------------
 void djMode::updateGlobals(ofColor c, bool changeColor) {
 	if (changeColor)smartColor = c;
+
 }
 
 //--------------------------------------------------------------

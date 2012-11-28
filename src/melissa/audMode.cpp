@@ -15,7 +15,9 @@ audMode::~audMode(){
 
 
 void audMode::setup() {
-	//ofSetLogLevel(OF_LOG_VERBOSE);
+
+	ofSetLogLevel(OF_LOG_VERBOSE);
+
 	
 	c1.setHex(0xF9CDAD); //butternut squash
 	c2.setHex(0xFFD700); //cornucopia
@@ -24,6 +26,7 @@ void audMode::setup() {
 	//c5.setHex(0xC8C8A9); //Timothy Hay
 	alpha = 255;
 	
+
 	// enable depth->video image calibration
 	kinect.setRegistration(true);
     
@@ -31,8 +34,9 @@ void audMode::setup() {
 	kinect.init(true); // shows infrared instead of RGB video image
 	kinect.init(false, false); // disable video image (faster fps)
 	
-	kinect.open();
-	//kinect.open("A00362A08602047A");		// opens kinect
+
+	kinect.open();		// opens first available kinect
+
 	
 	grayImage.allocate(kinect.width, kinect.height);
 	grayThreshNear.allocate(kinect.width, kinect.height);
@@ -76,23 +80,21 @@ void audMode::update() {
 		} 		
 		// update the cv images
 		grayImage.flagImageChanged();
-		//hello	
+
 	}
 	
 }
 
 //--------------------------------------------------------------
 void audMode::draw() {
-	ofEnableAlphaBlending();
-	ofBackground(50,1);
-	ofDisableAlphaBlending();
+
+	ofEnableAlphaBlending();    // turn on alpha blending
+	ofBackground(50, 1);
+	ofDisableAlphaBlending();   // turn off alpha
 	
 	easyCam.begin();
-	ofSetColor(0,255,255);
 	drawPointCloud();
 	easyCam.end();
-	
-	
 }
 
 void audMode::drawPointCloud() {	
@@ -110,8 +112,7 @@ void audMode::drawPointCloud() {
 				mesh_r.addVertex(kinect.getWorldCoordinateAt(x, y));
 				mesh.addColor(ofColor(230, 230, 230, alpha));
 				mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-				ofVec3f tmp = kinect.getWorldCoordinateAt(x, y);
-				printf("%d %d %d\n", tmp.x, tmp.y, tmp.z );
+
 			}
 		}
 	}
@@ -120,9 +121,20 @@ void audMode::drawPointCloud() {
 	// the projected points are 'upside down' and 'backwards' 
 	ofScale(-1, -1, -1);
 	ofTranslate(w/2, 0, -1000); // center the points a bit
-	//ofTranslate(0, 0, -1000); // center the points a bit
+
 	glEnable(GL_DEPTH_TEST);
+	vector<ofVec3f> list = mesh.getVertices();
 	int counter = 0;
+	/*for(int j = 0; j < mesh.getNumVertices(); j += step) {
+	 ofVec3f vec = list.front();
+	 list.pop_back();
+	 ofSetColor(255,0,0,127); 
+	 ofFill();
+	 ofRect(vec.x, vec.y, 20, 20);
+	 }  
+	 ofSetColor(255,0,0,127); 
+	 ofFill();
+	 ofEllipse	(0, 0, 200, 200);*/
 	mesh.drawVertices(); 
 	//mesh.drawWireframe();
 	glDisable(GL_DEPTH_TEST);

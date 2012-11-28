@@ -12,7 +12,10 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+
 #include "ofxCv.h"
+
+
 
 
 class audMode {

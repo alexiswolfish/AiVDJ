@@ -9,6 +9,7 @@
 #include "jake/djMode.h"
 #include "melissa/audMode.h"
 
+
 class testApp : public ofBaseApp{
 
 	public:
@@ -101,5 +102,11 @@ class testApp : public ofBaseApp{
 	// 256 samples per buffer
 	// 4 num buffers (latency)
 
+
+		/*-----------Test Variables-----------*/
+	int r,g,b;
 	
+		/*-----------Melissa-----------*/
+	audMode Aud;
+
 };
