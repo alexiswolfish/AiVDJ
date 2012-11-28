@@ -43,10 +43,13 @@ void testApp::setup(){
 	guiSetup();
 	initRects();
 	ofEnableSmoothing();
-
+//				ofEnableAlphaBlending();
 	/*-------Alex-------*/
+	ofBackground(ccomp5.r,ccomp5.g,ccomp5.b,100);
 	physics.setup();
-	generateColors(ccomp3);
+	vid.setup();
+	//curShade = CT_SOFT;
+	generateColors(CT_SOFT);
 	numParticles = 0;
 	/*-------Jake-------*/
 	DJMODE.setup();
@@ -78,7 +81,7 @@ void testApp::update(){
 	for(int i=0; i<fft_bins; i++)
 		cVol += bd.magnitude_average[i];
 	cVol/=fft_bins;
-	printf("%f \n", abs(pVol - cVol)*100);
+	//printf("%f \n", abs(pVol - cVol)*100);
 	if(abs(pVol - cVol)*100>1){
 		isChanged = true;
 	}
@@ -95,21 +98,22 @@ void testApp::update(){
 		default:
 		case PHYSICS:
 			physics.addParticles(numParticles);
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged);
+			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
 			physics.update();
 			break;
+			vid.update(mouseX, mouseY);
 	}
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBackground(ccomp5);
-
-
+	
+	ofSetBackgroundAuto(true);
 	//sound
 	if(drawSound){
-		drawVolGraphs();
+	//	drawVolGraphs();
 		drawBeatBins();
+		drawColorSwatches(guiWidth+10, 10);
 	}
 
 	//modes
@@ -121,21 +125,20 @@ void testApp::draw(){
 		case AUD:
 			Aud.draw();
 			break;
-		case PHYSICS:{
+		case PHYSICS:
 			physics.render();
-			}
 			break;
 		case VID:
-			{
-			}
+			ofSetBackgroundAuto(false);
+			ofSetColor(0,0,0, (int)ofRandom(10,30));
+			ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
+			vid.draw(mouseX, mouseY);
 			break;
 		default:
-			{
 				ofPushStyle();
 				ofSetColor(white);
 				ofRect(displayRect);
 				ofPopStyle();
-			}
 			break;
 		}
 	}
@@ -174,7 +177,8 @@ void testApp::drawBeatBins(){
 	float rectHeight = 150;
 	float spacer = 16;
 	ofPushMatrix();
-	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*3 + spacer*3), 0);
+	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*1.5 + spacer), 0);
+
 	ofSetColor(white);
 	bd.drawSubbands();
 	//ofTranslate(0, rectHeight + spacer, 0);
@@ -184,6 +188,19 @@ void testApp::drawBeatBins(){
         else
             ofSetColor(white);
 		ofLine(10+(i*3), 150,  10+(i*3),150-bd.magnitude_average[i]*10.0f);
+	}
+	ofTranslate(0,rectHeight+spacer*2,0);
+	if(bd.isSnare()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("snare",0,0);
+	}
+	if(bd.isHat()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("hat",60,0);
+	}
+	if(bd.isKick()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("kick",180,0);
 	}
 	ofPopMatrix();
 }
@@ -383,10 +400,31 @@ void testApp::guiSetup(){
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
 //--------------------------------------------------------------
-void testApp::generateColors(ofColor seed){
-	colors = colorGen.createRangeFromLeftSplitComplementary(seed);
-}
 
+/*-------------------------------------------------------------*
+Color Generation
+options: light,dark,bright,weak,neutral,fresh,soft,hard,warm,cool,intense
+ *-------------------------------------------------------------*/
+
+void testApp::generateColors(ColourShade cs){
+	colors.clear();
+	for(int i=0; i<100; i++){
+		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
+	}
+}
+void testApp::drawColorSwatches(int x, int y){
+	ofPushMatrix();
+	ofPushStyle();
+	ofTranslate(x,y,0);
+	for(int i=0; i<colors.size(); i++){
+		ofSetColor(colors[i]);
+		ofRect(i*4,0,0,3,10);
+	}
+	ofSetColor(white);
+	ofDrawBitmapString(curShade.name, colors.size()*4 + 20, 10, 0);
+	ofPopStyle();
+	ofPopMatrix();
+}
 void testApp::keyPressed(int key){
 	if(drawDJ){
 //		DJ.DJkeyPressed(key);
@@ -399,11 +437,10 @@ void testApp::keyPressed(int key){
 		soundStream.stop();
 	}
 	if(key == ' '){
-	//	ofColor r = ofColor(ofRandom(0,255),ofRandom(0,255),ofRandom(0,255));
-		ofColor r = colorGen.getColor(10, colorGen.getColourConstraints(CT_FRESH));
-		r.setBrightness(100);
-		generateColors(r);
-//		colorGen.
+		//change the color range
+		ColourShade randomShade =  (ColourShade) ((int)(ofRandom(0,10)));
+		curShade = colorGen.getColourConstraints(randomShade);
+		generateColors(randomShade);
 	}
 }
 
@@ -414,7 +451,8 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
+	mouseX = x;
+	mouseY= y;
 }
 
 //--------------------------------------------------------------
