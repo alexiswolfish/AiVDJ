@@ -1,13 +1,8 @@
 #include "djMode.h"
 #include "ofAppGlutWindow.h"
 
-//graphics shader example
-
-
-
 //--------------------------------------------------------------
 djMode::djMode(){
-
 
 }
 
@@ -23,13 +18,7 @@ void djMode::setup() {
 	bDrawMeshCloud = false;
 	bDrawPointCloud = true;
 	bcloth = false;
-	test = false;
-	oldMouseX = -999;
-    oldMouseY = -999;
 	
-/*	for (int i=0; i<640; i++){
-		lastY[i].push_back(ofVec3f (0,0,0));
-	}*/
 	vector<int>sortedY(640, 0);
 
 	ofSetLogLevel(OF_LOG_VERBOSE);
@@ -45,25 +34,23 @@ void djMode::setup() {
 	ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
-	ofEnableSmoothing();
-	cols = 640 / CLOTH_RES;
-    rows = 480 / CLOTH_RES; 
-    controller.init(cols,rows);
-    controller.initMesh(); 
-
-  
-	tex.loadImage("large_brown.png"); 
-    shader.load("shader");
-	//myShader.load("myShader");   
-    directional.setDirectional();
-
-	//// zero the tilt on startup
+	if (bcloth){
+		ofEnableSmoothing();
+		cols = 640 / CLOTH_RES;
+		rows = 480 / CLOTH_RES; 
+		controller.init(cols,rows);
+		controller.initMesh(); 
+		tex.loadImage("large_brown.png"); 
+		shader.load("shader");
+		directional.setDirectional();
+		oldMouseX = -999;
+		oldMouseY = -999;
+	}
 	angle = 10;
 	kinect.setCameraTiltAngle(angle);
-	//
-	//// start from the front
-	////printf("serial:'%s'", kinect.getSerial());
+	//printf("serial:'%s'", kinect.getSerial());
 	easyCam.tilt(15);
+	
 
 }
 
@@ -75,12 +62,145 @@ void djMode::update(float depthLow, float depthHigh) {
 
 	Zlow = depthLow;
 	Zhigh = depthHigh;
-	//testVar = newslider;
 
-	if (test)getLineData();
+	if (bDrawPointCloud) updatePoints();
+	else if (bcloth) clothShit();
 
-	if (bcloth){
-		for(int i=0;i<cols*rows;i++) {
+}
+
+//--------------------------------------------------------------
+
+
+void djMode::draw() {
+	ofBackground(95, 100);
+	
+	if(bDrawPointCloud) {
+		easyCam.begin();
+		drawPointCloud();
+		easyCam.end();
+	} 
+	else if (bDrawMeshCloud){
+		easyCam.begin();
+		drawMeshCloud();
+		easyCam.end();
+	}
+	else if (bcloth){
+		ofPushMatrix();
+		glEnable(GL_DEPTH_TEST);
+		ofTranslate(ofGetWidth()/2-cols*CLOTH_RES/2, 100,0);
+		shader.begin();
+		shader.setUniformTexture("tex", tex.getTextureReference(), 0);
+		controller.drawMesh();
+		shader.end();
+		ofPopMatrix();
+	}
+}
+
+void djMode::updatePoints(){
+	int w = 640;
+	int h = 480;
+	int step = 5;
+	bool thresh = false;
+	int points = 0;
+	for(int y = 0; y < h; y += step) {
+		for(int x = 0; x < w; x += step) {
+			if(kinect.getDistanceAt(x, y) > 0) {
+				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
+					points++;
+					if (!thresh){
+						thresh = true;
+						ofPolyline p;
+						p.addVertex(kinect.getWorldCoordinateAt(x, y));
+						lines.push_back(p);
+					}
+					else{
+						lines.back().addVertex(kinect.getWorldCoordinateAt(x, y));
+					}
+				}
+				else{
+					thresh = false;
+				}
+			}
+		}
+	}
+	if (points < 750){
+		noDJ++;
+		//printf("\nnodj %d\n", noDJ);
+	}
+	if (noDJ > 10){
+		WheresMyDj = false;
+		noDJ = 0;
+	}
+}
+
+void djMode::drawPointCloud() {
+	ofPushMatrix();
+	ofScale(1, -1, -1); // the projected points are 'upside down' and 'backwards' 
+	ofTranslate(0, 0, -1000); // center the points a bit
+
+	ofBackground(95, 100);
+	ofPushStyle();
+	ofSetColor(155, 175, 200);
+	for (int i=0; i<lines.size();i++){
+		lines[i].draw();
+	}
+	//if (maxY >= 320 && maxY < 480){
+	//	easyCam.tilt(0);
+	//	easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
+	//	return -maxY-320/3.55;
+	//}
+	//else return 0.0;
+	ofPopStyle();
+	ofPopMatrix();
+	lines.clear();
+}
+
+void djMode::drawMeshCloud() {
+	int w = 640;
+	int h = 480;
+	ofMesh mesh;
+	float maxY = 0;
+	float minX = 0;
+	float maxX = 0;
+	mesh.setMode(OF_PRIMITIVE_POINTS);
+	int step = 4; // try higher steps 
+	int rand1 = ofRandom(128.0, 255.0);
+	for(int y = 0; y < h; y += step*1.5) {
+		for(int x = 0; x < w; x += step) {
+			if(kinect.getDistanceAt(x, y) > 0) {
+				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
+					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
+					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+				}
+			}
+		}
+	}
+
+	ofBackground(95, 100);
+	glPointSize(3);
+	ofPushMatrix();
+	// the projected points are 'upside down' and 'backwards' 
+	ofScale(1, -1, -1);
+	ofTranslate(0, 0, -1000); // center the points a bit
+	glEnable(GL_DEPTH_TEST);
+	mesh.drawVertices();
+	//printf("size %d \n", mesh.getVertices().size());
+	if (mesh.getVertices().size() < 750){
+		noDJ++;
+		//printf("\nnodj %d\n", noDJ);
+	}
+	if (noDJ > 10){
+		WheresMyDj = false;
+		noDJ = 0;
+	}
+
+	glDisable(GL_DEPTH_TEST);
+	ofPopMatrix();
+	
+}
+
+void djMode::clothShit(){
+	for(int i=0;i<cols*rows;i++) {
  
 			int x = int(i) % cols;
 			int y = int(i) / cols;
@@ -113,292 +233,6 @@ void djMode::update(float depthLow, float depthHigh) {
 		controller.update();
 		controller.updateMesh();
 		controller.updateMeshNormals();
-	}
-
-
-
-}
-
-//--------------------------------------------------------------
-void djMode::getLineData(){
-	ofPushStyle();
-
-	ofPushMatrix();
-	// the projected points are 'upside down' and 'backwards' 
-	ofScale(1, -1, -1);
-	ofTranslate(0, 0, -1000); // center the points a bit
-
-	int w = 640;
-	int h = 480;
-	int step = 10;
-	for(int y = 0; y < h; y += step) {
-		ofPolyline line;
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					printf("\nYint: %d", (int)kinect.getWorldCoordinateAt(x, y).y);
-					lastY[(int)kinect.getWorldCoordinateAt(x, y).y].push_back(kinect.getWorldCoordinateAt(x, y));
-					sortedY.push_back((int)kinect.getWorldCoordinateAt(x, y).y);
-				}
-			}
-		}
-		line.close();
-		line.draw();
-	}
-	
-	ofPopMatrix();
-	ofPopStyle();
-}
-
-void djMode::draw() {
-	//middleX = 320;
-	ofBackground(95, 100);
-	
-	if(bDrawPointCloud) {
-		easyCam.begin();
-		drawPointCloud();
-		easyCam.end();
-	} 
-	else if (bDrawMeshCloud){
-		easyCam.begin();
-		drawMeshCloud();
-		easyCam.end();
-	}
-	else if(test){
-		int rand1 = ofRandom(128, 255);
-		int rand2 = ofRandom(128, 255);
-		ofPushStyle();
-		ofSetColor(rand1, rand2, 200);
-		sort(sortedY.begin(), sortedY.end());
-		int myY = sortedY.back(); 
-		//bool endLine = false;
-		ofPolyline line;
-		for(int i= sortedY.back(); sortedY.size() > 0; sortedY.pop_back()){
-			if (i - myY > 5){ 
-				myY=i;
-				//endLine = true;
-				line.close();
-				line.draw();
-				line.clear();
-			}
-			else{
-				for(int k= 0; k < lastY[sortedY[i]].size(); k++){
-					line.addVertex(lastY[sortedY[i]][k]);
-				}
-			}
-			/*if (endLine){
-				line.close();
-				line.draw();
-				line.clear();
-				endLine = false;
-			}*/
-		}
-		ofPopStyle();
-	}
-	else if (bcloth){
-		ofPushMatrix();
-		glEnable(GL_DEPTH_TEST);
-		//ofEnableLighting();
-		//directional.enable();
-		ofTranslate(ofGetWidth()/2-cols*CLOTH_RES/2, 100,0);
-		//ofBackground(0);
-		//ofBackground(95, 100);
-		shader.begin();
-		//myShader.begin();
-		shader.setUniformTexture("tex", tex.getTextureReference(), 0);
-		controller.drawMesh();
-		//myShader.end();
-		shader.end();
-		//directional.disable();
-		//ofDisableLighting();
-		ofPopMatrix();
-	}
-		//ofSetColor(255, 25, 255);
-		//testfbo.draw(0,0);
-
-}
-
-void djMode::testDraw(){
-	ofPushStyle();	
-		int rand1 = ofRandom(128, 255);
-		int rand2 = ofRandom(128, 255);
-		ofPushMatrix();
-		ofScale(1, -1, -1);
-		ofTranslate(0, 0, -1000); // center the points a bit
-		struct DJpoint {
-			int x;
-			int y;
-			int z;
-		};
-		vector<vector<DJpoint>>Ypoints;
-
-		int w = 640;
-		int h = 480;
-		int step = 10;
-		for(int y = 0; y < h; y += step) {
-			for(int x = 0; x < w; x += step) {
-				if(kinect.getDistanceAt(x, y) > 0) {
-					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-						//ofSetColor(rand1, rand2, kinect.getWorldCoordinateAt(x, y).z / (Zhigh-Zlow/255));
-						//ofSphere(kinect.getWorldCoordinateAt(x, y).x, kinect.getWorldCoordinateAt(x, y).y, kinect.getWorldCoordinateAt(x, y).z, 1);
-						DJpoint new_point;
-						new_point.x = kinect.getWorldCoordinateAt(x, y).x;
-						new_point.y = kinect.getWorldCoordinateAt(x, y).y;
-						new_point.z = kinect.getWorldCoordinateAt(x, y).z;
-						Ypoints[y].push_back(new_point);
-					}
-				}
-			}
-		}
-		ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));
-		for(int k=0; k<Ypoints.size();k+=step/2){
-			ofPolyline line;
-			for (int j=0; j<Ypoints[k].size(); j++){
-				line.addVertex(Ypoints[k][j].x, Ypoints[k][j].y, Ypoints[k][j].z);
-			}
-			line.close();
-			line.draw();		
-		}
-		ofPopMatrix();
-		ofPopStyle();
-}
-
-void djMode::drawPointCloud() {
-	//maxY = ofVec3f(0,0,0);
-	ofBackground(95, 100);
-
-	//easyCam.setDistance(100);
-	ofPushStyle();
-	
-	//ofSetColor(ofRandom(128, 255),ofRandom(128, 255),ofRandom(128, 255));	
-	int rand1 = ofRandom(128, 255);
-	int rand2 = ofRandom(128, 255);
-
-	ofPushMatrix();
-	// the projected points are 'upside down' and 'backwards' 
-	ofScale(1, -1, -1);
-	ofTranslate(0, 0, -1000); // center the points a bit
-	
-	vector<ofVec3f>lastVert;
-	//vector<vector<ofVec3f>>lastY;
-	int w = 640;
-	int h = 480;
-	int step = 5;
-	bool thresh = false;
-	vector<ofPolyline> lines;
-	for(int y = 0; y < h; y += step) {
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					if (!thresh){
-						thresh = true;
-						ofPolyline p;
-						p.addVertex(kinect.getWorldCoordinateAt(x, y));
-						lines.push_back(p);
-					}
-					else{
-						lines.back().addVertex(kinect.getWorldCoordinateAt(x, y));
-					}
-					//ofSetColor(rand1, rand2, kinect.getWorldCoordinateAt(x, y).z / (Zhigh-Zlow/255));
-					//ofSphere(kinect.getWorldCoordinateAt(x, y).x, kinect.getWorldCoordinateAt(x, y).y, kinect.getWorldCoordinateAt(x, y).z, 1);
-
-				}
-				else{
-					thresh = false;
-				}
-			}
-		}
-		ofSetColor(rand1, rand2, 200);
-		for (int i=0; i<lines.size();i++){
-			lines[i].draw();
-		}
-
-	}
-	
-	ofPopMatrix();
-
-	//if (maxY >= 320 && maxY < 480){
-	//	easyCam.tilt(0);
-	//	easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
-	//	return -maxY-320/3.55;
-	//}
-	//else return 0.0;
-	ofPopStyle();
-}
-
-void djMode::drawMeshCloud() {
-	int w = 640;
-	int h = 480;
-	ofMesh mesh;
-	float maxY = 0;
-	float minX = 0;
-	float maxX = 0;
-	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 4; // try higher steps 
-	//ofColor meshColor = ofColor(ofRandom(128.0, 255.0), 0, ofRandom(128.0, 255.0));
-	int rand1 = ofRandom(128.0, 255.0);
-		//vector<ofVec3f>lastVert;
-	for(int y = 0; y < h; y += step*1.5) {
-		//ofPolyline line;
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-					//if (lastVert.size() > 0){
-						//float dist = ofDistSquared(kinect.getWorldCoordinateAt(x, y).x,kinect.getWorldCoordinateAt(x, y).y,lastVert.at(lastVert.size()-1).x,lastVert.at(lastVert.size()-1).y);
-						//float Ydist = ofDistSquared(0,kinect.getWorldCoordinateAt(x, y).y,0,lastVert.at(lastVert.size()-1).y);
-						//if (dist < testVar /*&& Ydist < 56.25 1.5step^2*/){
-							//mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-							//printf("\ndistance? %f %f %f %f %f \n",dist,kinect.getWorldCoordinateAt(x, y).x,kinect.getWorldCoordinateAt(x, y).y,lastVert.at(lastVert.size()-1).x,lastVert.at(lastVert.size()-1).y);
-							//line.addVertex(kinect.getWorldCoordinateAt(x, y).x, kinect.getWorldCoordinateAt(x, y).y, kinect.getWorldCoordinateAt(x, y).z);
-						//}
-					//}
-					//lastVert.push_back(kinect.getWorldCoordinateAt(x, y));
-				}
-			}
-		}
-		//line.close();
-		//line.draw();
-	}
-
-	ofBackground(95, 100);
-	glPointSize(3);
-	ofPushMatrix();
-	// the projected points are 'upside down' and 'backwards' 
-	ofScale(1, -1, -1);
-	ofTranslate(0, 0, -1000); // center the points a bit
-	glEnable(GL_DEPTH_TEST);
-	mesh.drawVertices();
-	printf("size %d \n", mesh.getVertices().size());
-	if (mesh.getVertices().size() < 750){
-		noDJ++;
-		//printf("\nnodj %d\n", noDJ);
-	}
-	if (noDJ > 10){
-		WheresMyDj = false;
-		noDJ = 0;
-	}
-	struct iys{
-		int y;
-		vector<int>is;
-	};
-	vector<ofVec3f>printme = mesh.getVertices();
-	vector<iys>ys;
-
-	//maxY = printme[printme.size()-1].y;
-	//printf("--------------------");
-	for (int i =0; i<printme.size(); i++){
-
-		//printf("\ni%d x%4.2f y%4.2f z%4.2f", i, printme[i].x,printme[i].y, printme[i].z);
-		//if (printme[i].y > maxY){maxY = printme[i].y;}
-	}
-	//ofColor(255,255,0);
-	//ofSphere(0, maxY, 900, 10);
-	//printf("\n--------------------");
-	glDisable(GL_DEPTH_TEST);
-	ofPopMatrix();
-	
 }
 
 //--------------------------------------------------------------
@@ -413,7 +247,7 @@ void djMode::DJkeyPressed (int key) {
 			
 		case'i':
 			bDrawPointCloud = false;			
-			bDrawMeshCloud = false;						break;
+			bDrawMeshCloud = false;			break;
 
 		case'p':
 			if (bDrawMeshCloud){

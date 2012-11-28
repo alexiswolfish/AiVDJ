@@ -13,34 +13,16 @@ class djMode {
 public:
 	djMode();
 	~djMode();
-	
-	bool WheresMyDj;
-	int noDJ;
-
-	ClothController controller;
-    
-    float oldMouseX,oldMouseY;
-    
-    ofImage tex;
-    ofShader shader;
-	ofShader myShader;
-    
-    int rows, cols;
-    
-    ofLight directional;
 
 	void setup();
 	void update(float depthLow, float depthHigh);
 	void draw();
-
 	void exit();
-	void getLineData();
 
-	ofFbo testfbo;
-	
+	void updatePoints();
 	void drawPointCloud();
 	void drawMeshCloud();
-	void testDraw();
+	void clothShit();
 
 	void DJkeyPressed(int key);
 	void DJmouseDragged(int x, int y, int button);
@@ -48,13 +30,11 @@ public:
 	void DJmouseReleased(int x, int y, int button);
 	void DJwindowResized(int w, int h);
 	void mouseMoved(int w, int h );
-
-	float Zlow, Zhigh, testVar;
-	ofVec3f maxY;
-	int middleX;
-
-	vector<vector<ofVec3f>>lastY;
-	vector<int>sortedY;
+		
+	bool WheresMyDj;
+	int noDJ;
+	float Zlow, Zhigh;
+	vector<ofPolyline> lines;
 
 	ofxKinect kinect;
 	
@@ -66,15 +46,22 @@ public:
 	
 	ofxCvContourFinder contourFinder;
 	
-	bool bThreshWithOpenCV;
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 	bool bcloth;
-	bool test;
 	
 	int angle;
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
+
+	// cloth vars
+	ClothController controller;
+    float oldMouseX,oldMouseY;
+    ofImage tex;
+    ofShader shader;
+	ofShader myShader;
+    int rows, cols;
+    ofLight directional;
 };
 
