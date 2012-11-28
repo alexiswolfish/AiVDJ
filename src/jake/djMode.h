@@ -20,6 +20,15 @@ public:
 	void draw();
 	void exit();
 
+	// cloth vars
+	ClothController controller;
+    float oldMouseX,oldMouseY;
+    ofImage tex;
+    ofShader shader;
+	ofShader myShader;
+    int rows, cols;
+    ofLight directional;
+
 	void updatePoints();
 	void updateGlobals(ofColor c, bool changeColor);
 	void drawPointCloud();
@@ -61,13 +70,6 @@ public:
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
 
-	// cloth vars
-	ClothController controller;
-    float oldMouseX,oldMouseY;
-    ofImage tex;
-    ofShader shader;
-	ofShader myShader;
-    int rows, cols;
-    ofLight directional;
+
 };
 

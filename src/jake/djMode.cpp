@@ -35,7 +35,7 @@ void djMode::setup() {
 	//ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
-	if (bcloth){
+
 		ofEnableSmoothing();
 		cols = 640 / CLOTH_RES;
 		rows = 480 / CLOTH_RES; 
@@ -46,8 +46,8 @@ void djMode::setup() {
 		directional.setDirectional();
 		oldMouseX = -999;
 		oldMouseY = -999;
-	}
-	angle = 15;
+
+	angle = 0;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	easyCam.tilt(15);
@@ -67,18 +67,19 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 	else if (bDrawPointCloud){
 		int w = 640;
 		int h = 480;
-		int step = 5;
+		int step = 2;
 		bool thresh = false;
 		int points = 0;
 		//maxY = 0;
-		for(int y = 0; y < h; y += step*2) {
+		for(int y = 0; y < h; y += step*3) {
 			for(int x = 0; x < w; x += step) {
 				if(kinect.getDistanceAt(x, y) > 0) {
 					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
 						points++;
 						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
 						float addMe = (vol[x] * 800.0f);
-						//if (addMe > 10) addMe = 10; 
+						if (addMe > 10) addMe = 10; 
+						else if (addMe < -10) addMe = -10;
 
 						if (vec.y > maxY) maxY = vec.y;
 						if (!thresh){
@@ -171,7 +172,7 @@ void djMode::drawMeshCloud() {
 	int w = 640;
 	int h = 480;
 	ofMesh mesh;
-	float maxY = 0;
+	//float maxY = 0;
 	float minX = 0;
 	float maxX = 0;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
@@ -261,14 +262,14 @@ void djMode::DJkeyPressed (int key) {
 			bDrawMeshCloud = false;			break;
 
 		case'p':
-			if (bDrawMeshCloud){
+			if (bDrawPointCloud){
 				//bDrawPointCloud=false;
 				bcloth = true;
-				bDrawMeshCloud = false;
+				bDrawPointCloud = false;
 			}
 			else{
 				bcloth = false;
-				bDrawMeshCloud = true;
+				bDrawPointCloud = true;
 			}
 			//bDrawPointCloud = !bDrawPointCloud;			
 			//bDrawMeshCloud = !bDrawMeshCloud;			
