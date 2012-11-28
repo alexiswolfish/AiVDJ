@@ -18,6 +18,7 @@ void djMode::setup() {
 	bDrawMeshCloud = false;
 	bDrawPointCloud = true;
 	bcloth = false;
+	tiltDegr = 15;
 	
 	vector<int>sortedY(640, 0);
 
@@ -46,7 +47,7 @@ void djMode::setup() {
 		oldMouseX = -999;
 		oldMouseY = -999;
 	}
-	angle = 10;
+	angle = 15;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	easyCam.tilt(15);
@@ -56,8 +57,7 @@ void djMode::setup() {
 
 //--------------------------------------------------------------
 void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
-	//ofBackground(100, 100, 100);
-	
+
 	kinect.update();
 
 	Zlow = depthLow;
@@ -70,20 +70,25 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 		int step = 5;
 		bool thresh = false;
 		int points = 0;
-		for(int y = 0; y < h; y += step) {
+		//maxY = 0;
+		for(int y = 0; y < h; y += step*2) {
 			for(int x = 0; x < w; x += step) {
 				if(kinect.getDistanceAt(x, y) > 0) {
 					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
 						points++;
 						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
+						float addMe = (vol[x] * 800.0f);
+						//if (addMe > 10) addMe = 10; 
+
+						if (vec.y > maxY) maxY = vec.y;
 						if (!thresh){
 							thresh = true;
 							ofPolyline p;
-							p.addVertex(vec.x, vec.y + (vol[x] * 1200.0f), vec.z);
+							p.addVertex(vec.x, vec.y + addMe, vec.z);
 							lines.push_back(p);
 						}
 						else{
-							lines.back().addVertex(vec.x, vec.y + (vol[x] * 1200.0f), vec.z);
+							lines.back().addVertex(vec.x, vec.y + addMe, vec.z);
 						}
 					}
 					else{
@@ -140,7 +145,7 @@ void djMode::draw() {
 
 
 void djMode::drawPointCloud() {
-	ofPushMatrix();  //comment out??
+	ofPushMatrix();  
 	ofScale(1, -1, -1); 
 	ofTranslate(0, 0, -1000); // center the points a bit
 
@@ -150,12 +155,13 @@ void djMode::drawPointCloud() {
 	for (int i=0; i<lines.size();i++){
 		lines[i].draw();
 	}
-	//if (maxY >= 320 && maxY < 480){
-	//	easyCam.tilt(0);
-	//	easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
-	//	return -maxY-320/3.55;
-	//}
-	//else return 0.0;
+	printf("\n---max %f \n", maxY);
+	ofSphere(ofGetWidth()/2, maxY, Zhigh/2, 30);
+	if (maxY >= 320 && maxY < 480){
+		easyCam.tilt(0);
+		easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
+	}
+
 	ofPopStyle();
 	ofPopMatrix();
 	lines.clear();
@@ -169,7 +175,7 @@ void djMode::drawMeshCloud() {
 	float minX = 0;
 	float maxX = 0;
 	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 4; // try higher steps 
+	int step = 4; 
 	int rand1 = ofRandom(128.0, 255.0);
 	for(int y = 0; y < h; y += step*1.5) {
 		for(int x = 0; x < w; x += step) {

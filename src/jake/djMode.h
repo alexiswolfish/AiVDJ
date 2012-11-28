@@ -4,7 +4,7 @@
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
 #include "../cloth/ofxKCloth.h"
-//#include "../testApp.h"
+
 
 
 // uncomment this to read from two kinects simultaneously
@@ -34,8 +34,10 @@ public:
 	void mouseMoved(int w, int h );
 		
 	bool WheresMyDj;
-	int noDJ;
-	float Zlow, Zhigh;
+	int noDJ, tiltDegr;
+	float Zlow, Zhigh, maxY;
+
+	ofVec3f maxPt;
 	vector<ofPolyline> lines;
 	vector<float> volHist;
 	ofColor smartColor;
