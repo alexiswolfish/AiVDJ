@@ -19,7 +19,7 @@ void physicsMode::update(){
 	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
 		for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end(); ++p){
 			p->applyForce(*e, e->mass*10);
-			p->update();
+		//	p->update();
 		}
 	}
 	for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end();){
@@ -46,7 +46,7 @@ Update Sources
 update the source particles with relevant data 
 from the main app
  *--------------------------------------------------*/
-void physicsMode::updateSources(float vol, ofColor c, bool isChanged){
+void physicsMode::updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare){
 	int distThresh = 51;
 
 		repulseSources();
@@ -56,7 +56,7 @@ void physicsMode::updateSources(float vol, ofColor c, bool isChanged){
 			e1->radius = vol;
 			e1->mass = vol*2;
 			e1->pullToCenter(vol*2);
-			e1->update();
+			e1->update(isKick, isSnare);
 		}
 }
 
@@ -94,7 +94,19 @@ void physicsMode::source::render(){
 	ofPushStyle();
 	ofSetColor(col);
 	float imgRad = radius*5 +10;
-	ofCircle(loc.x, loc.y, radius*3);
+	float radMult = 0.09;
+	float radSq = (radius*radius) * radMult;
+
+	if(radSq > 200){
+		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.009))*radMult);
+		ofSetColor(40);
+		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.005))*radMult);
+		ofSetColor(col);
+		ofCircle(loc.x, loc.y, radSq/2*radMult);
+	}
+	else{
+		ofCircle(loc.x, loc.y, radSq/2*radMult);
+	}
 //	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
 
 	renderParticles();
@@ -115,7 +127,7 @@ physicsMode::source::source(ofVec3f initPos, Type _type, ofImage s){
 	addParticles(20);
 }
 
-void physicsMode::source::update(){
+void physicsMode::source::update(bool isKick, bool isSnare){
 	vel = vel+acc;
 
 	vel.limit(5); //BPM
@@ -125,7 +137,7 @@ void physicsMode::source::update(){
 	//vel = ofVec3f(0,0,0);
 	acc = ofVec3f(0,0,0);
 
-	updateParticles();
+	updateParticles(isKick, isSnare);
 }
 
 void physicsMode::source::attract(source s, float range){
@@ -199,12 +211,17 @@ float physicsMode::source::findAngle(float x, float y){
   return theta;
 }
 /*---------PARTICLE CONTROL-----------*/
-void physicsMode::source::updateParticles(){
+void physicsMode::source::updateParticles(bool isKick, bool isSnare){
 	repulseParticles();
 	for(vector<particle>::iterator e1 = mParticles.begin(); e1 != mParticles.end(); ++e1){
-		e1->pull(*this,radius*3+100); //outer ring limit
+		//volume is stored in the radius
+		e1->pull(*this,radius*3+radius); //outer ring limit
 		e1->push(*this,radius*3+10);  //inner ring limit
-		e1->update();
+
+		if(isKick){
+			e1->orbit(*this, radius*5);
+		}
+		e1->update(isSnare);
 	}
 }
 void physicsMode::source::renderParticles(){
@@ -271,6 +288,7 @@ physicsMode::source::particle::particle(ofVec3f _loc, float m, int life){
 	lifespan = life;
 	isDead = false;
 	col = colorGen.getColor(50, colorGen.getColourConstraints(CT_FRESH));
+	analgCol = col;
 	//vel = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
 	//acc = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
 }
@@ -278,13 +296,13 @@ physicsMode::source::particle::particle(ofVec3f _loc, float m, int life){
 void physicsMode::source::particle::render(){
 	ofPushStyle();
 	ofFill();
-	ofSetColor(col);
+	ofSetColor(analgCol);
 	ofCircle(loc.x, loc.y, 5);
 	ofLine(pLoc, loc);
 	ofPopStyle();
 }
 
-void physicsMode::source::particle::update(){
+void physicsMode::source::particle::update(bool isSnare){
 
 	pLoc = loc;
 	vel = vel+acc;
@@ -295,6 +313,10 @@ void physicsMode::source::particle::update(){
 	age++;
 	if(age > lifespan)
 		isDead = true;
+
+	if(isSnare){
+		analgCol = colorGen.createRangeFromAnalogous(col)[(int)ofRandom(0,4)];
+	}
 }
 
 void physicsMode::source::particle::pull(source s, float range){

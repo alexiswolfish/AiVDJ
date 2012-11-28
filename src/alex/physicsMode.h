@@ -21,13 +21,13 @@ class source {
 					int age, lifespan;
 					bool isDead;
 					ofColor col;
-
+					ofColor analgCol;
 					particle(ofVec3f _loc, float m, int life);
 
 					particle();
 					~particle();
 
-					void update();
+					void update(bool isSnare);
 					void render();
 					void pull(source s, float range);
 					void push(source s, float range);
@@ -53,7 +53,7 @@ class source {
 			//functions that operate on other sources
 			source(ofVec3f initPos, Type type, ofImage s);
 			void render();
-			void update();
+			void update(bool isKick, bool isSnare);
 			void attract(source s, float range);
 			void pullToCenter(float distThresh);
 			float findAngle(float x1, float y1, float x2, float y2);
@@ -62,7 +62,7 @@ class source {
 			//particle controller functions
 			void repulseParticles();
 			vector<particle> addParticles(int num);
-			void updateParticles();
+			void updateParticles(bool isKick, bool isSnare);
 			void renderParticles();
 			ofImage spark;
 	};
@@ -76,7 +76,7 @@ class source {
 		void setup();
 		void update();
 		void render();
-		void updateSources(float vol, ofColor c, bool isChanged);
+		void updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare);
 		void repulseSources();
 
 		void addParticles(int amt);	

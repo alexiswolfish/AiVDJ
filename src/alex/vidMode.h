@@ -20,7 +20,7 @@ class vidMode{
 			ofVec3f pos, vel;
 
 			void update(int x, int y);
-			void render(int x, int y);
+			void render(int x, int y, unsigned char * p);
 		};
 		ParticleController();
 		ParticleController(int particles);
@@ -29,7 +29,7 @@ class vidMode{
 		int numParticles;
 		vector<Particle> particles;
 		void update(int x, int y);
-		void render(int x, int y);
+		void render(int x, int y, unsigned char * p);
 
 		
 	};
@@ -40,8 +40,6 @@ class vidMode{
 	ParticleController p;
 
 		ofVideoGrabber 		vidGrabber;
-		unsigned char * 	videoInverted;
-		ofTexture			videoTexture;
 		int 				camWidth;
 		int 				camHeight;
 

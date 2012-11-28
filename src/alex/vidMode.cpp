@@ -23,12 +23,21 @@
     if(pos.y>ofGetScreenHeight())pos.y-=ofGetScreenHeight();
   }
   
-  void vidMode::ParticleController::Particle::render(int x, int y)
+  void vidMode::ParticleController::Particle::render(int x, int y, unsigned char * p)
   {
 	ofPushStyle();
 	ofNoFill();
    // ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
-	// ofSetColor(x/1.5,y/1.5,ofRandom(0,255));
+
+	//RGB
+	int numPix = 480*640*3;
+	int realCoord = (640*3)*y + x;
+
+	int pixOffsetX = ((ofGetWindowWidth()/2)-320);
+	int pixOffsetY = ((ofGetWindowHeight()/2)-240);
+
+
+	ofSetColor(x/1.5,y/1.5,ofRandom(0,255));
 	ofSetLineWidth(1.5);	
     ofLine(pos.x,pos.y,pos.x-vel.x,pos.y-vel.y);
 	ofPopStyle();
@@ -65,11 +74,11 @@
     }
   }
     
-  void vidMode::ParticleController::render(int x, int y)
+  void vidMode::ParticleController::render(int x, int y, unsigned char * p)
   {
     for(int i = 0; i < numParticles; i++)
     {
-      particles[i].render(x,y);
+      particles[i].render(x,y, p);
     }
   }
 
@@ -101,7 +110,7 @@ void vidMode::update(int x, int y)
 
 void vidMode::draw(int x, int y)
 {
-  p.render(x,y);
+  p.render(x,y, vidGrabber.getPixels());
   ofSetHexColor(0xffffff);
   vidGrabber.draw(20,20);
   //camera garbage

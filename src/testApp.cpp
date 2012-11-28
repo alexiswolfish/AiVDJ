@@ -78,7 +78,7 @@ void testApp::update(){
 			break;
 		case PHYSICS:
 			physics.addParticles(numParticles);
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged);
+			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
 			physics.update();
 			break;
 		case VID:
@@ -149,6 +149,7 @@ void testApp::drawBeatBins(){
 	float spacer = 16;
 	ofPushMatrix();
 	ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*1.5 + spacer), 0);
+
 	ofSetColor(white);
 	bd.drawSubbands();
 	//ofTranslate(0, rectHeight + spacer, 0);
@@ -158,6 +159,19 @@ void testApp::drawBeatBins(){
         else
             ofSetColor(white);
 		ofLine(10+(i*3), 150,  10+(i*3),150-bd.magnitude_average[i]*10.0f);
+	}
+	ofTranslate(0,rectHeight+spacer*2,0);
+	if(bd.isSnare()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("snare",0,0);
+	}
+	if(bd.isHat()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("hat",60,0);
+	}
+	if(bd.isKick()){
+		ofSetColor(ccomp3);
+		ofDrawBitmapString("kick",180,0);
 	}
 	ofPopMatrix();
 }
