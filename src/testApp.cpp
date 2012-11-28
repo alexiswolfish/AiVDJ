@@ -38,10 +38,13 @@ void testApp::setup(){
 	guiSetup();
 	initRects();
 	ofEnableSmoothing();
-
+//				ofEnableAlphaBlending();
+	ofBackground(ccomp5.r,ccomp5.g,ccomp5.b,100);
 	/*-------Alex------*/
 	physics.setup();
-	generateColors(CT_FRESH);
+	vid.setup();
+	//curShade = CT_SOFT;
+	generateColors(CT_SOFT);
 	numParticles = 0;
 	/*-------Jake-------*/
 //	DJ.setup();
@@ -79,6 +82,7 @@ void testApp::update(){
 			physics.update();
 			break;
 		case VID:
+			vid.update(mouseX, mouseY);
 			break;
 		default:
 			break;
@@ -87,8 +91,8 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBackground(ccomp5);
-
+	
+	ofSetBackgroundAuto(true);
 	//sound
 	if(drawSound){
 		drawVolGraphs();
@@ -99,28 +103,23 @@ void testApp::draw(){
 	if(drawDisplay){
 		switch(mode){
 		case DJ:
-			{
-			}
 			break;
 		case AUD:
-			{
-			}
 			break;
-		case PHYSICS:{
+		case PHYSICS:
 			physics.render();
-			}
 			break;
 		case VID:
-			{
-			}
+			ofSetBackgroundAuto(false);
+			ofSetColor(0,0,0, (int)ofRandom(10,30));
+			ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
+			vid.draw(mouseX, mouseY);
 			break;
 		default:
-			{
 				ofPushStyle();
 				ofSetColor(white);
 				ofRect(displayRect);
 				ofPopStyle();
-			}
 			break;
 		}
 	}
@@ -360,11 +359,15 @@ void testApp::generateColors(ColourShade cs){
 }
 void testApp::drawColorSwatches(int x, int y){
 	ofPushMatrix();
+	ofPushStyle();
 	ofTranslate(x,y,0);
 	for(int i=0; i<colors.size(); i++){
 		ofSetColor(colors[i]);
 		ofRect(i*4,0,0,3,10);
 	}
+	ofSetColor(white);
+	ofDrawBitmapString(curShade.name, colors.size()*4 + 20, 10, 0);
+	ofPopStyle();
 	ofPopMatrix();
 }
 void testApp::keyPressed(int key){
@@ -380,7 +383,9 @@ void testApp::keyPressed(int key){
 	}
 	if(key == ' '){
 		//change the color range
-		generateColors( (ColourShade) ((int)(ofRandom(0,10))) );
+		ColourShade randomShade =  (ColourShade) ((int)(ofRandom(0,10)));
+		curShade = colorGen.getColourConstraints(randomShade);
+		generateColors(randomShade);
 	}
 }
 
@@ -391,7 +396,8 @@ void testApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
+	mouseX = x;
+	mouseY= y;
 }
 
 //--------------------------------------------------------------

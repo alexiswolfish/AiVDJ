@@ -10,6 +10,30 @@ class physicsMode{
 	public:
 		class source{
 			public:
+				class particle{
+					public:
+						ofVec3f pLoc, loc, vel, acc;
+						float mass, magnitude, angle;
+						float maxSpeed, death;
+						int age, lifespan;
+						bool isDead;
+						ofColor col;
+
+						particle(ofVec3f _loc, float m, int life);
+
+						particle();
+						~particle();
+
+						void update();
+						void render();
+						void pull(source s, float range);
+						void push(source s, float range);
+						void push(particle p, float range);
+						void orbit(source s, float range);
+						void applyForce(source a, float range);
+						float findAngle(float x, float y);
+					};
+
 				enum Type{
 					EMIT,
 					SINK,
@@ -21,6 +45,9 @@ class physicsMode{
 				Type type;
 				ofColor col;
 
+				vector<particle> mParticles;
+
+				//functions that operate on other sources
 				source(ofVec3f initPos, Type type, ofImage s);
 				void render();
 				void update();
@@ -29,33 +56,15 @@ class physicsMode{
 				float findAngle(float x1, float y1, float x2, float y2);
 				float findAngle(float x, float y);
 
+				//particle controller functions
+				void repulseParticles();
+				void addParticles(int num);
+
 				ofImage spark;
 		};
 
-		class particle{
-			public:
-				ofVec3f pLoc, loc, vel, acc;
-				float mass, magnitude, angle;
-				float maxSpeed, death;
-				int age, lifespan;
-				bool isDead;
-
-				ofColor col;
-
-				particle(ofVec3f _loc, float m, int life);
-
-				particle();
-				~particle();
-
-				void update();
-				void render();
-				void pullToCenter(ofVec3f center);
-				void applyForce(source a, float range);
-				float findAngle(float x, float y);
-		};
-
 		vector<source> sources;
-		vector<particle> particles;
+		vector<source::particle> particles;
 		int birthRate, maxParticles;
 
 		physicsMode();
