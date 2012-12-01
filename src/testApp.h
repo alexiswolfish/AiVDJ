@@ -116,8 +116,6 @@ class testApp : public ofBaseApp{
 
 		/*-----------Test Variables-----------*/
 	int r,g,b;
-	
-		/*-----------Melissa-----------*/
-	audMode Aud;
+
 
 };

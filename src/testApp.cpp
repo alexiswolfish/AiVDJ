@@ -51,7 +51,7 @@ void testApp::setup(){
 	generateColors(CT_SOFT);
 	numParticles = 0;
 	/*-------Jake-------*/
-	DJMODE.setup();
+	//DJMODE.setup();
 	/*------Melissa-----*/
 	Aud.setup();
 }
@@ -67,7 +67,7 @@ void testApp::update(){
 		DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
 	}
 	if(drawAudKinect){
-		Aud.update();
+		//Aud.update(cVol);
 	}
 
 
@@ -93,7 +93,7 @@ void testApp::update(){
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
-			Aud.update();
+			Aud.update(cVol);
 			break;
 		default:
 		case PHYSICS:
@@ -165,23 +165,6 @@ void testApp::draw(){
 	}
 
 	
-}
-
-//--------------------------------------------------------------
-void testApp::keyPressed(int key){
-	if(drawDJ){
-		DJMODE.DJkeyPressed(key);
-	} else if (drawAud) {
-		Aud.AudkeyPressed(key);
-	}
-	if( key == 's' ){
-		soundStream.start();
-	}
-	
-	if( key == 'e' ){
-		soundStream.stop();
-	}
-
 }
 
 /*--------------------------------------------------*

@@ -1,45 +1,34 @@
-/*
- *  audMode.h
- *  ofxKinectExample
- *
- *  Created by Melissa Alleyne on 10/23/12.
- *  Copyright 2012 Carnegie Mellon University. All rights reserved.
- *
- */
-
 #pragma once
 
 #include "ofMain.h"
 #include "ofxOpenCv.h"
+#include "ofxCvMain.h"
 #include "ofxKinect.h"
-
 #include "ofxCv.h"
 
+// uncomment this to read from two kinects simultaneously
+//#define USE_TWO_KINECTS
 
-
-
-class audMode {
+class audMode : public ofBaseApp {
 public:
-	audMode();
-	~audMode();
 	
 	void setup();
-	void update();
+	void update(float vol);
 	void draw();
 	void exit();
 	
-	ofColor getColor(int);
-	float getNoiseColor(int, int);
 	void drawPointCloud();
 	
-	void AudkeyPressed(int);
-	void AudmouseDragged(int, int, int);
-	void AudmousePressed(int, int, int);
-	void AudmouseReleased(int, int, int);
-	void AudwindowResized(int, int);
-	
+	float getValue(float volume);
+	float mapValue(float value, float low, float high);
+	void AudkeyPressed(int key);
+	void AudmouseDragged(int x, int y, int button);
+	void AudmousePressed(int x, int y, int button);
+	void AudmouseReleased(int x, int y, int button);
+	void AudwindowResized(int w, int h);
 	
 	ofxKinect kinect;
+	ofxCvColorImage colorImg;
 	
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
 	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
@@ -53,9 +42,18 @@ public:
 	int nearThreshold;
 	int farThreshold;
 	
+	/*----------camera stuff----------------*/
 	int angle;
-	int alpha;
-	ofColor c0, c1, c2, c3, c4;
-	// used for viewing the point cloud
-	ofEasyCam easyCam;
+	ofEasyCam easyCam; // used for viewing the point cloud
+	/*----------------------------------------*/
+	
+	
+	/*----------arduino stuffs----------------*/
+	ofSerial serial;
+	/*----------------------------------------*/
+	
+	float distance;
+	int updates;
+	ofColor choicecolor; 
+	ofVec3f last_vec;
 };
