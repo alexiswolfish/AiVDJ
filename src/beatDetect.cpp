@@ -134,6 +134,17 @@ void beatDetect::audioReceived(float* input, int bufferSize){
 	}
 }
 
+// decide the width of the sub bands used in the detection
+bool beatDetect::isBeatRange(int low, int high, int threshold)
+{
+    int num = 0;
+    for(int i = low; i < high+1; i++) 
+        if(isBeat(i)) 
+            num++;
+    return num > threshold;
+
+}
+
 // Beat itself
 bool beatDetect::isBeat(int subband)
 {
@@ -161,16 +172,31 @@ bool beatDetect::isHat()
     return isBeatRange(low, hi, thresh);
 }
 
-// decide the width of the sub bands used in the detection
-bool beatDetect::isBeatRange(int low, int high, int threshold)
-{
-    int num = 0;
-    for(int i = low; i < high+1; i++) 
-        if(isBeat(i)) 
-            num++;
-    return num > threshold;
-}
+void beatDetect::drawSmoothedFFT(){
+	int height = 75;
+	int width = FFT_SUBBANDS*3+10;
+	int spacer = 16;
 
+	for(int i=0; i<FFT_SUBBANDS; i++){
+		ofLine(10+(i*3),height,10+(i*3),height-fftSmoothed[i]*20.0f);
+	}
+
+}
+//the magnitude(volume) of each frequency
+void beatDetect::drawAverageMagnitude(){
+	float rectWidth = 512;
+	float rectHeight = 150;
+	float spacer = 16;
+
+	for (int i = 1; i < (int)rectWidth/2; i++){
+        if(i % 16 == 0)
+            ofSetColor(0xf56494);
+        else
+            ofSetColor(255,255,255);
+		ofLine(10+(i*3), 150,  10+(i*3),150-magnitude_average[i]*10.0f);
+	}
+}
+//draw the three other graphs
 void beatDetect::drawSubbands(){
 	ofPushMatrix();
 	int height = 75;

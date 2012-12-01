@@ -39,7 +39,7 @@ void testApp::setup(){
 	initRects();
 	ofEnableSmoothing();
 //				ofEnableAlphaBlending();
-	ofBackground(240);
+	ofBackground(40);
 	/*-------Alex------*/
 	physics.setup();
 	vid.setup();
@@ -57,6 +57,7 @@ void testApp::update(){
 //	audio->addPoint(scaledVol*100);
 	//calculate average volume as a single float instead of per frequency
 	bd.updateFFT();
+
 
 	bool isChanged = false;
 	float fft_bins = 512.0f; //this really should be a class constant
