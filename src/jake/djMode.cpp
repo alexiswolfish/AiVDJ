@@ -47,7 +47,7 @@ void djMode::setup() {
 		oldMouseX = -999;
 		oldMouseY = -999;
 
-	angle = 0;
+	angle = 5;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	easyCam.tilt(15);
@@ -71,15 +71,15 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 		bool thresh = false;
 		int points = 0;
 		//maxY = 0;
-		for(int y = 0; y < h; y += step*3) {
+		for(int y = 0; y < h; y += step*4) {
 			for(int x = 0; x < w; x += step) {
 				if(kinect.getDistanceAt(x, y) > 0) {
 					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
 						points++;
 						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
 						float addMe = (vol[x] * 800.0f);
-						if (addMe > 10) addMe = 10; 
-						else if (addMe < -10) addMe = -10;
+						if (addMe > 10) addMe = 5; 
+						else if (addMe < -10) addMe = -5;
 
 						if (vec.y > maxY) maxY = vec.y;
 						if (!thresh){
