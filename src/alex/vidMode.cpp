@@ -27,7 +27,7 @@
   {
 	ofPushStyle();
 	ofNoFill();
-   // ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
+    ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
 
 	//RGB
 	int numPix = 480*640*3;
@@ -37,7 +37,7 @@
 	int pixOffsetY = ((ofGetWindowHeight()/2)-240);
 
 
-	ofSetColor(x/1.5,y/1.5,ofRandom(0,255));
+	//ofSetColor(x/1.5,y/1.5,ofRandom(0,255));
 	ofSetLineWidth(1.5);	
     ofLine(pos.x,pos.y,pos.x-vel.x,pos.y-vel.y);
 	ofPopStyle();
