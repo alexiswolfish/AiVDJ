@@ -71,15 +71,15 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh) {
 		bool thresh = false;
 		int points = 0;
 		//maxY = 0;
-		for(int y = 0; y < h; y += step*4) {
+		for(int y = 0; y < h; y += step*6) {
 			for(int x = 0; x < w; x += step) {
 				if(kinect.getDistanceAt(x, y) > 0) {
 					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
 						points++;
 						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
 						float addMe = (vol[x] * 800.0f);
-						if (addMe > 10) addMe = 5; 
-						else if (addMe < -10) addMe = -5;
+						if (addMe > 5) addMe = 5; 
+						else if (addMe < -5) addMe = -5;
 
 						if (vec.y > maxY) maxY = vec.y;
 						if (!thresh){
@@ -155,7 +155,14 @@ void djMode::drawPointCloud() {
 	ofPushStyle();
 	ofSetColor(smartColor);
 	for (int i=0; i<lines.size();i++){
+		ofSetLineWidth(3);
 		lines[i].draw();
+		//int subLines;
+		//vector<ofPoint> ps = lines[i].getVertices();
+		//subLines = lines[i].size()/4;
+		//for (int k=0; k<subLines; k++){
+		//	ps.
+		//}
 	}
 	printf("\n---max %f \n", maxY);
 	//ofSphere(ofGetWidth()/2, maxY, Zhigh/2, 30);

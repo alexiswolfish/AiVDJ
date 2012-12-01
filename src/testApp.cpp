@@ -41,7 +41,7 @@ void testApp::setup(){
 	setVid = false;
 
 	DjDepthSliderLow = 0;
-	DjDepthSliderHigh = 1300;
+	DjDepthSliderHigh = 1100;
 
 	guiSetup();
 	initRects();
@@ -404,7 +404,7 @@ void testApp::guiSetup(){
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1300, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1100, dim*25, dim),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
 	//w = gui->addWidgetSouthOf(new ofxUISlider("dJ testt", 1, 100, 40, dim*25, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
