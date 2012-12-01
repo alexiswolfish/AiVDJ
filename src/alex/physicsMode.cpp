@@ -79,7 +79,7 @@ void physicsMode::repulseSources(){
 }
 
 void physicsMode::mousePressed(physicsMode::source::Type t, ofVec3f pos){
-	if(sources.size()<5)
+	if(sources.size()<3)
 		sources.push_back(source(pos, t, srcImg));
 }
 void physicsMode::addParticles(int amt){

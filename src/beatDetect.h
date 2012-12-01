@@ -41,7 +41,8 @@ public:
     void drawSmoothedFFT();
 	void drawAverageMagnitude();
     void drawSubbands();
-    //void drawBeats();
+	void drawBeats();
+
     void audioReceived(float* input, int bufferSize); //finished
     
     // detect beats

@@ -187,14 +187,15 @@ void beatDetect::drawAverageMagnitude(){
 	float rectWidth = 512;
 	float rectHeight = 150;
 	float spacer = 16;
-
+	ofPushStyle();
 	for (int i = 1; i < (int)rectWidth/2; i++){
         if(i % 16 == 0)
-            ofSetColor(0xf56494);
+            ofSetHexColor(0xf56494);
         else
             ofSetColor(255,255,255);
-		ofLine(10+(i*3), 150,  10+(i*3),150-magnitude_average[i]*10.0f);
+		ofLine(10+(i*3), 0,  10+(i*3), magnitude_average[i]*10.0f);
 	}
+	ofPopStyle();
 }
 //draw the three other graphs
 void beatDetect::drawSubbands(){
@@ -217,4 +218,20 @@ void beatDetect::drawSubbands(){
 		ofLine(10+(i*3),height,10+(i*3),height-fftVariance[i]*20.0f);
 	}
 	ofPopMatrix();
+}
+
+void beatDetect::drawBeats(){
+
+	int height = 75;
+	int width = FFT_SUBBANDS*3+10;
+	int spacer = 16;
+	ofPushStyle();
+	for(int i=0; i<FFT_SUBBANDS; i++){
+		if(isBeat(i))
+			ofSetHexColor(0xf56494);
+		else
+			ofSetColor(255,255,255);
+		ofLine(10+(i*3),height,10+(i*3),height-fftSubbands[i]*20.0f);
+	}
+	ofPopStyle();
 }
