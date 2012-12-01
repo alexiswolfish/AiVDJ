@@ -31,17 +31,19 @@ protected:
 	ofSoundPlayer soundtrack;
 	
 public:
-	beatDetect();
+	beatDetect(); //finished
 	virtual ~beatDetect() {}
 
     // FFT functions
 	void initFFT();
-    void updateFFT();
+    void updateFFT(); //finished
     //void updateFFT(float* in_fft, int infft_size);
     void drawSmoothedFFT();
+	void drawAverageMagnitude();
     void drawSubbands();
-    //void drawBeats();
-    void audioReceived(float* input, int bufferSize);
+	void drawBeats();
+
+    void audioReceived(float* input, int bufferSize); //finished
     
     // detect beats
     void enableBeatDetect() {bDetectBeat = true;}

@@ -79,7 +79,7 @@ void physicsMode::repulseSources(){
 }
 
 void physicsMode::mousePressed(physicsMode::source::Type t, ofVec3f pos){
-	if(sources.size()<6)
+	if(sources.size()<3)
 		sources.push_back(source(pos, t, srcImg));
 }
 void physicsMode::addParticles(int amt){
@@ -94,8 +94,8 @@ void physicsMode::source::render(){
 	ofPushStyle();
 	ofSetColor(col);
 	float imgRad = radius*5 +10;
-	float radMult = 0.09;
-	float radSq = (radius*radius) * radMult;
+	float radMult = 0.08;
+	float radSq = 50 + (radius*radius) * radMult;
 
 	if(radSq > 200){
 		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.009))*radMult);
@@ -214,8 +214,12 @@ float physicsMode::source::findAngle(float x, float y){
 void physicsMode::source::updateParticles(bool isKick, bool isSnare){
 	repulseParticles();
 	for(vector<particle>::iterator e1 = mParticles.begin(); e1 != mParticles.end(); ++e1){
+		float radMult = 0.09;
+		float radSq = (radius*radius) * radMult;
+
 		//volume is stored in the radius
-		e1->pull(*this,radius*3+radius); //outer ring limit
+		//e1->pull(*this,radius*3+radius); //outer ring limit
+		e1->pull(*this,(radSq * ((radSq/2)*.009))*radMult);
 		e1->push(*this,radius*3+10);  //inner ring limit
 
 		if(isKick){

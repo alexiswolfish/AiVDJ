@@ -56,6 +56,8 @@ class source {
 			void update(bool isKick, bool isSnare);
 			void attract(source s, float range);
 			void pullToCenter(float distThresh);
+
+
 			float findAngle(float x1, float y1, float x2, float y2);
 			float findAngle(float x, float y);
 
