@@ -20,7 +20,7 @@ void djMode::setup() {
 	bcloth = false;
 	tiltDegr = 15;
 	
-	vector<int>sortedY(640, 0);
+	//vector<int>sortedY(640, 0);
 
 	ofSetLogLevel(OF_LOG_VERBOSE);
 	//// enable depth->video image calibration
@@ -47,10 +47,10 @@ void djMode::setup() {
 		oldMouseX = -999;
 		oldMouseY = -999;
 
-	angle = 5;
+	angle = 10;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
-	easyCam.tilt(15);
+	//easyCam.tilt(15);
 	
 
 }
@@ -158,11 +158,12 @@ void djMode::drawPointCloud() {
 		lines[i].draw();
 	}
 	printf("\n---max %f \n", maxY);
-	ofSphere(ofGetWidth()/2, maxY, Zhigh/2, 30);
-	if (maxY >= 320 && maxY < 480){
-		easyCam.tilt(0);
-		easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
-	}
+	//ofSphere(ofGetWidth()/2, maxY, Zhigh/2, 30);
+	//if (maxY >= 320 && maxY < 480){
+	//	easyCam.tilt(0);
+	//	easyCam.tilt(-maxY-320/3.55);  //max tilt ~-45
+	//	ofRotateY(-1*(maxY-320/3.55));
+	//}
 
 	ofPopStyle();
 	ofPopMatrix();
@@ -258,7 +259,7 @@ void djMode::exit() {
 void djMode::DJkeyPressed (int key) {
 	switch (key) {
 			
-		case'i':
+		case'k':
 			bDrawPointCloud = false;			
 			bDrawMeshCloud = false;			break;
 

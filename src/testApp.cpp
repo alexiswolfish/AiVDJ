@@ -35,9 +35,13 @@ void testApp::setup(){
 	drawSound = true;
 	mode = PHYSICS;
 
-	DjDepthSliderLow = 0;
+	/*--------setup booleans-----------*/
+	setDJ = false;
+	setAud = false;
+	setVid = false;
 
-	DjDepthSliderHigh = 1900;
+	DjDepthSliderLow = 0;
+	DjDepthSliderHigh = 1300;
 
 	guiSetup();
 	initRects();
@@ -45,15 +49,15 @@ void testApp::setup(){
 //				ofEnableAlphaBlending();
 	/*-------Alex-------*/
 	ofBackground(ccomp5.r,ccomp5.g,ccomp5.b,100);
-	physics.setup();
-	vid.setup();
+	//physics.setup();
+	//vid.setup();
 	//curShade = CT_SOFT;
 	generateColors(CT_SOFT);
 	numParticles = 0;
 	/*-------Jake-------*/
-	//DJMODE.setup();
+	DJMODE.setup();
 	/*------Melissa-----*/
-	Aud.setup();
+	//Aud.setup();
 }
 
 
@@ -88,19 +92,31 @@ void testApp::update(){
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
+			//if (!setDJ) {
+			//	setDJ = true;
+			//	DJMODE.setup();}
 			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
 			DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
+			if (!setAud) {
+				setAud = true;
+				Aud.setup();}
 			Aud.update(cVol);
 			break;
 		default:
 		case PHYSICS:
+			if (!setPhy) {
+				setPhy = true;
+				physics.setup();}
 			physics.addParticles(numParticles);
 			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
 			physics.update();
 			break;
+			if (!setVid) {
+				setVid = true;
+				vid.setup();}
 			vid.update(mouseX, mouseY);
 	}
 }
@@ -320,6 +336,7 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		DjDepthSliderHigh = slider->getScaledValueHigh(); 
 		DjDepthSliderLow = slider->getScaledValueLow(); 
 	}
+
  //   else if(name == "dJ testt")
 	//{
 	//	ofxUISlider *slider = (ofxUISlider *) e.widget; 
@@ -387,7 +404,7 @@ void testApp::guiSetup(){
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1900, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1300, dim*25, dim),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
 	//w = gui->addWidgetSouthOf(new ofxUISlider("dJ testt", 1, 100, 40, dim*25, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
