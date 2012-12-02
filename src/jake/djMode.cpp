@@ -425,7 +425,7 @@ void djMode::clothShit(){
 
 //--------------------------------------------------------------
 void djMode::exit() {
-	//kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 }
 

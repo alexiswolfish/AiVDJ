@@ -36,8 +36,8 @@ void testApp::setup(){
 	mode = PHYSICS;
 
 	/*--------setup booleans-----------*/
-	setDJ = false;
-	setAud = false;
+	//setDJ = false;
+	//setAud = false;
 	setVid = false;
 
 	DjDepthSliderLow = 0;
@@ -95,22 +95,21 @@ void testApp::update(){
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			if (!setDJ) {
-				setDJ = true;
-				DJMODE.setup();}
+			Aud.exit();
+			DJMODE.setup();
 			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
 			DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
-			if (!setAud) {
-				setAud = true;
-				Aud.setup();
-			}
+			DJMODE.exit();
+			Aud.setup();
 			Aud.update(cVol);
 			break;
 		default:
 		case PHYSICS:
+			DJMODE.exit();
+			Aud.exit();
 			if (!setPhy) {
 				setPhy = true;
 				physics.setup();
@@ -121,6 +120,8 @@ void testApp::update(){
 			break;
 
 		case VID:
+			DJMODE.exit();
+			Aud.exit();
 			if (!setVid) {
 				setVid = true;
 				vid.setup();
