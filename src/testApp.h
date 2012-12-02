@@ -4,10 +4,13 @@
 #include "ofxUI.h"
 #include "beatDetect.h"
 #include "ofxColourTheory.h"
+#include "MSABPMTapper.h"
 
 #include "alex/physicsMode.h"
 #include "alex/vidMode.h"
 //#include "jake/djMode.h"
+
+using namespace msa;
 
 class testApp : public ofBaseApp{
 
@@ -89,6 +92,7 @@ class testApp : public ofBaseApp{
 
 		void drawVolGraphs();
 		void drawBeatBins();
+		bool trackBeats(int low, int high); //check subbands between low and high for beats
 
 		vector <float> left;
 		vector <float> right;
@@ -101,7 +105,8 @@ class testApp : public ofBaseApp{
 		ofxUIMovingGraph *audio;
 
 		beatDetect bd;
-		
+		BPMTapper bpmTapper;
+
 	// 0 output channels, 
 	// 2 input channels
 	// 44100 samples per second

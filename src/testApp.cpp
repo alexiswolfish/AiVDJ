@@ -38,7 +38,7 @@ void testApp::setup(){
 	guiSetup();
 	initRects();
 	ofEnableSmoothing();
-//				ofEnableAlphaBlending();
+	ofEnableAlphaBlending();
 	ofBackground(40);
 	/*-------Alex------*/
 	physics.setup();
@@ -57,8 +57,6 @@ void testApp::update(){
 //	audio->addPoint(scaledVol*100);
 	//calculate average volume as a single float instead of per frequency
 	bd.updateFFT();
-
-
 	bool isChanged = false;
 	float fft_bins = 512.0f; //this really should be a class constant
 	pVol = cVol;
@@ -71,6 +69,9 @@ void testApp::update(){
 		isChanged = true;
 	}
 
+
+	bpmTapper.update();
+
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
@@ -78,7 +79,7 @@ void testApp::update(){
 		case AUD:
 			break;
 		case PHYSICS:
-			physics.addParticles(numParticles);
+			//physics.addParticles(numParticles);
 			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
 			physics.update();
 			break;
@@ -99,6 +100,9 @@ void testApp::draw(){
 	
 	ofSetBackgroundAuto(true);
 	//sound
+	trackBeats(0,1);
+
+
 	if(drawSound){
 	//	drawVolGraphs();
 		drawBeatBins();
@@ -115,9 +119,10 @@ void testApp::draw(){
 			physics.render();
 			break;
 		case VID:
-			ofSetBackgroundAuto(false);
-			ofSetColor(0,0,0, (int)ofRandom(10,30));
-			ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
+		//	ofSetBackgroundAuto(false);
+			//ofSetColor(255,255,255, (int)ofRandom(10,30));  //white
+		//	ofSetColor(0,0,0, (int)ofRandom(10,30));
+		//	ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
 			vid.draw(mouseX, mouseY);
 			break;
 		default:
@@ -142,7 +147,20 @@ void testApp::draw(){
 		ofPopStyle();
 	}
 }
+/*--------------------------------------------------*
+BPM tracking
+ *--------------------------------------------------*/
+bool testApp::trackBeats(int low, int high){
+	bool tap = false;
 
+	for(int i=low; i<high; i++){
+		if(bd.isBeat(i))
+			tap = true;
+	}
+	if(tap)
+		bpmTapper.tap();
+	return tap;
+}
 /*--------------------------------------------------*
 Draw Beat Bins
 
@@ -175,6 +193,10 @@ void testApp::drawBeatBins(){
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("Beat Detection",0,-spacer);
 	bd.drawBeats();
+	ofTranslate (32*3+26,0,0);
+	ofDrawBitmapString("BPM: " + ofToString(bpmTapper.bpm()), 0, -spacer);
+
+	bpmTapper.draw(40,50,10);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);

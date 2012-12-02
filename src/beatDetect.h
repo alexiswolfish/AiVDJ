@@ -3,6 +3,7 @@
 
 #include "ofMain.h"
 #include "fft.h"
+#include "MSATimer.h"
 
 #include <list>
 
@@ -60,7 +61,8 @@ public:
     float *magnitude_average, *magnitude_average_snapshot; 
 	bool bDetectBeat;
     fft myfft;
-    
+
+
 };
 
 #endif

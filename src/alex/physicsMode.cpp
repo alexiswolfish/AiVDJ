@@ -95,7 +95,8 @@ void physicsMode::source::render(){
 	ofSetColor(col);
 	float imgRad = radius*5 +10;
 	float radMult = 0.08;
-	float radSq = 50 + (radius*radius) * radMult;
+	float radSq = (radius*radius) * radMult;
+	float radMin = 0;
 
 	if(radSq > 200){
 		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.009))*radMult);
@@ -105,7 +106,7 @@ void physicsMode::source::render(){
 		ofCircle(loc.x, loc.y, radSq/2*radMult);
 	}
 	else{
-		ofCircle(loc.x, loc.y, radSq/2*radMult);
+		ofCircle(loc.x, loc.y, radMin + radSq);
 	}
 //	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
 

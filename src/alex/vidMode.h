@@ -39,9 +39,6 @@ class vidMode{
 	
 	ParticleController p;
 
-		ofVideoGrabber 		vidGrabber;
-		int 				camWidth;
-		int 				camHeight;
 
 	void setup();
 	void update(int x, int y);
