@@ -57,7 +57,7 @@ void testApp::setup(){
 	generateColors(CT_SOFT);
 	numParticles = 0;
 	/*-------Jake-------*/
-	DJMODE.setup();
+	//DJMODE.setup();
 	/*------Melissa-----*/
 	//Aud.setup();
 }
@@ -95,9 +95,9 @@ void testApp::update(){
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			//if (!setDJ) {
-			//	setDJ = true;
-			//	DJMODE.setup();}
+			if (!setDJ) {
+				setDJ = true;
+				DJMODE.setup();}
 			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
 			DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}

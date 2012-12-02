@@ -20,6 +20,19 @@ public:
 	void draw();
 	void exit();
 
+	//CV shit 
+	ofxCvColorImage colorImg;
+	
+	ofxCvGrayscaleImage grayImage; // grayscale depth image
+	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
+	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
+	int nearThreshold;
+	int farThreshold;
+	vector<ofPoint> fingers;
+	ofPoint palmCenter;
+
+	ofxCvContourFinder contourFinder;
+
 	// cloth vars
 	ClothController controller;
     float oldMouseX,oldMouseY;
@@ -31,6 +44,7 @@ public:
 
 	void updatePoints();
 	void updateGlobals(ofColor c, bool changeColor);
+	vector<ofPoint> getFingerTips( ofxCvGrayscaleImage input);
 	void drawPointCloud();
 	void drawMeshCloud();
 	void clothShit();
@@ -48,18 +62,13 @@ public:
 
 	ofVec3f maxPt;
 	vector<ofPolyline> lines;
+	ofMesh mesh;
+
 	vector<float> volHist;
 	ofColor smartColor;
 
 	ofxKinect kinect;
 	
-	ofxCvColorImage colorImg;
-	
-	ofxCvGrayscaleImage grayImage; // grayscale depth image
-	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
-	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
-	
-	ofxCvContourFinder contourFinder;
 	
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
