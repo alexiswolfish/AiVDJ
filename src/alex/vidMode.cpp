@@ -28,6 +28,7 @@
 	ofPushStyle();
 	ofNoFill();
     ofSetColor(x/1.5,y/1.5,ofRandom(0,255),ofRandom(2,40));
+	//ofSetColor(x/1.5,ofRandom(2,40));
 
 	//RGB
 	int numPix = 480*640*3;
@@ -92,11 +93,7 @@ void vidMode::setup()
   numParticles = 7000;
   p = ParticleController(numParticles);
 
-  	camWidth 		= 640;	// try to grab at this size. 
-	camHeight 		= 480;
-	
-	vidGrabber.setVerbose(true);
-	vidGrabber.initGrabber(camWidth,camHeight);
+
 
 }
 void vidMode::update(int x, int y)
@@ -104,16 +101,29 @@ void vidMode::update(int x, int y)
   p.update(x,y);
 
   //camera garbage
-  vidGrabber.update();
-	//end camera garbage
+  //end camera garbage
 }
 
 void vidMode::draw(int x, int y)
 {
-  p.render(x,y, vidGrabber.getPixels());
-  ofSetHexColor(0xffffff);
-  vidGrabber.draw(20,20);
-  //camera garbage
- 
 
+	ofPushMatrix();
+
+	ofPopMatrix();
+	
+	//draw in the alpha channel only
+	glDisable(GL_BLEND);  
+	glColorMask(0, 0, 0, 1);  
+	glColor4f(1,1,1,1.0f); 
+
+	p.render(x,y);
+	
+
+	//draw image to be masked
+	glColorMask(1,1,1,0);  
+	glEnable(GL_BLEND);  
+	glBlendFunc( GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA );  
+	
+	
+	//camera garbage
 }

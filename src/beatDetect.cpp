@@ -235,3 +235,4 @@ void beatDetect::drawBeats(){
 	}
 	ofPopStyle();
 }
+

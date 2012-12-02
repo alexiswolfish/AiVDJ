@@ -46,9 +46,9 @@ void testApp::setup(){
 	guiSetup();
 	initRects();
 	ofEnableSmoothing();
-//				ofEnableAlphaBlending();
 
 	/*-------Alex-------*/
+	ofEnableAlphaBlending();
 	ofBackground(40);
 	//physics.setup();
 	//vid.setup();
@@ -78,8 +78,6 @@ void testApp::update(){
 
 
 	bd.updateFFT();
-
-
 	bool isChanged = false;
 	float fft_bins = 512.0f; //this really should be a class constant
 	pVol = cVol;
@@ -91,6 +89,9 @@ void testApp::update(){
 	if(abs(pVol - cVol)*100>1){
 		isChanged = true;
 	}
+
+
+	bpmTapper.update();
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -114,7 +115,7 @@ void testApp::update(){
 				setPhy = true;
 				physics.setup();
 			}
-			physics.addParticles(numParticles);
+			//physics.addParticles(numParticles);
 			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
 			physics.update();
 			break;
@@ -141,10 +142,11 @@ void testApp::draw(){
 	
 	ofSetBackgroundAuto(true);
 	//sound
-	//if(drawSound){
+	if(drawSound){
 		drawVolGraphs();
+		trackBeats(0,1);
 		drawBeatBins();
-	//}
+	}
 
 
 	//modes
@@ -160,9 +162,10 @@ void testApp::draw(){
 			physics.render();
 			break;
 		case VID:
-			ofSetBackgroundAuto(false);
-			ofSetColor(0,0,0, (int)ofRandom(10,30));
-			ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
+		//	ofSetBackgroundAuto(false);
+			//ofSetColor(255,255,255, (int)ofRandom(10,30));  //white
+		//	ofSetColor(0,0,0, (int)ofRandom(10,30));
+		//	ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
 			vid.draw(mouseX, mouseY);
 			break;
 		default:
@@ -197,7 +200,20 @@ void testApp::draw(){
 
 	
 }
+/*--------------------------------------------------*
+BPM tracking
+ *--------------------------------------------------*/
+bool testApp::trackBeats(int low, int high){
+	bool tap = false;
 
+	for(int i=low; i<high; i++){
+		if(bd.isBeat(i))
+			tap = true;
+	}
+	if(tap)
+		bpmTapper.tap();
+	return tap;
+}
 /*--------------------------------------------------*
 Draw Beat Bins
 
@@ -230,6 +246,10 @@ void testApp::drawBeatBins(){
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("Beat Detection",0,-spacer);
 	bd.drawBeats();
+	ofTranslate (32*3+26,0,0);
+	ofDrawBitmapString("BPM: " + ofToString(bpmTapper.bpm()), 0, -spacer);
+
+	bpmTapper.draw(40,50,10);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
