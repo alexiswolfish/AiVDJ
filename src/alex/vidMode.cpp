@@ -116,7 +116,7 @@ void vidMode::draw(int x, int y)
 	glColorMask(0, 0, 0, 1);  
 	glColor4f(1,1,1,1.0f); 
 
-	p.render(x,y);
+	//p.render(x,y);
 	
 
 	//draw image to be masked

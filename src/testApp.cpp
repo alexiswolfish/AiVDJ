@@ -21,6 +21,8 @@ void testApp::setup(){
 	pVol = 0.0;
 	cVol = 0.0;
 
+	AvgSetListBPM = externalBpm();
+
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
 	//volHistory.assign(400, 0.0);
@@ -36,8 +38,8 @@ void testApp::setup(){
 	mode = PHYSICS;
 
 	/*--------setup booleans-----------*/
-	//setDJ = false;
-	//setAud = false;
+	setDJ = false;
+	setAud = false;
 	setVid = false;
 
 	DjDepthSliderLow = 0;
@@ -53,8 +55,13 @@ void testApp::setup(){
 	//physics.setup();
 	//vid.setup();
 
+	
 	//curShade = CT_SOFT;
-	generateColors(CT_SOFT);
+
+	//get colors based on average set bpm
+	ColourShade shade = IntelliColor();
+
+	generateColors(shade);
 	numParticles = 0;
 	/*-------Jake-------*/
 	//DJMODE.setup();
@@ -70,7 +77,7 @@ void testApp::update(){
 	//calculate average volume as a single float instead of per frequency
 	/*-------kinect side displays------*/
 	if(drawDJKinect){
-		DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
+		DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh, bd.isKick() || bd.isSnare());
 	}
 	if(drawAudKinect){
 		//Aud.update(cVol);
@@ -90,21 +97,33 @@ void testApp::update(){
 		isChanged = true;
 	}
 
-
 	bpmTapper.update();
 
 	/*-------Modes-----*/
 	switch(mode){
 		case DJ:
-			Aud.exit();
-			DJMODE.setup();
-			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh);
-			DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged);
+			if (setAud) {
+				Aud.exit();
+				setAud = false;
+			}
+			if (!setDJ){
+				setDJ = true;
+				DJMODE.setup();
+			}
+			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh, bd.isKick() || bd.isSnare());
+			//DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged, cVol, bd.isKick() || bd.isSnare());
+			DJMODE.updateGlobals(colorGen.getRandom(colors), bd.isKick() || bd.isSnare(), cVol);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
 			break;
 		case AUD:
-			DJMODE.exit();
-			Aud.setup();
+			if (setDJ) {
+				DJMODE.exit();
+				setDJ = false;
+			}
+			if (!setAud){
+				setAud = true;
+				Aud.setup();
+			}
 			Aud.update(cVol);
 			break;
 		default:
@@ -144,7 +163,7 @@ void testApp::draw(){
 	//sound
 	if(drawSound){
 		drawVolGraphs();
-		trackBeats(0,1);
+		trackBeats(1,3);
 		drawBeatBins();
 	}
 
@@ -489,6 +508,32 @@ void testApp::drawColorSwatches(int x, int y){
 	ofPopStyle();
 	ofPopMatrix();
 }
+int testApp::externalBpm(){
+	using namespace std;
+	ifstream f;
+	char input[10];
+	f.open("avg_bpm.txt");
+	while (!f.eof()){
+		f >> input;
+	}
+	f.close();
+	return atoi(input);
+}
+
+ColourShade testApp::IntelliColor(){
+	ColourShade colors[10] = {CT_LIGHT,CT_WEAK,CT_SOFT, CT_COOL, CT_NEUTRAL, CT_WARM,CT_HARD,CT_INTENSE,CT_BRIGHT,CT_FRESH}; //not using CT_DARK
+	if (AvgSetListBPM < 60) return colors[0];
+	else if (AvgSetListBPM < 70) return colors[1];
+	else if (AvgSetListBPM < 80) return colors[2];
+	else if (AvgSetListBPM < 90) return colors[3];
+	else if (AvgSetListBPM < 100) return colors[4];
+	else if (AvgSetListBPM < 110) return colors[5];
+	else if (AvgSetListBPM < 120) return colors[6];
+	else if (AvgSetListBPM < 130) return colors[7];
+	else if (AvgSetListBPM < 140) return colors[8];
+	else return colors[9];
+}
+
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);

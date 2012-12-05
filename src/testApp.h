@@ -46,6 +46,7 @@ class testApp : public ofBaseApp{
 		void guiColors(ofxUIWidget *w);
 		void guiEvent(ofxUIEventArgs &e);
 		void initRects();
+		int externalBpm();
 		void exit();
 
 		ofxUICanvas *gui;
@@ -80,6 +81,7 @@ class testApp : public ofBaseApp{
 
 		void generateColors(ColourShade seed);
 		void drawColorSwatches(int x, int y);
+		ColourShade IntelliColor();
 		/*-----------Jake-----------*/
 		djMode DJMODE;
 		/*-----------Melissa-----------*/
@@ -108,6 +110,8 @@ class testApp : public ofBaseApp{
 		
 		float cVol;
 		float pVol;
+
+		int AvgSetListBPM;
 
 		ofSoundStream soundStream;
 		ofxUIMovingGraph *audio;

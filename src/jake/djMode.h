@@ -16,7 +16,7 @@ public:
 	~djMode();
 
 	void setup();
-	void update(vector<float> &vol, float depthLow, float depthHigh);
+	void update(vector<float> &vol, float depthLow, float depthHigh, bool beat);
 	void draw();
 	void exit();
 
@@ -43,11 +43,13 @@ public:
     ofLight directional;
 
 	void updatePoints();
-	void updateGlobals(ofColor c, bool changeColor);
+	void updateGlobals(ofColor c, bool changeColor, float volume);
 	vector<ofPoint> getFingerTips( ofxCvGrayscaleImage input);
 	void drawPointCloud();
 	void drawMeshCloud();
 	void clothShit();
+
+	bool newBeat;
 
 	void DJkeyPressed(int key);
 	void DJmouseDragged(int x, int y, int button);
@@ -66,6 +68,7 @@ public:
 
 	vector<float> volHist;
 	ofColor smartColor;
+	float vol;
 
 	ofxKinect kinect;
 	
