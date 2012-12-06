@@ -117,7 +117,7 @@ void testApp::update(){
 			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh, bd.isKick() || bd.isSnare());
 			//DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged, cVol, bd.isKick() || bd.isSnare());
 			DJMODE.updateGlobals(colorGen.getRandom(colors), bd.isKick() || bd.isSnare(), cVol*5);
-			if (!DJMODE.WheresMyDj){mode = PHYSICS;}
+			if (!DJMODE.WheresMyDj){mode = PHYSICS; setDJ = false;}
 			break;
 		case AUD:
 			if (setDJ) {
@@ -167,13 +167,14 @@ void testApp::draw(){
 	trackBeats(1,1);
 	ofSetBackgroundAuto(true);
 
-
 	//modes
 	if(drawDisplay){
 		switch(mode){
-		case DJ:
+		case DJ:{
+			ofSetBackgroundAuto(false);
 			DJMODE.draw();
 			break;
+			}
 		case AUD:
 			Aud.draw();
 			break;
@@ -185,10 +186,10 @@ void testApp::draw(){
 			vid.draw(mouseX, mouseY);
 			break;
 		default:
-				ofPushStyle();
-				ofSetColor(white);
-				ofRect(displayRect);
-				ofPopStyle();
+			ofPushStyle();
+			ofSetColor(white);
+			ofRect(displayRect);
+			ofPopStyle();
 			break;
 		}
 	}

@@ -33,7 +33,7 @@ void djMode::setup() {
 	//wave_image.allocate(ofGetScreenHeight(), ofGetScreenHeight());
 	wave = true;
 	wave_count = 0;		
-	new_img_height = wave_image.height * (float)((float)(ofGetWidth()/2)/wave_image.width);
+	
 	
 
 	// for finger detection
@@ -64,7 +64,8 @@ void djMode::setup() {
 		rows = 480 / CLOTH_RES; 
 		controller.init(cols,rows);
 		controller.initMesh(); 
-		tex.loadImage("large_brown.png"); 
+		//tex.loadImage("large_brown.png"); 
+		tex = albumArt;
 		shader.load("shader");
 		directional.setDirectional();
 		oldMouseX = -999;
@@ -187,15 +188,22 @@ float djMode::waves(float x, float y, float w, float a, float t){
 
 
 void djMode::draw() {
-	ofBackground(95, 100);
+	float new_img_height = wave_image.height * (float)((float)(ofGetHeight()/2)/wave_image.height);
+	float new_img_width = wave_image.width * (float)((float)(ofGetHeight()/2)/wave_image.width);
 
-	BnW_image.draw(10,500, BnW_image.width,BnW_image.height);
+	ofSetColor(95, 165);
+	ofRect(0,0,ofGetWidth(), ofGetHeight());
+	//ofBackground(95, 100);
+
+	//BnW_image.draw(10,500, BnW_image.width,BnW_image.height);
+
 	//wave_image.scale(ofGetScreenHeight(), ofGetScreenHeight());
 	//wave_image.draw(ofGetScreenWidth()/3,0, new_img_height, new_img_height);
 
-	
+	ofPushStyle();
+	ofPushMatrix();
 	if(bDrawPointCloud) {
-		drawImage();
+		//drawImage();
 		easyCam.begin();
 		drawPointCloud();
 		easyCam.end();
@@ -218,25 +226,29 @@ void djMode::draw() {
 		shader.end();
 		ofPopMatrix();
 	}
+	ofPopStyle();
+	ofPopMatrix();
 	fingers.clear();
+
+
 }
 
 void djMode::drawImage(){
 	int k = 3;
 	ofPushStyle();
 	ofSetHexColor(0x000000);
-	printf("\n chan %d",albumArt.getPixelsRef().getNumChannels());
+	//printf("\n chan %d",albumArt.getPixelsRef().getNumChannels());
 	unsigned char * pixels = albumArt.getPixels();
-	for (int x=0; x< albumArt.width; x+= 8){
-		for (int y=0; y< albumArt.height; y+= 8){
+	for (int x=0; x< albumArt.width; x+= 5){
+		for (int y=0; y< albumArt.height; y+= 5){
 			int loc = x + y*albumArt.width;
 			unsigned char r = pixels[loc];
 			float val = 1-((float)r / 255.0f);
 			//float test = waves(x,y,BnW_image.width,.7,1);
 			//float testt = sin(val);
 			ofSetColor(r,vol*50);
-			float limitVol = (vol*vol*.8);
-			if (limitVol > 7) limitVol = 7;
+			float limitVol = (vol);
+			if (limitVol > 4) limitVol = 4;
 			ofCircle((150 + x)*k,(20+y)*k, val + limitVol );
 
 		}
@@ -462,6 +474,7 @@ void djMode::clothShit(){
 			float d = kinect.getDistanceAt(x*CLOTH_RES, y*CLOTH_RES);
 
 			if(d >0 && d < 1000) {
+			//if(0) {
             
 				d = ofMap(d,0,4000,0,30);
                             
@@ -472,14 +485,14 @@ void djMode::clothShit(){
 				controller.particles[i]->addForce(ff);
 				
 		   }
-				if (controller.particles.size() < 500){
-					noDJ++;
-					//printf("\nnodj %d\n", noDJ);
-				}
-				if (noDJ > 10){
-					WheresMyDj = false;
-					noDJ = 0;
-				}
+				//if (controller.particles.size() < 500){
+				//	noDJ++;
+				//	//printf("\nnodj %d\n", noDJ);
+				//}
+				//if (noDJ > 10){
+				//	WheresMyDj = false;
+				//	noDJ = 0;
+				//}
 		}
    
 		controller.update();
