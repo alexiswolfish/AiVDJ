@@ -37,7 +37,14 @@ class physicsMode {
 			void update(beatDetect bd, float bpm);
 			void render(int x, int y);
 		};
+		class Emitter : public Source{
+		public:
+			void render();
 
+		};
+		class dParticle : public Emitter{
+		public:
+		};
 
 		physicsMode();
 		
@@ -57,6 +64,8 @@ class physicsMode {
 
 		void addParticle(float x, float y, float z);
 
+		void setColorScheme(int s);
+
 		vector<ofVec3f> locs;
 		vector<ofVec3f> sizes;
 
@@ -73,4 +82,8 @@ class physicsMode {
 		float minRad, maxRad;
 		ofTexture texture;
 		ofTexture srcTexture;
+
+
+		ofColor bg, particleMain;
+		ColourShade centerTheme, particleTheme;
 	};

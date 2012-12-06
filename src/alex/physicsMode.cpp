@@ -53,9 +53,12 @@ physicsMode::physicsMode(){
 }
 
 void physicsMode::setup(int numParticles){
-	ofBackgroundHex(0x000000);
-	generateColors(CT_FRESH);
+	//ofBackgroundHex(0x000000);
+	setColorScheme(0);
 
+	ofBackground(bg);
+	generateColors(centerTheme);
+	
 	// load the texure
 	ofDisableArbTex();
 	ofLoadImage(texture, "dot.png");
@@ -121,12 +124,11 @@ void physicsMode::update(beatDetect bd, float bpm){
 
 void physicsMode::render(beatDetect bd, float bpm){
 	glDepthMask(GL_FALSE);
-
 	
 	if(bd.isBeat(27))
-		ofSetColor(colorGen.getColor(ofRandom(0,255),  colorGen.getColourConstraints(CT_LIGHT)));
+		ofSetColor(colorGen.getColor(ofRandom(0,255),  colorGen.getColourConstraints(particleTheme)));
 	else
-		ofSetColor(255, 100, 90);
+		ofSetColor(particleMain);
 	//glow
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofEnablePointSprites();
@@ -193,6 +195,39 @@ void physicsMode::keyPressed(int key){
 		camDist += 10;
 	}
 	camera.setDistance(camDist);
+	if(key == '0'){
+		setColorScheme(0);
+	}
+	if(key == '1')
+		setColorScheme(1);
+	if(key == '2')
+		setColorScheme(2);
+	ofBackground(bg);
+	generateColors(centerTheme);
+}
+
+void physicsMode::setColorScheme(int s){
+	switch(s){
+	case 0:  //soft mauve
+		bg = ofColor(79, 55, 56);
+		particleMain = ofColor(255, 100, 90);
+		centerTheme = CT_SOFT;
+		particleTheme = CT_LIGHT;
+		break;
+	case 1: //black
+		bg = ofColor(0,0,0);
+		particleMain = ofColor(255,100,90);
+		centerTheme = CT_FRESH;
+		particleTheme = CT_BRIGHT;
+		break;
+	case 2: //blue
+		bg = ofColor(0,130,255);
+		particleMain = ofColor(255,191,97);
+		centerTheme = CT_BRIGHT;
+		particleTheme = CT_WARM;
+	default:
+		break;
+	}
 }
 
 
