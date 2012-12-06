@@ -81,10 +81,12 @@ public:
 	float waves(float x, float y, float w, float a, float t);
 	bool wave;
 	int wave_count;
+	float new_img_height;
 	
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 	bool bcloth;
+	bool init_cloth;
 	
 	int angle;
 	

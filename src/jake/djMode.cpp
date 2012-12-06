@@ -21,6 +21,7 @@ void djMode::setup() {
 	bDrawPointCloud = true;
 	bcloth = false;
 	tiltDegr = 15;
+	init_cloth = false;
 
 	//size(300,300);
 	albumArt.loadImage("data/album_art/common_be.jpg");
@@ -28,21 +29,22 @@ void djMode::setup() {
 	BnW_image.setFromPixels(albumArt.getPixels(),albumArt.width,albumArt.height);
 	//BnW_image.blurHeavily();
 	BnW_image.threshold(50);
-	wave_image.allocate(BnW_image.width, BnW_image.height);
+	//wave_image.allocate(BnW_image.width, BnW_image.height);
 	//wave_image.allocate(ofGetScreenHeight(), ofGetScreenHeight());
 	wave = true;
 	wave_count = 0;		
+	new_img_height = wave_image.height * (float)((float)(ofGetWidth()/2)/wave_image.width);
 	
 
-
+	// for finger detection
 	//try running the hand detect with the example code
-	colorImg.allocate(kinect.width, kinect.height);
-	grayImage.allocate(kinect.width, kinect.height);
-	grayThreshNear.allocate(kinect.width, kinect.height);
-	grayThreshFar.allocate(kinect.width, kinect.height);
-	
-	nearThreshold = 255;
-	farThreshold = 70;
+	//colorImg.allocate(kinect.width, kinect.height);
+	//grayImage.allocate(kinect.width, kinect.height);
+	//grayThreshNear.allocate(kinect.width, kinect.height);
+	//grayThreshFar.allocate(kinect.width, kinect.height);
+	//
+	//nearThreshold = 255;
+	//farThreshold = 70;
 
 	//// enable depth->video image calibration
 	kinect.setRegistration(true);
@@ -56,7 +58,7 @@ void djMode::setup() {
 	//ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
-
+	if (init_cloth){
 		ofEnableSmoothing();
 		cols = 640 / CLOTH_RES;
 		rows = 480 / CLOTH_RES; 
@@ -67,7 +69,7 @@ void djMode::setup() {
 		directional.setDirectional();
 		oldMouseX = -999;
 		oldMouseY = -999;
-
+	}
 	angle = 10;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
@@ -132,26 +134,26 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 					}
 				}
 			}
-			if (beat){
-				mesh.setMode(OF_PRIMITIVE_POINTS);
-				int rand1 = ofRandom(128.0, 255.0);
-				for(int y = 0; y < h; y += step*2) {
-					for(int x = 0; x < w; x += step*2) {
-						if(kinect.getDistanceAt(x, y) > 0) {
-							if (kinect.getWorldCoordinateAt(x, y).z > Zhigh){	
-								float sizeD = (vol[x] * 2000.0f);
-								if (sizeD > 5) sizeD = 5; 
-								else if (sizeD < -5) sizeD = -5;
-								mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-								mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-								//bg_points.point.push_back(kinect.getWorldCoordinateAt(x, y));
-								//bg_points.color.push_back(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-								//bg_points.size.push_back(sizeD);
-							}
-						}
-					}
-				}
-			}
+			//if (beat){
+			//	mesh.setMode(OF_PRIMITIVE_POINTS);
+			//	int rand1 = ofRandom(128.0, 255.0);
+			//	for(int y = 0; y < h; y += step*2) {
+			//		for(int x = 0; x < w; x += step*2) {
+			//			if(kinect.getDistanceAt(x, y) > 0) {
+			//				if (kinect.getWorldCoordinateAt(x, y).z > Zhigh){	
+			//					float sizeD = (vol[x] * 2000.0f);
+			//					if (sizeD > 5) sizeD = 5; 
+			//					else if (sizeD < -5) sizeD = -5;
+			//					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
+			//					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+			//					//bg_points.point.push_back(kinect.getWorldCoordinateAt(x, y));
+			//					//bg_points.color.push_back(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
+			//					//bg_points.size.push_back(sizeD);
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
 
 			if (points < 750){
 				noDJ++;
@@ -164,28 +166,7 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 		}
 	}
  
-	//wave_image.scale(BnW_image.width, BnW_image.height);
-	wave_count++;
-	for (int x=0; x< BnW_image.width; x++){
-		for (int y=0; y< BnW_image.height; y++){
-			int loc = x + y*BnW_image.width;
-			if (wave){
-				if (x % 2 == 0 && wave) {
-					wave_image.getPixelsRef()[loc] = BnW_image.getPixelsRef()[loc];
-				}
-			}
-			else{
-				if (x % 2 == 1 && wave) {
-					wave_image.getPixelsRef()[loc] = BnW_image.getPixelsRef()[loc];
-				}
-			}
-			
-		}
-	}
-	wave_image.updateTexture();
-	if (wave_count = 50) wave = !wave;
 
-	
 
 
 }
@@ -208,16 +189,16 @@ float djMode::waves(float x, float y, float w, float a, float t){
 void djMode::draw() {
 	ofBackground(95, 100);
 
-	BnW_image.draw(100,500, BnW_image.width,BnW_image.height);
+	BnW_image.draw(10,500, BnW_image.width,BnW_image.height);
 	//wave_image.scale(ofGetScreenHeight(), ofGetScreenHeight());
-	wave_image.draw(ofGetScreenWidth()/3,100, albumArt.width, albumArt.height);
+	//wave_image.draw(ofGetScreenWidth()/3,0, new_img_height, new_img_height);
 
 	
 	if(bDrawPointCloud) {
+		drawImage();
 		easyCam.begin();
 		drawPointCloud();
 		easyCam.end();
-
 		//grayImage.draw(10, 320, 400, 300);
 		//contourFinder.draw(10, 320, 400, 300);
 				
@@ -241,7 +222,27 @@ void djMode::draw() {
 }
 
 void djMode::drawImage(){
+	int k = 3;
+	ofPushStyle();
+	ofSetHexColor(0x000000);
+	printf("\n chan %d",albumArt.getPixelsRef().getNumChannels());
+	unsigned char * pixels = albumArt.getPixels();
+	for (int x=0; x< albumArt.width; x+= 8){
+		for (int y=0; y< albumArt.height; y+= 8){
+			int loc = x + y*albumArt.width;
+			unsigned char r = pixels[loc];
+			float val = 1-((float)r / 255.0f);
+			//float test = waves(x,y,BnW_image.width,.7,1);
+			//float testt = sin(val);
+			ofSetColor(r,vol*50);
+			float limitVol = (vol*vol*.8);
+			if (limitVol > 7) limitVol = 7;
+			ofCircle((150 + x)*k,(20+y)*k, val + limitVol );
 
+		}
+	}
+
+	ofPopStyle();
 }
 
 void djMode::drawPointCloud() {
@@ -488,7 +489,7 @@ void djMode::clothShit(){
 
 //--------------------------------------------------------------
 void djMode::exit() {
-	kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	//kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 }
 
