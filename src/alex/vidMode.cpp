@@ -49,7 +49,7 @@
 	ParticleController Class
   *-----------------------------------*/
   vidMode::ParticleController::ParticleController(){
-  numParticles = 7000;
+  numParticles = 9000;
       for(int i = 0; i < numParticles; i++)
     {
 		Particle p;
@@ -101,7 +101,7 @@ void vidMode::setup()
 	seedY = ofRandom(100, 1000);
 
 	/*---------------Video----------------*/
-	curVid.loadMovie("vid/blockhead.mp4");
+	curVid.loadMovie("vid/nicki.mp4");
 	curVid.setFrame(100);
 	curVid.play();
 	curVid.setVolume(0);
@@ -163,6 +163,8 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
 	//fill fbos
 	maskFbo.begin();
 	 p.render(seedX, seedY);
+	 ofSetColor(255,255,255,ofRandom(0,10));
+	 ofRect(0,0,ofGetWidth(), ofGetHeight());
     maskFbo.end();
  
 	fbo.begin();
@@ -177,7 +179,8 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
     shader.end();
     fbo.end();
 
-	if(bd.isSnare(), bd.isKick(), bd.isSnare()){
+	if(bd.isSnare() && bd.isKick() && bd.isSnare()){// && (ofGetElapsedTimef()-time > 3))){
+		time = ofGetElapsedTimef();
 		//clear buffer
 		maskFbo.begin();
 		ofClear(0,0,0,30);
@@ -203,7 +206,6 @@ void vidMode::draw(int x, int y)
 		ofSetColor(255,255);
 		topLayer.draw( 0, 0, vidWidth, vidHeight);
 		fbo.draw(0,0);
-
 
 	}
 }

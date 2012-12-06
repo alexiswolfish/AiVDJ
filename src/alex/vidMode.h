@@ -60,4 +60,5 @@ class vidMode{
     ofFbo       fbo;
 
 	float seedX, seedY;
+	float time;
 };
