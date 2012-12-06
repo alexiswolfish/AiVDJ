@@ -81,7 +81,7 @@ void testApp::update(){
 		case AUD:
 			break;
 		case PHYSICS:
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
+			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd);
 			physics.update(bd, bpm);
 			break;
 		case VID:
