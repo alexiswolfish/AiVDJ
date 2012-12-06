@@ -184,7 +184,7 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
 
 	if(bd.isSnare() && bd.isKick() && bd.isSnare()){// && (ofGetElapsedTimef()-time > 3))){
 		time = ofGetElapsedTimef();
-		float clear = ofMap(bpm, 60, 800, 1, 45);
+		float clear = ofMap(bpm, 40, 800, 1, 45);
 		//clear buffer
 		maskFbo.begin();
 		ofClear(0,0,0,clear);
@@ -235,6 +235,6 @@ void vidMode::keyPressed(int key){
 
 void vidMode::updateSpeed(){
 	
-	float speed = ofMap(bpm, 60, 600, 0, 5);
+	float speed = ofMap(bpm, 40, 600, 0, 5);
 	curVid.setSpeed(speed);
 }

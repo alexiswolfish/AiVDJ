@@ -81,7 +81,7 @@ void testApp::update(){
 		case AUD:
 			break;
 		case PHYSICS:
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
+			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd);
 			physics.update(bd, bpm);
 			break;
 		case VID:
@@ -141,7 +141,7 @@ void testApp::draw(){
 	}
 
 	if(drawDisplay){
-		ofSaveFrame();
+		//ofSaveFrame();
 	}
 }
 /*--------------------------------------------------*
@@ -206,6 +206,8 @@ void testApp::drawBeatBins(){
 	bd.drawBeats();
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("BPM: " + ofToString(bpm), 0, -spacer);
+	string info = "FPS: "+ofToString(ofGetFrameRate(), 0) + "\n";
+	ofDrawBitmapString(info,0,spacer);
 
 	ofPopMatrix();
 
