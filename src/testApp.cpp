@@ -46,7 +46,7 @@ void testApp::setup(){
 	ofEnableAlphaBlending();
 	ofBackground(80);
 	/*-------Alex------*/
-	physics.setup();
+	//physics.setup(100);
 	vid.setup();
 	//curShade = CT_SOFT;
 	generateColors(CT_SOFT);
@@ -81,8 +81,7 @@ void testApp::update(){
 		case AUD:
 			break;
 		case PHYSICS:
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd);
-			physics.update(bd, bpm);
+//			physics.update(bd, bpm);
 			break;
 		case VID:
 			if(bd.isKick()){
@@ -109,7 +108,7 @@ void testApp::draw(){
 		case AUD:
 			break;
 		case PHYSICS:
-			physics.render();
+		//	physics.render();
 			break;
 		case VID:
 			ofSetBackgroundAuto(false);
@@ -206,7 +205,8 @@ void testApp::drawBeatBins(){
 	bd.drawBeats();
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("BPM: " + ofToString(bpm), 0, -spacer);
-
+	string info = "FPS: "+ofToString(ofGetFrameRate(), 0) + "\n";
+	ofDrawBitmapString(info,0,spacer);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
@@ -312,12 +312,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIRotarySlider *r = (ofxUIRotarySlider *)e.widget;
 		numParticles = r->getScaledValue();
 	}
-	else if (name == "emit")
-		sourceType = physicsMode::source::EMIT;
-	else if (name == "sink")
-		sourceType = physicsMode::source::SINK;
-	else if (name == "orbit")
-		sourceType = physicsMode::source::ORBIT;
 }
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
@@ -403,6 +397,8 @@ void testApp::keyPressed(int key){
 	if(mode == VID){
 		vid.keyPressed(key);
 	}
+	if(mode == PHYSICS)
+		physics.keyPressed(key);
 	if( key == 's' ){
 		soundStream.start();
 	}
@@ -442,8 +438,8 @@ void testApp::mousePressed(int x, int y, int button){
 void testApp::mouseReleased(int x, int y, int button){
 	ofRectangle guiRect = ofRectangle(0,0,guiWidth, guiHeight);
 	if(mode == PHYSICS){
-		if(!guiRect.inside(ofVec2f(x,y)))
-			physics.mousePressed( sourceType, ofVec3f(x,y,0));
+	//	if(!guiRect.inside(ofVec2f(x,y)))
+			//physics.mousePressed( sourceType, ofVec3f(x,y,0));
 	}
 }
 
