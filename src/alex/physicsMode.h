@@ -6,6 +6,7 @@
 
 #include "ofMain.h"
 #include "ofxColourTheory.h"
+#include "..\beatDetect.h"
 
 class physicsMode{
 	public:
@@ -76,9 +77,9 @@ class source {
 		physicsMode();
 
 		void setup();
-		void update();
+		void update(beatDetect bd, float bpm);
 		void render();
-		void updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare);
+		void updateSources(float vol, ofColor c, bool isChanged, beatDetect bd);
 		void repulseSources();
 
 		void addParticles(int amt);	

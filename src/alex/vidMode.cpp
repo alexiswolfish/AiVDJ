@@ -101,7 +101,7 @@ void vidMode::setup()
 	seedY = ofRandom(100, 1000);
 
 	/*---------------Video----------------*/
-	curVid.loadMovie("vid/nicki.mp4");
+	curVid.loadMovie("vid/blockhead.mp4");
 	curVid.setFrame(100);
 	curVid.play();
 	curVid.setVolume(0);
@@ -163,7 +163,10 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
 	//fill fbos
 	maskFbo.begin();
 	 p.render(seedX, seedY);
-	 ofSetColor(255,255,255,ofRandom(0,10));
+	 ofSetColor(0,0,0,ofRandom(1,20));
+	 ofRect(0,0,ofGetWidth(), ofGetHeight());
+
+	 ofSetColor(255,255,255,ofRandom(0,18));
 	 ofRect(0,0,ofGetWidth(), ofGetHeight());
     maskFbo.end();
  
@@ -181,9 +184,10 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
 
 	if(bd.isSnare() && bd.isKick() && bd.isSnare()){// && (ofGetElapsedTimef()-time > 3))){
 		time = ofGetElapsedTimef();
+		float clear = ofMap(bpm, 60, 800, 1, 45);
 		//clear buffer
 		maskFbo.begin();
-		ofClear(0,0,0,30);
+		ofClear(0,0,0,clear);
 		maskFbo.end();
 		//refresh x and y
 		

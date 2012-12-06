@@ -6,8 +6,6 @@ physicsMode::physicsMode(){
 }
 
 void physicsMode::setup(){
-	srcImg.allocate(256, 256, OF_IMAGE_COLOR_ALPHA);
-    srcImg.loadImage("source.png");
 
 	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), physicsMode::source::ORBIT, srcImg));
 //	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), physicsMode::source::SINK, srcImg));
@@ -15,21 +13,20 @@ void physicsMode::setup(){
 	//addParticles(800);
 }
 
-void physicsMode::update(){
-	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
-		for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end(); ++p){
-			p->applyForce(*e, e->mass*10);
-		//	p->update();
-		}
-	}
-	for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end();){
-		if(p->isDead)
-			p = particles.erase(p);
-		else
-			p++;
-		
-	}
-	//printf("particle array size %d", particles.size());
+void physicsMode::update(beatDetect bd, float bpm){
+	//for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
+	//	for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end(); ++p){
+	//		p->applyForce(*e, e->mass*10);
+	//	//	p->update();
+	//	}
+	//}
+	//for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end();){
+	//	if(p->isDead)
+	//		p = particles.erase(p);
+	//	else
+	//		p++;
+	//	
+	//}
 }
 
 void physicsMode::render(){
@@ -46,7 +43,7 @@ Update Sources
 update the source particles with relevant data 
 from the main app
  *--------------------------------------------------*/
-void physicsMode::updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare){
+void physicsMode::updateSources(float vol, ofColor c, bool isChanged, beatDetect bd){
 	int distThresh = 51;
 
 		repulseSources();
@@ -56,7 +53,7 @@ void physicsMode::updateSources(float vol, ofColor c, bool isChanged, bool isKic
 			e1->radius = vol;
 			e1->mass = vol*2;
 			e1->pullToCenter(vol*2);
-			e1->update(isKick, isSnare);
+			e1->update(bd.isKick(), bd.isSnare());
 		}
 }
 
@@ -125,7 +122,7 @@ physicsMode::source::source(ofVec3f initPos, Type _type, ofImage s){
 	col = ofColor(255,0,255);
 	charge = 10; //set to music
 
-	addParticles(20);
+	addParticles(10);
 }
 
 void physicsMode::source::update(bool isKick, bool isSnare){
