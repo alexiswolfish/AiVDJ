@@ -100,7 +100,7 @@ void vidMode::setup()
 	seedY = ofRandom(100, 1000);
 
 	/*---------------Video----------------*/
-	curVid.loadMovie("vid/blockhead.mp4");
+	curVid.loadMovie("vid/nicki.mp4");
 	curVid.setFrame(100);
 	curVid.setVolume(0);
 	curVid.play();

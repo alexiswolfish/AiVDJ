@@ -38,7 +38,7 @@ void testApp::setup(){
 	drawAudKinect = false;
 	drawDisplay = true;
 	drawSound = true;
-	mode = VID;
+	mode = PHYSICS;
 
 	guiSetup();
 	initRects();
@@ -47,7 +47,7 @@ void testApp::setup(){
 	ofBackground(80);
 	/*-------Alex------*/
 	vid.setup();
-//	physics.setup(100);
+	physics.setup(100);
 	
 	//curShade = CT_SOFT;
 	generateColors(CT_WEAK);
@@ -83,7 +83,7 @@ void testApp::update(){
 			break;
 		case PHYSICS:
 			ofSetVerticalSync(true);
-		//	physics.update(bd, bpm);
+			physics.update(bd, bpm);
 			break;
 		case VID:
 			ofSetVerticalSync(false);
@@ -107,7 +107,7 @@ void testApp::draw(){
 		case AUD:
 			break;
 		case PHYSICS:
-		//	physics.render(bd,bpm);
+			physics.render(bd,bpm);
 			break;
 		case VID:
 			ofSetBackgroundAuto(false);
@@ -414,6 +414,8 @@ void testApp::keyPressed(int key){
 		curShade = colorGen.getColourConstraints(randomShade);
 		generateColors(randomShade);
 	}
+	if(key == 'q')
+		ofSaveFrame();
 }
 
 //--------------------------------------------------------------
