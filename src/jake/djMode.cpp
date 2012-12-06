@@ -22,6 +22,15 @@ void djMode::setup() {
 	bcloth = false;
 	tiltDegr = 15;
 
+	//size(300,300);
+	albumArt.loadImage("data/album_art/common_be.jpg");
+	albumArt.setImageType(OF_IMAGE_GRAYSCALE);
+	BnW_image.setFromPixels(albumArt.getPixels(),albumArt.width,albumArt.height);
+	//BnW_image.blurHeavily();
+	BnW_image.threshold(50);
+	wave_image.allocate(BnW_image.width, BnW_image.height);
+
+
 	//try running the hand detect with the example code
 	colorImg.allocate(kinect.width, kinect.height);
 	grayImage.allocate(kinect.width, kinect.height);
@@ -150,6 +159,19 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 			}
 		}
 	}
+ 
+	//wave_image
+	for (int x=0; x< BnW_image.width; x++){
+		for (int y=0; y< BnW_image.height; y++){
+			int loc = x + y*BnW_image.width;
+		
+		}
+	
+	}
+
+
+	
+
 
 }
 
@@ -160,10 +182,20 @@ void djMode::updateGlobals(ofColor c, bool changeColor, float volume) {
 }
 
 //--------------------------------------------------------------
+float djMode::waves(float x, float y, float w, float a, float t){
+	//float a = .7;
+	return sin(w*(cos(a) + sin(a)*x + (sin(y)-cos(y)*y) + t*2*3.14159));
+}
+
+//--------------------------------------------------------------
 
 
 void djMode::draw() {
 	ofBackground(95, 100);
+
+	BnW_image.draw(100,500, BnW_image.width,BnW_image.height);
+	albumArt.draw(500,500, albumArt.width, albumArt.height);
+
 	
 	if(bDrawPointCloud) {
 		easyCam.begin();
@@ -192,7 +224,9 @@ void djMode::draw() {
 	fingers.clear();
 }
 
+void djMode::drawImage(){
 
+}
 
 void djMode::drawPointCloud() {
 	ofPushMatrix();

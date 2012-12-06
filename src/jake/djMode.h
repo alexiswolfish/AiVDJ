@@ -49,6 +49,8 @@ public:
 	void drawMeshCloud();
 	void clothShit();
 
+	void drawImage();
+
 	bool newBeat;
 
 	void DJkeyPressed(int key);
@@ -71,6 +73,11 @@ public:
 	float vol;
 
 	ofxKinect kinect;
+
+	//image shit
+	ofImage albumArt;
+	ofxCvGrayscaleImage BnW_image, wave_image;
+	float waves(float x, float y, float w, float a, float t);
 	
 	
 	bool bDrawPointCloud;

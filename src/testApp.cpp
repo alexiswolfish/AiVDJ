@@ -268,7 +268,7 @@ void testApp::drawBeatBins(){
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("BPM: " + ofToString(bpmTapper.bpm()), 0, -spacer);
 
-	bpmTapper.draw(40,50,10);
+	//bpmTapper.draw(40,50,10);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
