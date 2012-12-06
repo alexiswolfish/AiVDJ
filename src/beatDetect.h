@@ -38,11 +38,16 @@ public:
     // FFT functions
 	void initFFT();
     void updateFFT(); //finished
+
+	float curVol, pVol;
+	float getVolume();
+	bool diffVol(float thresh);
     //void updateFFT(float* in_fft, int infft_size);
     void drawSmoothedFFT();
 	void drawAverageMagnitude();
     void drawSubbands();
 	void drawBeats();
+	
 
     void audioReceived(float* input, int bufferSize); //finished
     

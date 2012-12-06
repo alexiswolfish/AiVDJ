@@ -110,6 +110,22 @@ void beatDetect::updateFFT()
             historyPos = (historyPos+1) % ENERGY_HISTORY; // forward pointer and rotate if necessary
         }
     }
+	getVolume();
+}
+
+float beatDetect::getVolume(){
+	pVol = curVol;
+	float fft_bins = 512.0f; //this really should be a class constant
+	float cVol = 0;
+	for(int i=0; i<fft_bins; i++)
+		cVol += magnitude_average[i];
+	cVol/=fft_bins;
+	curVol = cVol;
+	return cVol;
+}
+
+bool beatDetect::diffVol(float thresh){
+	return abs(curVol-pVol) > thresh;
 }
 
 //When you receive a voice input, update the array magnitude FFT analysis is performed

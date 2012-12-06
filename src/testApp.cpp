@@ -46,10 +46,11 @@ void testApp::setup(){
 	ofEnableAlphaBlending();
 	ofBackground(80);
 	/*-------Alex------*/
-	//physics.setup(100);
 	vid.setup();
+	physics.setup(100);
+	
 	//curShade = CT_SOFT;
-	generateColors(CT_SOFT);
+	generateColors(CT_WEAK);
 	numParticles = 9000;
 	/*-------Jake-------*/
 //	DJ.setup();
@@ -81,13 +82,11 @@ void testApp::update(){
 		case AUD:
 			break;
 		case PHYSICS:
-//			physics.update(bd, bpm);
+			ofSetVerticalSync(true);
+			physics.update(bd, bpm);
 			break;
 		case VID:
-			if(bd.isKick()){
-				vidX = (int) ofRandom(0, ofGetScreenWidth()-100);
-				vidY = (int) ofRandom(0, ofGetScreenHeight()-100);
-			}
+			ofSetVerticalSync(false);
 			vid.update(mouseX, mouseY, bpm, bd);
 			break;
 		default:
@@ -108,7 +107,7 @@ void testApp::draw(){
 		case AUD:
 			break;
 		case PHYSICS:
-		//	physics.render();
+			physics.render(bd,bpm);
 			break;
 		case VID:
 			ofSetBackgroundAuto(false);
@@ -140,7 +139,7 @@ void testApp::draw(){
 	}
 
 	if(drawDisplay){
-		ofSaveFrame();
+	//	ofSaveFrame();
 	}
 }
 /*--------------------------------------------------*
@@ -207,6 +206,7 @@ void testApp::drawBeatBins(){
 	ofDrawBitmapString("BPM: " + ofToString(bpm), 0, -spacer);
 	string info = "FPS: "+ofToString(ofGetFrameRate(), 0) + "\n";
 	ofDrawBitmapString(info,0,spacer);
+	ofDrawBitmapString("VOL: " + ofToString(bd.getVolume()) + "\n",0,spacer*2);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
@@ -377,6 +377,7 @@ void testApp::generateColors(ColourShade cs){
 		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
 	}
 }
+
 void testApp::drawColorSwatches(int x, int y){
 	ofPushMatrix();
 	ofPushStyle();
@@ -390,6 +391,7 @@ void testApp::drawColorSwatches(int x, int y){
 	ofPopStyle();
 	ofPopMatrix();
 }
+
 void testApp::keyPressed(int key){
 	if(drawDJ){
 //		DJ.DJkeyPressed(key);

@@ -92,7 +92,6 @@ void vidMode::setup()
 {
 	/*---------------Flags--------------*/
 	ofEnableAlphaBlending();
-	ofSetVerticalSync(false);
 
 	drawParticles = true;
 	ofSetBackgroundAuto(false);
@@ -198,6 +197,7 @@ void vidMode::update(int x, int y, float _bpm, beatDetect bd)
 
 void vidMode::draw(int x, int y)
 {
+	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
 
 	ofSetHexColor(0xFFFFFF);
 	//draw video only
