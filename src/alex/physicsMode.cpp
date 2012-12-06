@@ -33,7 +33,7 @@ void physicsMode::Particle::update(beatDetect bd, float bpm){
 	if(bd.isSnare()){
 		vel += bpm/8000.0f;
 	}
-	vel.limit(bpm/5000.0f);
+	vel.limit(bpm/7000.0f);
 	theta += vel;
 	vel*=0.96f;
 
@@ -107,13 +107,13 @@ void physicsMode::update(beatDetect bd, float bpm){
 	for (int i=0; i<sources.size(); i++){
 		if(bd.isSnare())
 			sources[i].c = colorGen.getRandom(colors);
-		sources[i].radius = bd.magnitude_average[0]*50;
+		sources[i].radius = bd.magnitude_average[0]*90;
 	}
 
 	updateShaderArrays();
 
 	for( int i =0; i<sizes.size(); i++ ){
-		sizes[i] = ofVec3f( particles[i].radius -3  + bd.magnitude_average[(i%256)]*20.0f);
+		sizes[i] = ofVec3f( particles[i].radius -3  + bd.magnitude_average[(i%256)]*bd.magnitude_average[(i%256)]*18.0f);
 	}
 	vbo.setVertexData(&locs[0], (int)locs.size(), GL_STATIC_DRAW);
 	vbo.setNormalData(&sizes[0],(int)locs.size(), GL_STATIC_DRAW);
@@ -121,8 +121,12 @@ void physicsMode::update(beatDetect bd, float bpm){
 
 void physicsMode::render(beatDetect bd, float bpm){
 	glDepthMask(GL_FALSE);
-	ofSetColor(255, 100, 90);
 
+	
+	if(bd.isBeat(27))
+		ofSetColor(colorGen.getColor(ofRandom(0,255),  colorGen.getColourConstraints(CT_LIGHT)));
+	else
+		ofSetColor(255, 100, 90);
 	//glow
 	ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofEnablePointSprites();
