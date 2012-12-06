@@ -25,25 +25,31 @@ class physicsMode {
 		class Particle : public Source{
 		public:
 			Particle();
-	//		~Particle();
-
-		//	ofVec3f ppos, pvel;
-		//	float pradius;
-			//float theta1, theta2;
 			ofVec3f theta;
-			ofVec3f oPos;
-		
+			ofVec3f oPos;	
 
 			void update(beatDetect bd, float bpm);
 			void render(int x, int y);
 		};
 		class Emitter : public Source{
 		public:
+			Emitter();
+
 			void render();
+			void addParticles();
+
+			bool emitting;
+
+			
 
 		};
 		class dParticle : public Emitter{
 		public:
+			dParticle();
+
+			int age;
+			int lifeSpan;
+			bool isDead;
 		};
 
 		physicsMode();

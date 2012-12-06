@@ -7,7 +7,15 @@ void physicsMode::generateColors(ColourShade cs){
 		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
 	}
 }
+/*-----------Emitter class-------------*/
+physicsMode::Emitter::Emitter(){
+}
+/*-----------dParticle class-------------*/
+physicsMode::dParticle::dParticle(){
+	age = 0;
+	lifeSpan = 100;
 
+}
 /*-----------Source class-------------*/
 physicsMode::Source::Source(){
 	pos = ofVec3f(0,0,0);
