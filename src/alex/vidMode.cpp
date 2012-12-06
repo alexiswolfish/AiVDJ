@@ -103,8 +103,8 @@ void vidMode::setup()
 	/*---------------Video----------------*/
 	curVid.loadMovie("vid/blockhead.mp4");
 	curVid.setFrame(100);
-	curVid.play();
 	curVid.setVolume(0);
+	curVid.play();
 
 	vidWidth = curVid.width * (float)((float)ofGetWidth()/curVid.width);
 	vidHeight = curVid.height * (float)((float)ofGetHeight()/curVid.height);
