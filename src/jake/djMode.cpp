@@ -29,6 +29,10 @@ void djMode::setup() {
 	//BnW_image.blurHeavily();
 	BnW_image.threshold(50);
 	wave_image.allocate(BnW_image.width, BnW_image.height);
+	//wave_image.allocate(ofGetScreenHeight(), ofGetScreenHeight());
+	wave = true;
+	wave_count = 0;		
+	
 
 
 	//try running the hand detect with the example code
@@ -160,15 +164,26 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 		}
 	}
  
-	//wave_image
+	//wave_image.scale(BnW_image.width, BnW_image.height);
+	wave_count++;
 	for (int x=0; x< BnW_image.width; x++){
 		for (int y=0; y< BnW_image.height; y++){
 			int loc = x + y*BnW_image.width;
-		
+			if (wave){
+				if (x % 2 == 0 && wave) {
+					wave_image.getPixelsRef()[loc] = BnW_image.getPixelsRef()[loc];
+				}
+			}
+			else{
+				if (x % 2 == 1 && wave) {
+					wave_image.getPixelsRef()[loc] = BnW_image.getPixelsRef()[loc];
+				}
+			}
+			
 		}
-	
 	}
-
+	wave_image.updateTexture();
+	if (wave_count = 50) wave = !wave;
 
 	
 
@@ -194,7 +209,8 @@ void djMode::draw() {
 	ofBackground(95, 100);
 
 	BnW_image.draw(100,500, BnW_image.width,BnW_image.height);
-	albumArt.draw(500,500, albumArt.width, albumArt.height);
+	//wave_image.scale(ofGetScreenHeight(), ofGetScreenHeight());
+	wave_image.draw(ofGetScreenWidth()/3,100, albumArt.width, albumArt.height);
 
 	
 	if(bDrawPointCloud) {

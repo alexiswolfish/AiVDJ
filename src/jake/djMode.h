@@ -77,8 +77,10 @@ public:
 	//image shit
 	ofImage albumArt;
 	ofxCvGrayscaleImage BnW_image, wave_image;
+//	ofPixelsRef newPixs;
 	float waves(float x, float y, float w, float a, float t);
-	
+	bool wave;
+	int wave_count;
 	
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
