@@ -43,6 +43,8 @@ void djMode::setup() {
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	//easyCam.tilt(15);
+
+	maxLines = 5;
 }
 
 //--------------------------------------------------------------
@@ -50,22 +52,19 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 
 	kinect.update();
 
-	//if (!volHist.empty()){
-	//	if (volHist.size()>10){
-	//	
-	//	}
-	//	else{
-	//	
-	//	}
-	//	for (int i=0; i<; i--){
-	//		volHistVec[i] = volHistVec[i-1];
-	//	}
+	//for (int i=0; i<=360; i++){
+	//	volHist.push_back(vol[i]);
 	//}
 
-	//volHist.clear();
-	//for (int i=0; i<360; i++){
-	//	volHist[i] = vol[i];
+	//volHistVec.push_back(volHist);
+	//for (int i=volHistVec.size(); i>0; i--){
+	//	if(i!=volHistVec.size()) volHistVec[i+1] = volHistVec[i];
 	//}
+	//if (volHistVec.size() > 10){
+	//	volHistVec.pop_back();
+	//}
+
+
 
 	Zlow = depthLow;
 	Zhigh = depthHigh;
@@ -105,6 +104,11 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 				}
 			
 			}
+		}
+		if(lines.size() > maxLines)
+			lines.erase(lines.begin());
+
+
 			//if (beat){
 			//	mesh.setMode(OF_PRIMITIVE_POINTS);
 			//	int rand1 = ofRandom(128.0, 255.0);
@@ -135,12 +139,9 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 				noDJ = 0;
 			}
 		}
-	}
+}
  
 
-
-
-}
 
 //--------------------------------------------------------------
 void djMode::updateGlobals(ofColor c, bool changeColor, float volume) {
@@ -161,17 +162,18 @@ void djMode::draw() {
 	ofPushStyle();
 	ofPushMatrix();
 	if(bDrawPointCloud) {
+		drawCircleBg();
 		//drawImage();
-		//ofColor c = ofColor(95,50);
-		//float brightness = 200;
-		int k = 50;
-		for (int i=750; i>200; i-= 50){
-			//c.setBrightness(brightness);
-			ofSetColor(k);
-			ofSphere(ofGetWidth()/2,ofGetHeight()/2,i);
-			//brightness-=10;
-			k += 10;
-		}
+		//int k = 50;
+		//if (volHistVec.size() > 9){
+		//	int size = 9;
+		//	for (int i=750; i>200; i-= 50){
+		//		vector<float> h = volHistVec[size];
+		//		drawCircle(i,ofColor(k),h);
+		//		size--;
+		//		k += 10;
+		//	}
+		//}
 		easyCam.begin();
 		drawPointCloud();
 		easyCam.end();
@@ -194,18 +196,70 @@ void djMode::draw() {
 
 }
 
+void djMode::drawCircleBg(){
+	float radius = 700;
+	int k = 70;
+	ofVec2f center = ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+	ofPushStyle();
+	ofPushMatrix();
+	for(int i=0; i< lines.size(); i++){
+		ofPolyline curLine = lines[i];
+		vector<ofPoint> points = curLine.getVertices();
+		ofRectangle bb = curLine.getBoundingBox();
+		
+		ofPolyline circle;
+		for (int i=0; i<points.size(); i+=25){
+			float dist = ofDist(0, points[i].y,0, bb.getMinY());
+			float rad = ofRandom(0, TWO_PI);
+			float r = (radius + (dist*.5));
+			ofClamp(r, 0, 5);
+			ofVec3f loc;
+			loc.x = center.x + cos(rad)*r;
+			loc.y = center.y + sin(rad)*r;
+			loc.z = 0;
+			circle.addVertex(loc);
+		}
+		circle.close();
+
+		ofSetColor(k);
+		ofBeginShape();
+		for (int i=0;i<circle.getVertices().size();i++){
+			 ofVertex(circle.getVertices().at(i).x, circle.getVertices().at(i).y, -1000); 
+		}
+		ofEndShape();
+
+		radius -= 50;
+		k -= 10;
+	}
+	ofPopStyle();
+	ofPushMatrix();
+	
+}
+
 void djMode::drawCircle(float radius, ofColor _color, vector<float> v){
 	const float DEG2RAD = 3.14159/180;
+	float centerx = ofGetWidth()/2;
+	float centery = ofGetHeight()/2;
 	ofPushStyle();
-	ofSetLineWidth(1);
+	//ofSetLineWidth(1);
 	ofSetColor(_color);
+	//ofFill();
 	ofPolyline l;
+
 	for (int i=0; i<360; i++){
-		float r = radius + v[i];
+		float addMe = (v[i] * 800.0f);
+		if (addMe > 10) addMe = 10; 
+		else if (addMe < -10) addMe = -10;
 		float deg_rad = i * DEG2RAD;
-		l.addVertex(cos(deg_rad)*r,sin(deg_rad)*r,0);
+		float r = radius + addMe;
+		l.addVertex(centerx + cos(deg_rad)*r, centery + sin(deg_rad)*r,0);
 	}
-	l.draw();
+	l.close();
+	ofBeginShape();
+	for (int i=0;i<l.getVertices().size();i++){
+		 ofVertex(l.getVertices().at(i).x, l.getVertices().at(i).y); 
+	}
+	ofEndShape();
 	ofPopStyle();
 }
 

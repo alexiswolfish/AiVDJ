@@ -74,6 +74,7 @@ public:
 	float volf;
 
 	void drawCircle(float radius, ofColor _color, vector<float> v);
+	void drawCircleBg();
 
 	ofxKinect kinect;
 
@@ -96,6 +97,6 @@ public:
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
 
-
+	float maxLines;
 };
 
