@@ -64,7 +64,6 @@ class testApp : public ofBaseApp{
 		/*-----------Alex-----------*/
 		//Physics
 		physicsMode physics;
-		physicsMode::source::Type sourceType;
 		int numParticles;
 
 		//Video

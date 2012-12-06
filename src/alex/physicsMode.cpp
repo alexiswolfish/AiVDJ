@@ -1,488 +1,242 @@
 #include "physicsMode.h"
 
-physicsMode::physicsMode(){
-	birthRate = 0;
-	maxParticles = 800;
-}
-
-void physicsMode::setup(){
-	srcImg.allocate(256, 256, OF_IMAGE_COLOR_ALPHA);
-    srcImg.loadImage("source.png");
-
-	sources.push_back(source(ofVec3f(ofGetWidth()/2+10, ofGetHeight()/2+10, 0), physicsMode::source::ORBIT, srcImg));
-//	sources.push_back(source(ofVec3f(ofGetWidth()/2-10, ofGetHeight()/2-10, 0), physicsMode::source::SINK, srcImg));
-//	sources.push_back(source(ofVec3f(ofGetWidth()/2, ofGetHeight()/2, 0), physicsMode::source::SINK, srcImg));
-	//addParticles(800);
-}
-
-void physicsMode::update(){
-	for(vector<source>::iterator e = sources.begin(); e != sources.end(); ++e){
-		for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end(); ++p){
-			p->applyForce(*e, e->mass*10);
-		//	p->update();
-		}
-	}
-	for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end();){
-		if(p->isDead)
-			p = particles.erase(p);
-		else
-			p++;
-		
-	}
-	//printf("particle array size %d", particles.size());
-}
-
-void physicsMode::render(){
-	for(vector<source>::iterator e = sources.begin(); e != sources.end(); e++){
-		e->render();
-	}
-	printf("\n");
-	for(vector<physicsMode::source::particle>::iterator p = particles.begin(); p != particles.end(); p++)
-		p->render();
-}
-/*--------------------------------------------------*
-Update Sources
-
-update the source particles with relevant data 
-from the main app
- *--------------------------------------------------*/
-void physicsMode::updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare){
-	int distThresh = 51;
-
-		repulseSources();
-		for(vector<source>::iterator e1 = sources.begin(); e1 != sources.end(); ++e1){
-			if(isChanged)
-				e1->col = c;
-			e1->radius = vol;
-			e1->mass = vol*2;
-			e1->pullToCenter(vol*2);
-			e1->update(isKick, isSnare);
-		}
-}
-
-void physicsMode::repulseSources(){
-	for(vector<source>::iterator e1 = sources.begin(); e1 != sources.end(); ++e1){
-		for(vector<source>::iterator e2 = sources.begin(); e2 != sources.end(); ++e2){
-			e1->attract(*e2,300);
-			ofVec3f dir = e1->loc - e2->loc;
-            float distSqrd = dir.lengthSquared();
-            
-            if( distSqrd > 0.0f ){
-                dir.normalize();
-                float F = 1.0f/distSqrd;
-                    
-                e1->acc += dir * ( F / e1->mass );
-                e2->acc -= dir * ( F / e2->mass );
-			}
-		}
+/*------------Utils------------------*/
+void physicsMode::generateColors(ColourShade cs){
+	colors.clear();
+	for(int i=0; i<100; i++){
+		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
 	}
 }
-
-void physicsMode::mousePressed(physicsMode::source::Type t, ofVec3f pos){
-	if(sources.size()<3)
-		sources.push_back(source(pos, t, srcImg));
+/*-----------Emitter class-------------*/
+physicsMode::Emitter::Emitter(){
 }
-void physicsMode::addParticles(int amt){
-	if(particles.size() < maxParticles){
-	for(int i=0; i<amt; i++)
-		particles.push_back(physicsMode::source::particle());}
+/*-----------dParticle class-------------*/
+physicsMode::dParticle::dParticle(){
+	age = 0;
+	lifeSpan = 100;
+
 }
-/*--------------------------------*
-	Source Class
- *--------------------------------*/
-void physicsMode::source::render(){
-	ofPushStyle();
-	ofSetColor(col);
-	float imgRad = radius*5 +10;
-	float radMult = 0.08;
-	float radSq = (radius*radius) * radMult;
-	float radMin = 0;
-
-	if(radSq > 200){
-		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.009))*radMult);
-		ofSetColor(40);
-		ofCircle(loc.x, loc.y, (radSq * ((radSq/2)*.005))*radMult);
-		ofSetColor(col);
-		ofCircle(loc.x, loc.y, radSq/2*radMult);
-	}
-	else{
-		ofCircle(loc.x, loc.y, radMin + radSq);
-	}
-//	spark.draw(loc.x-imgRad/2,loc.y-imgRad/2,imgRad,imgRad);
-
-	renderParticles();
-	ofPopStyle();
-}
-
-physicsMode::source::source(ofVec3f initPos, Type _type, ofImage s){
-	loc = initPos;
+/*-----------Source class-------------*/
+physicsMode::Source::Source(){
+	pos = ofVec3f(0,0,0);
 	vel = ofVec3f(0,0,0);
-	acc = ofVec3f(0,0,0);
 	radius = 100;
-	mass = 50;
-	spark = s;
-	type = _type;
-	col = ofColor(255,0,255);
-	charge = 10; //set to music
-
-	addParticles(20);
+}
+physicsMode::Source::Source(ofVec3f loc){
+	pos = loc;
+	vel = ofVec3f(0,0,0);
 }
 
-void physicsMode::source::update(bool isKick, bool isSnare){
-	vel = vel+acc;
-
-	vel.limit(5); //BPM
-	loc = loc + vel;
-	vel = vel*.98;
-	//acc = acc * .1;
-	//vel = ofVec3f(0,0,0);
-	acc = ofVec3f(0,0,0);
-
-	updateParticles(isKick, isSnare);
+void physicsMode::Source::render(){
+	ofPushMatrix();
+	ofSetColor(c);
+	ofPopMatrix();
 }
 
-void physicsMode::source::attract(source s, float range){
-	float maxDist = ofGetWidth()/2;
-	ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - s.loc;
-    float distToPull = dirToPull.length();
+/*-----------Particle class-------------*/
+physicsMode::Particle::Particle(){
+}
+void physicsMode::Particle::update(beatDetect bd, float bpm){
+	
+	if(bd.isSnare()){
+		vel += bpm/8000.0f;
+	}
+	vel.limit(bpm/7000.0f);
+	theta += vel;
+	vel*=0.96f;
 
-	if(distToPull > 1){
-			//straight up attraction/repuslion forces
-			float theta, F;
-			F = mass * s.mass;
-			m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
-			m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
 
-			if(distToPull < range){
-				theta = findAngle( loc.x - m.x, loc.y - m.y);
-			//if(distToPull > range)
-			//	 theta = findAngle( m.x - loc.x, m.y - loc.y );
-    
-			m.x = (F*cos(theta)) / distToPull;
-			m.y = (F*sin(theta)) / distToPull;
-    
-			theta = physicsMode::source::findAngle(m.x, m.y);
-			acc.x += (m.length() * cos(theta));
-			acc.y += (m.length() * sin(theta)); 
-			}
+	oPos.x = cos( theta.x ) * cos( theta.y );
+	oPos.y = sin( theta.x );
+	oPos.z = cos( theta.x ) * sin( theta.y );
+	oPos *= 100;
+
+	pos = oPos * bd.getVolume()*30;
+
+}
+
+/*-----------Physics Mode-------------*/
+physicsMode::physicsMode(){
+	sources.push_back(Source());
+}
+
+void physicsMode::setup(int numParticles){
+	//ofBackgroundHex(0x000000);
+	setColorScheme(0);
+
+	ofBackground(bg);
+	generateColors(centerTheme);
+	
+	// load the texure
+	ofDisableArbTex();
+	ofLoadImage(texture, "dot.png");
+	ofLoadImage(srcTexture, "spark.png");
+
+	camDist  = 1800;
+	camera.setDistance(camDist);
+
+	minRad = 100;
+	maxRad = 1000;
+
+	for(int i = 0; i<numParticles; i++ ) {
+		
+		Particle p;
+		p.theta = ofVec3f(ofRandom(0, TWO_PI), ofRandom(0, TWO_PI), 0);
+		p.c = colorGen.getRandom(colors);
+
+		ofVec3f loc;
+		loc.x = cos( p.theta.x ) * cos( p.theta.y );
+		loc.y = sin( p.theta.x );
+		loc.z = cos( p.theta.x ) * sin( p.theta.y );
+		loc *= minRad;
+		locs.push_back(loc);
+
+		p.pos = loc;
+		p.oPos = loc;
+		p.radius = ofRandom(5, 50);
+		sizes.push_back(ofVec3f(p.radius));
+
+		particles.push_back(p);
+	}
+
+	int total = (int)locs.size();
+	vbo.setVertexData(&locs[0], total, GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0], total, GL_STATIC_DRAW);
+	
+	if(shader.load("shader")) {
+		printf("Shader is loaded\n"); 
+	}
+
+}
+
+void physicsMode::update(beatDetect bd, float bpm){
+
+	for (int i=0; i<particles.size(); i++) {
+		particles[i].update(bd, bpm);
+	}
+
+	for (int i=0; i<sources.size(); i++){
+		if(bd.isSnare())
+			sources[i].c = colorGen.getRandom(colors);
+		sources[i].radius = bd.magnitude_average[0]*90;
+	}
+
+	updateShaderArrays();
+
+	for( int i =0; i<sizes.size(); i++ ){
+		sizes[i] = ofVec3f( particles[i].radius -3  + bd.magnitude_average[(i%256)]*bd.magnitude_average[(i%256)]*18.0f);
+	}
+	vbo.setVertexData(&locs[0], (int)locs.size(), GL_STATIC_DRAW);
+	vbo.setNormalData(&sizes[0],(int)locs.size(), GL_STATIC_DRAW);
+}
+
+void physicsMode::render(beatDetect bd, float bpm){
+	glDepthMask(GL_FALSE);
+	
+	if(bd.isBeat(27))
+		ofSetColor(colorGen.getColor(ofRandom(0,255),  colorGen.getColourConstraints(particleTheme)));
+	else
+		ofSetColor(particleMain);
+	//glow
+	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	ofEnablePointSprites();
+
+	//bind shader/camera
+	shader.begin();
+	camera.begin();
+
+	texture.bind();
+	vbo.draw(GL_POINTS, 0, (int)locs.size());
+	texture.unbind();
+	
+	camera.end();
+	shader.end();
+
+	ofDisablePointSprites();
+	ofDisableBlendMode();
+
+	//draw rays
+	ofEnableAlphaBlending();
+	camera.begin();
+	for(int s=0; s<sources.size(); s++){
+
+		Source curS = sources[s];
+		//render sources
+		curS.render();
+		float rad =  curS.radius*1.5;
+		srcTexture.draw(curS.pos - rad/2, rad, rad);
+
+		//render rays;
+		for (int i=0; i<particles.size(); i++) {
+			ofVec3f mid = particles[i].oPos;
+			mid.normalize();
+			mid *= sources[s].radius;
+			ofSetColor(255, 80);
+			ofLine(mid, particles[i].pos);
+		} 
+	}
+	camera.end();
+}
+
+void physicsMode::addParticle(float x, float y, float z) {
+	ofVec3f p(x, y, z);
+	locs.push_back(p);
+	
+	// we are passing the size in as a normal x position
+	float size = ofRandom(5, 50);
+	sizes.push_back(ofVec3f(size));
+}
+
+void physicsMode::updateShaderArrays(){
+	for( int i =0; i<sizes.size(); i++ ){
+
+		sizes[i] = ofVec3f( particles[i].radius);
+		locs[i] = particles[i].pos;
 	}
 }
 
-void physicsMode::source::pullToCenter(float distThresh)
-  {
-	ofVec3f center = ofVec3f(ofGetWidth()/2, ofGetHeight()/2);
-    ofVec3f dirToCenter = ofVec3f(loc.x, loc.y, loc.z);
-    dirToCenter= dirToCenter - center;
-	float distToCenter = dirToCenter.length();
-
-    
-    if(distToCenter >distThresh){
-      dirToCenter.normalize();
-      float pullStrength = 0.001f;
-      dirToCenter= dirToCenter*(((distToCenter -distThresh))*pullStrength);
-      vel= vel - (dirToCenter);
-    }
-  }
-
-float physicsMode::source::findAngle(float x1, float y1, float x2, float y2){
-  float xd = x1 - x2;
-  float yd = y1 - y2;
-
-  float t = atan2(yd,xd);
-  float a = (180 + (-(180 * t) / PI));
-  return a;
-}
-float physicsMode::source::findAngle(float x, float y){
-  float theta;
-  if(x == 0) {
-    if(y > 0) 
-      theta = PI/2.0;
-    else if(y < 0) 
-      theta = PI/2.0;
-    else 
-      theta = 0;
-  }
-  else {
-    theta = atan( y / x );
-    if(( x < 0 ) && ( y >= 0 )) { theta += PI; }
-    if(( x < 0 ) && ( y < 0 )) { theta -= PI; }
-  }
-  return theta;
-}
-/*---------PARTICLE CONTROL-----------*/
-void physicsMode::source::updateParticles(bool isKick, bool isSnare){
-	repulseParticles();
-	for(vector<particle>::iterator e1 = mParticles.begin(); e1 != mParticles.end(); ++e1){
-		float radMult = 0.09;
-		float radSq = (radius*radius) * radMult;
-
-		//volume is stored in the radius
-		//e1->pull(*this,radius*3+radius); //outer ring limit
-		e1->pull(*this,(radSq * ((radSq/2)*.009))*radMult);
-		e1->push(*this,radius*3+10);  //inner ring limit
-
-		if(isKick){
-			e1->orbit(*this, radius*5);
-		}
-		e1->update(isSnare);
+void physicsMode::keyPressed(int key){
+	if(key == OF_KEY_UP) {
+		camDist -= 10;
 	}
-}
-void physicsMode::source::renderParticles(){
-	for(vector<particle>::iterator e1 = mParticles.begin(); e1 != mParticles.end(); ++e1){
-		e1->render();
+	if(key == OF_KEY_DOWN) {
+		camDist += 10;
 	}
+	camera.setDistance(camDist);
+	if(key == '0'){
+		setColorScheme(0);
+	}
+	if(key == '1')
+		setColorScheme(1);
+	if(key == '2')
+		setColorScheme(2);
+	ofBackground(bg);
+	generateColors(centerTheme);
 }
-void physicsMode::source::repulseParticles(){
-	for(vector<particle>::iterator e1 = mParticles.begin(); e1 != mParticles.end(); ++e1){
-		for(vector<particle>::iterator e2 = e1; e2 != mParticles.end(); ++e2){
 
-			ofVec3f dir = e1->loc - e2->loc;
-            float distSqrd = dir.lengthSquared();
-            
-            if( distSqrd > 0.0f ){
-                dir.normalize();
-                float F = 1.0f/distSqrd;
-                    
-                e1->acc += dir * ( F / e1->mass );
-                e2->acc -= dir * ( F / e2->mass );
-			}
-		}
+void physicsMode::setColorScheme(int s){
+	switch(s){
+	case 0:  //soft mauve
+		bg = ofColor(79, 55, 56);
+		particleMain = ofColor(255, 100, 90);
+		centerTheme = CT_SOFT;
+		particleTheme = CT_LIGHT;
+		break;
+	case 1: //black
+		bg = ofColor(0,0,0);
+		particleMain = ofColor(255,100,90);
+		centerTheme = CT_FRESH;
+		particleTheme = CT_BRIGHT;
+		break;
+	case 2: //blue
+		bg = ofColor(0,130,255);
+		particleMain = ofColor(255,191,97);
+		centerTheme = CT_BRIGHT;
+		particleTheme = CT_WARM;
+	default:
+		break;
 	}
 }
 
-vector<physicsMode::source::particle> physicsMode::source::addParticles(int num){
-	for(int i=0; i<num; i++){
-		//parametric equations for a circle
-		float u = ofRandom(2*PI);
-		float v = ofRandom(-PI/2, PI/2);
-		particle p = particle(ofVec3f(loc.x + (radius + 10)*cos(v)*sin(u),loc.y + (radius + 10)*cos(u)*cos(v), loc.z + (radius+10)*sin(v)), 
-							  ofRandom(2,5), 100);
-		mParticles.push_back(p);
-	}
-	return mParticles;
-}
-
-/*--------------------------------*
-	Particle Class
- *--------------------------------*/
-physicsMode::source::particle::particle(){
-	loc = ofVec3f(ofRandom(0,ofGetWidth()),ofRandom(0,ofGetHeight()),0);
-	mass = ofRandom(1,5);
-	maxSpeed = 5;
-	magnitude = 0;
-	angle = 0;
-	death = 0.9;
-	age = 0;
-	lifespan = 600;
-	isDead = false;
-	vel = ofVec3f(ofRandom(-3,3),ofRandom(-3,3),0);
-	acc = ofVec3f(ofRandom(-3,3),ofRandom(-3,3),0);
-}
-physicsMode::source::particle::~particle(){
-}
-physicsMode::source::particle::particle(ofVec3f _loc, float m, int life){
-	loc = _loc;
-	mass = m;
-	maxSpeed = 9;
-	magnitude = 0;
-	angle = 0;
-	death = 0.99;
-	age = 0;
-	lifespan = life;
-	isDead = false;
-	col = colorGen.getColor(50, colorGen.getColourConstraints(CT_FRESH));
-	analgCol = col;
-	//vel = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
-	//acc = ofVec3f(ofRandom(-15,15),ofRandom(-15,15),0);
-}
-
-void physicsMode::source::particle::render(){
-	ofPushStyle();
-	ofFill();
-	ofSetColor(analgCol);
-	ofCircle(loc.x, loc.y, 5);
-	ofLine(pLoc, loc);
-	ofPopStyle();
-}
-
-void physicsMode::source::particle::update(bool isSnare){
-
-	pLoc = loc;
-	vel = vel+acc;
-	vel.limit(maxSpeed);
-	loc = loc + vel;
-	acc = ofVec3f(0,0,0);
-	//vel = vel*death;
-	age++;
-	if(age > lifespan)
-		isDead = true;
-
-	if(isSnare){
-		analgCol = colorGen.createRangeFromAnalogous(col)[(int)ofRandom(0,4)];
-	}
-}
-
-void physicsMode::source::particle::pull(source s, float range){
-
-	ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - s.loc;
-    float distToPull = dirToPull.length();
-
-	if(distToPull > 1){
-			//straight up attraction/repuslion forces
-			float theta, F;
-			F = mass * s.mass;
-			m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
-			m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
-
-			if(distToPull > range){
-			 theta = findAngle( m.x - loc.x, m.y - loc.y );
-			m.x = (F*cos(theta)) / distToPull;
-			m.y = (F*sin(theta)) / distToPull;
-    
-			theta = findAngle(m.x, m.y);
-			acc.x += (m.length() * cos(theta));
-			acc.y += (m.length() * sin(theta)); 
-			}
-	}
-}
-void physicsMode::source::particle::push(source s, float range){
-	ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - s.loc;
-    float distToPull = dirToPull.length();
-
-	if(distToPull > 1){
-			//straight up attraction/repuslion forces
-			float theta, F;
-			F = mass * s.mass;
-			m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
-			m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
-
-			if(distToPull < range){
-			 theta = findAngle( loc.x - m.x, loc.y - m.y);
-    
-			m.x = (F*cos(theta)) / distToPull;
-			m.y = (F*sin(theta)) / distToPull;
-    
-			theta = findAngle(m.x, m.y);
-			acc.x += (m.length() * cos(theta));
-			acc.y += (m.length() * sin(theta)); 
-			}
-	}
-}
-void physicsMode::source::particle::push(particle s, float range){
-		ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - s.loc;
-    float distToPull = dirToPull.length();
-
-	if(distToPull > 1){
-			//straight up attraction/repuslion forces
-			float theta, F;
-			F = mass * s.mass;
-			m.x = (mass*loc.x + s.mass*s.loc.x)/(mass+s.mass);
-			m.y = (mass*loc.y + s.mass*s.loc.y)/(mass+s.mass);
-
-			if(distToPull < range){
-			theta = findAngle( loc.x - m.x, loc.y - m.y);
-    
-			m.x = (F*cos(theta)) / distToPull;
-			m.y = (F*sin(theta)) / distToPull;
-    
-			theta = findAngle(m.x, m.y);
-			acc.x += (m.length() * cos(theta));
-			acc.y += (m.length() * sin(theta)); 
-			}
-	}
-}
-
-void physicsMode::source::particle::orbit(source s, float range){
-	ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - s.loc;
-    float distToPull = dirToPull.length();
-
-	if(distToPull < range){
-		float deathThresh = (range - distToPull) / range;
-		deathThresh = deathThresh * deathThresh;
-		if(deathThresh > 0.95){
-		//	isDead = true; //possibly respawn?
-		}
-
-		float F = mass * s.mass;
-		dirToPull = dirToPull.normalize();
-		ofVec3f tanForce = ofVec3f(dirToPull.y, - dirToPull.x, 0);
-		tanForce = tanForce * (deathThresh*10);
-		acc = (acc + tanForce);
-	}
-}
-
-void physicsMode::source::particle::applyForce(source a, float range){
-	ofVec3f m = ofVec3f(0,0,0);
-    ofVec3f dirToPull = ofVec3f(loc.x, loc.y, 0);
-    dirToPull = dirToPull - a.loc;
-    float distToPull = dirToPull.length();
-
-	if(distToPull < range){
-		float deathThresh = (range - distToPull) / range;
-		deathThresh = deathThresh * deathThresh;
-		if(deathThresh > 0.95){
-			isDead = true; //possibly respawn?
-		}
-		if((a.type == physicsMode::source::EMIT) || a.type == physicsMode::source::SINK){
-			//straight up attraction/repuslion forces
-			float theta, F;
-			F = mass * a.mass;
-			m.x = (mass*loc.x + a.mass*a.loc.x)/(mass+a.mass);
-			m.y = (mass*loc.y + a.mass*a.loc.y)/(mass+a.mass);
-
-			if(a.type == physicsMode::source::EMIT)
-				theta = findAngle( loc.x - m.x, loc.y -m.y);
-			else if(a.type == physicsMode::source::SINK)
-				 theta = findAngle( m.x - loc.x, m.y - loc.y );
-    
-			m.x = (F*cos(theta)) / distToPull;
-			m.y = (F*sin(theta)) / distToPull;
-    
-			angle = findAngle(m.x, m.y);
-			acc.x += (m.length() * cos(angle));
-			acc.y += (m.length() * sin(angle)); 
-		}
-		else{
-			//orbit
-			float F = mass * a.mass;
-			dirToPull = dirToPull.normalize();
-			ofVec3f tanForce = ofVec3f(dirToPull.y, - dirToPull.x, 0);
-			tanForce = tanForce * (deathThresh*10);
-			acc = (acc + tanForce);
-		}
-	}
-}
-
-
-float physicsMode::source::particle::findAngle(float x, float y){
-  float theta;
-  if(x == 0) {
-    if(y > 0) {
-      theta = HALF_PI;
-    }
-    else if(y < 0) {
-      theta = 3*HALF_PI;
-    }
-    else {
-      theta = 0;
-    }
-  }
-  else {
-    theta = atan( y / x );
-    if(( x < 0 ) && ( y >= 0 )) { theta += PI; }
-    if(( x < 0 ) && ( y < 0 )) { theta -= PI; }
-  }
-  return theta;
-}
 
 

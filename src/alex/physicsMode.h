@@ -6,84 +6,90 @@
 
 #include "ofMain.h"
 #include "ofxColourTheory.h"
+#include "..\beatDetect.h"
 
-class physicsMode{
+class physicsMode {
 	public:
-		
-class source {
+
+		class Source{
 		public:
-			class particle{
-				public:
-					ofxColourTheory colorGen;
-					ofVec3f pLoc, loc, vel, acc;
-					float mass, magnitude, angle;
-					float maxSpeed, death;
-					int age, lifespan;
-					bool isDead;
-					ofColor col;
-					ofColor analgCol;
-					particle(ofVec3f _loc, float m, int life);
+			Source();
+			Source(ofVec3f loc);
+			ofColor c;
+			ofVec3f pos, vel;
+			float radius;
 
-					particle();
-					~particle();
-
-					void update(bool isSnare);
-					void render();
-					void pull(source s, float range);
-					void push(source s, float range);
-					void push(particle p, float range);
-					void orbit(source s, float range);
-					void applyForce(source a, float range);
-					float findAngle(float x, float y);
-				};
-
-			enum Type{
-				EMIT,
-				SINK,
-				ORBIT
-			};
-			ofVec3f loc, vel, acc;
-			float radius, mass, energy, charge;
-			float p,f,theta;
-			Type type;
-			ofColor col;
-
-			vector<particle> mParticles;
-
-			//functions that operate on other sources
-			source(ofVec3f initPos, Type type, ofImage s);
+			void update();
 			void render();
-			void update(bool isKick, bool isSnare);
-			void attract(source s, float range);
-			void pullToCenter(float distThresh);
+		};
+		class Particle : public Source{
+		public:
+			Particle();
+			ofVec3f theta;
+			ofVec3f oPos;	
 
+			void update(beatDetect bd, float bpm);
+			void render(int x, int y);
+		};
+		class Emitter : public Source{
+		public:
+			Emitter();
 
-			float findAngle(float x1, float y1, float x2, float y2);
-			float findAngle(float x, float y);
+			void render();
+			void addParticles();
 
-			//particle controller functions
-			void repulseParticles();
-			vector<particle> addParticles(int num);
-			void updateParticles(bool isKick, bool isSnare);
-			void renderParticles();
-			ofImage spark;
-	};
+			bool emitting;
 
-		vector<source> sources;
-		vector<physicsMode::source::particle> particles;
-		int birthRate, maxParticles;
+			
+
+		};
+		class dParticle : public Emitter{
+		public:
+			dParticle();
+
+			int age;
+			int lifeSpan;
+			bool isDead;
+		};
 
 		physicsMode();
+		
+	/*------------Utils------------------*/
+		void generateColors(ColourShade cs);
+		void keyPressed(int key);
 
-		void setup();
-		void update();
-		void render();
-		void updateSources(float vol, ofColor c, bool isChanged, bool isKick, bool isSnare);
+
+		void setup(int numParticles);
+		void update(beatDetect bd, float bpm);
+		void render(beatDetect bd, float bpm);
+
+		void updateShaderArrays();
+
+		void updateSources(float vol, ofColor c, bool isChanged, beatDetect bd);
 		void repulseSources();
 
-		void addParticles(int amt);	
+		void addParticle(float x, float y, float z);
 
-		void mousePressed(physicsMode::source::Type t, ofVec3f loc);
-		
-		ofImage srcImg;
+		void setColorScheme(int s);
+
+		vector<ofVec3f> locs;
+		vector<ofVec3f> sizes;
+
+		vector<Particle> particles;
+		vector<Source> sources;
+		vector<ofColor> colors;
+
+		ofVbo vbo;
+		ofShader shader;
+		ofEasyCam camera;
+		ofxColourTheory colorGen;
+
+		float camDist;
+		float minRad, maxRad;
+		ofTexture texture;
+		ofTexture srcTexture;
+
+
+		ofColor bg, particleMain;
+		ColourShade centerTheme, particleTheme;
 	};

@@ -40,7 +40,7 @@ void testApp::setup(){
 	drawAudKinect = false;
 	drawDisplay = true;
 	drawSound = true;
-	mode = PHYSICS;
+	mode = VID;
 
 	/*--------setup booleans-----------*/
 	setDJ = false;
@@ -57,17 +57,13 @@ void testApp::setup(){
 	/*-------Alex-------*/
 	ofEnableAlphaBlending();
 	ofBackground(80);
-	//physics.setup();
-	//vid.setup();
-
+	physics.setup();
+	vid.setup();
+	
 	
 	//curShade = CT_SOFT;
-
-	//get colors based on average set bpm
-	ColourShade shade = IntelliColor();
-
-	generateColors(shade);
-	numParticles = 0;
+	generateColors(CT_WEAK);
+	numParticles = 9000;
 	/*-------Jake-------*/
 	//DJMODE.setup();
 	/*------Melissa-----*/
@@ -131,27 +127,12 @@ void testApp::update(){
 			break;
 		default:
 		case PHYSICS:
-			DJMODE.exit();
-			Aud.exit();
-			if (!setPhy) {
-				setPhy = true;
-				physics.setup();
-			}
-			//physics.addParticles(numParticles);
-			physics.updateSources(cVol *100, colorGen.getRandom(colors), isChanged, bd.isKick(), bd.isSnare());
-			physics.update();
+			ofSetVerticalSync(true);
+			physics.update(bd, bpm);
 			break;
 
 		case VID:
-			DJMODE.exit();
-			Aud.exit();
-			if (!setVid) {
-				setVid = true;
-				vid.setup();
-			}
-			if(bd.isKick()){
-				vidX = (int) ofRandom(0, ofGetScreenWidth()-100);
-				vidY = (int) ofRandom(0, ofGetScreenHeight()-100);}
+			ofSetVerticalSync(false);
 			vid.update(mouseX, mouseY, bpm, bd);
 			}
 
@@ -167,7 +148,7 @@ void testApp::draw(){
 
 
 	//modes
-	if(drawDisplay){
+//	if(drawDisplay){
 		switch(mode){
 		case DJ:
 			DJMODE.draw();
@@ -176,7 +157,7 @@ void testApp::draw(){
 			Aud.draw();
 			break;
 		case PHYSICS:
-			physics.render();
+		//	physics.render(bd,bpm);
 			break;
 		case VID:
 			ofSetBackgroundAuto(false);
@@ -189,7 +170,7 @@ void testApp::draw(){
 				ofPopStyle();
 			break;
 		}
-	}
+	//}
 	if(drawSound){
 		drawBeatBins();
 		drawColorSwatches(guiWidth+10, 10);
@@ -214,8 +195,8 @@ void testApp::draw(){
 		ofPopStyle();
 		ofPopMatrix();
 	}
-
 	
+	}
 }
 /*--------------------------------------------------*
 BPM tracking
@@ -240,7 +221,7 @@ bool testApp::trackBeats(int low, int high){
 		bpm = 60.0f / lengthOfBeat;
 		tapCount++;
 
-		printf("BPM: %i %f %f\n", tapCount, bpm,  elapsedTime);
+		//printf("BPM: %i %f %f\n", tapCount, bpm,  elapsedTime);
 	}
 
 	return tap;
@@ -279,7 +260,9 @@ void testApp::drawBeatBins(){
 	bd.drawBeats();
 	ofTranslate (32*3+26,0,0);
 	ofDrawBitmapString("BPM: " + ofToString(bpm), 0, -spacer);
-
+	string info = "FPS: "+ofToString(ofGetFrameRate(), 0) + "\n";
+	ofDrawBitmapString(info,0,spacer);
+	ofDrawBitmapString("VOL: " + ofToString(bd.getVolume()) + "\n",0,spacer*2);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
@@ -397,12 +380,6 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		ofxUIRotarySlider *r = (ofxUIRotarySlider *)e.widget;
 		numParticles = r->getScaledValue();
 	}
-	else if (name == "emit")
-		sourceType = physicsMode::source::EMIT;
-	else if (name == "sink")
-		sourceType = physicsMode::source::SINK;
-	else if (name == "orbit")
-		sourceType = physicsMode::source::ORBIT;
 }
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
@@ -450,7 +427,7 @@ void testApp::guiSetup(){
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 200, numParticles, "particle rebirth"),"input");guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 12000, numParticles, "particle rebirth"),"input");guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
     audio = (ofxUIMovingGraph *) gui->addWidgetSouthOf(new ofxUIMovingGraph(dim*12, 64, volHistory, buffersize, -100, 100, "Volume"),"input"); 
 	w = gui->addWidgetSouthOf(new ofxUIToggle("beat debug", drawSound, dim, dim),"Volume");guiColors(w);
@@ -469,6 +446,7 @@ void testApp::generateColors(ColourShade cs){
 		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
 	}
 }
+
 void testApp::drawColorSwatches(int x, int y){
 	ofPushMatrix();
 	ofPushStyle();
@@ -482,31 +460,9 @@ void testApp::drawColorSwatches(int x, int y){
 	ofPopStyle();
 	ofPopMatrix();
 }
-int testApp::externalBpm(){
-	using namespace std;
-	ifstream f;
-	char input[10];
-	f.open("avg_bpm.txt");
-	while (!f.eof()){
-		f >> input;
-	}
-	f.close();
-	return atoi(input);
-}
 
-ColourShade testApp::IntelliColor(){
-	ColourShade colors[10] = {CT_LIGHT,CT_WEAK,CT_SOFT, CT_COOL, CT_NEUTRAL, CT_WARM,CT_HARD,CT_INTENSE,CT_BRIGHT,CT_FRESH}; //not using CT_DARK
-	if (AvgSetListBPM < 60) return colors[0];
-	else if (AvgSetListBPM < 70) return colors[1];
-	else if (AvgSetListBPM < 80) return colors[2];
-	else if (AvgSetListBPM < 90) return colors[3];
-	else if (AvgSetListBPM < 100) return colors[4];
-	else if (AvgSetListBPM < 110) return colors[5];
-	else if (AvgSetListBPM < 120) return colors[6];
-	else if (AvgSetListBPM < 130) return colors[7];
-	else if (AvgSetListBPM < 140) return colors[8];
-	else return colors[9];
-}
+
+
 
 void testApp::keyPressed(int key){
 	if(drawDJ){
@@ -515,6 +471,8 @@ void testApp::keyPressed(int key){
 	if(mode == VID){
 		vid.keyPressed(key);
 	}
+	if(mode == PHYSICS)
+		physics.keyPressed(key);
 	if( key == 's' ){
 		soundStream.start();
 	}
@@ -553,8 +511,10 @@ void testApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void testApp::mouseReleased(int x, int y, int button){
 	ofRectangle guiRect = ofRectangle(0,0,guiWidth, guiHeight);
-	if(!guiRect.inside(ofVec2f(x,y)))
-		physics.mousePressed( sourceType, ofVec3f(x,y,0));
+	if(mode == PHYSICS){
+	//	if(!guiRect.inside(ofVec2f(x,y)))
+			//physics.mousePressed( sourceType, ofVec3f(x,y,0));
+	}
 }
 
 void testApp::exit()

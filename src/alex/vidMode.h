@@ -47,6 +47,7 @@ class vidMode{
 	void setup();
 	void update(int x, int y, float bpm, beatDetect bd);
 	void draw(int x, int y);
+	void circles();
 	void updateSpeed();
 	void keyPressed(int key);
 
@@ -60,4 +61,5 @@ class vidMode{
     ofFbo       fbo;
 
 	float seedX, seedY;
+	float time;
 };
