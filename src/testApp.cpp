@@ -30,6 +30,11 @@ void testApp::setup(){
 	//soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
 	ofSoundStreamSetup(0, 2, this, 44100, bufferSize, 4);
 
+	startTime = ofGetElapsedTimef();
+	lastBeatTime = 1;
+	lengthOfBeat = 1;
+	bpm = 1;
+	tapCount = 1;
 	/*--------GUI-----------*/
 	drawDJKinect = false;
 	drawAudKinect = false;
@@ -51,7 +56,7 @@ void testApp::setup(){
 
 	/*-------Alex-------*/
 	ofEnableAlphaBlending();
-	ofBackground(40);
+	ofBackground(80);
 	//physics.setup();
 	//vid.setup();
 
@@ -96,8 +101,6 @@ void testApp::update(){
 	if(abs(pVol - cVol)*100>1){
 		isChanged = true;
 	}
-
-	bpmTapper.update();
 
 	/*-------Modes-----*/
 	switch(mode){
@@ -148,8 +151,8 @@ void testApp::update(){
 			}
 			if(bd.isKick()){
 				vidX = (int) ofRandom(0, ofGetScreenWidth()-100);
-				vidY = (int) ofRandom(0, ofGetScreenHeight()-100);
-				vid.update(mouseX, mouseY);
+				vidY = (int) ofRandom(0, ofGetScreenHeight()-100);}
+			vid.update(mouseX, mouseY, bpm, bd);
 			}
 
 			
@@ -158,14 +161,9 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	
+
+	trackBeats(1,1);
 	ofSetBackgroundAuto(true);
-	//sound
-	if(drawSound){
-		drawVolGraphs();
-		trackBeats(1,3);
-		drawBeatBins();
-	}
 
 
 	//modes
@@ -181,10 +179,7 @@ void testApp::draw(){
 			physics.render();
 			break;
 		case VID:
-		//	ofSetBackgroundAuto(false);
-			//ofSetColor(255,255,255, (int)ofRandom(10,30));  //white
-		//	ofSetColor(0,0,0, (int)ofRandom(10,30));
-		//	ofRect(0,0,ofGetScreenWidth(), ofGetScreenHeight());
+			ofSetBackgroundAuto(false);
 			vid.draw(mouseX, mouseY);
 			break;
 		default:
@@ -195,7 +190,10 @@ void testApp::draw(){
 			break;
 		}
 	}
-
+	if(drawSound){
+		drawBeatBins();
+		drawColorSwatches(guiWidth+10, 10);
+	}
 	if(drawDJKinect){
 		ofPushMatrix();
 		ofRect(djRect);
@@ -223,14 +221,28 @@ void testApp::draw(){
 BPM tracking
  *--------------------------------------------------*/
 bool testApp::trackBeats(int low, int high){
-	bool tap = false;
+	float curTime = ofGetElapsedTimef();
+	bool tap = true;
 
-	for(int i=low; i<high; i++){
-		if(bd.isBeat(i))
-			tap = true;
+	for(int i=low; i<= high; i++){
+		if(!bd.isBeat(i))
+			tap = false;
 	}
-	if(tap)
-		bpmTapper.tap();
+
+	if( (curTime - lastBeatTime) > 2.0){
+		tapCount = 1;
+		startTime = curTime;
+	}
+	if(tap){
+		lastBeatTime = curTime;
+		float elapsedTime = (curTime - startTime);
+		lengthOfBeat = (elapsedTime+1)/tapCount;
+		bpm = 60.0f / lengthOfBeat;
+		tapCount++;
+
+		printf("BPM: %i %f %f\n", tapCount, bpm,  elapsedTime);
+	}
+
 	return tap;
 }
 /*--------------------------------------------------*
@@ -266,9 +278,8 @@ void testApp::drawBeatBins(){
 	ofDrawBitmapString("Beat Detection",0,-spacer);
 	bd.drawBeats();
 	ofTranslate (32*3+26,0,0);
-	ofDrawBitmapString("BPM: " + ofToString(bpmTapper.bpm()), 0, -spacer);
+	ofDrawBitmapString("BPM: " + ofToString(bpm), 0, -spacer);
 
-	bpmTapper.draw(40,50,10);
 	ofPopMatrix();
 
 	ofTranslate(0,rectHeight/2+spacer*2,0);
@@ -287,43 +298,6 @@ void testApp::drawBeatBins(){
 	ofPopMatrix();
 }
 
-void testApp::drawVolGraphs(){
-	// draw the left channel:
-	float rectWidth = 512;
-	float rectHeight = 150;
-	float spacer = 16;
-
-	ofPushStyle();
-		ofPushMatrix();
-		ofNoFill();
-		ofTranslate(ofGetWidth()- (rectWidth+spacer),ofGetHeight()-(rectHeight*2 + spacer*2), 0);
-		ofSetColor(white);
-		ofDrawBitmapString("Left Channel", 4, 18);	
-		ofSetLineWidth(1);	
-		ofRect(0, 0, rectWidth, rectHeight);
-		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);		
-			ofBeginShape();
-			for (int i = 0; i < left.size(); i++){
-				ofVertex(i*2, 100 -left[i]*180.0f);
-			}
-			ofEndShape(false);
-
-		ofTranslate(0, rectHeight + spacer, 0);			
-		ofSetColor(white);
-		ofDrawBitmapString("Right Channel", 4, 18);		
-		ofSetLineWidth(1);	
-		ofRect(0, 0, rectWidth, rectHeight);
-		ofSetColor(245, 58, 135);
-		ofSetLineWidth(3);					
-			ofBeginShape();
-			for (int i = 0; i < right.size(); i++){
-				ofVertex(i*2, 100 -right[i]*180.0f);
-			}
-			ofEndShape(false);			
-		ofPopMatrix();
-	ofPopStyle();
-}
 //--------------------------------------------------------------
 
 
@@ -537,6 +511,9 @@ ColourShade testApp::IntelliColor(){
 void testApp::keyPressed(int key){
 	if(drawDJ){
 		DJMODE.DJkeyPressed(key);
+	}
+	if(mode == VID){
+		vid.keyPressed(key);
 	}
 	if( key == 's' ){
 		soundStream.start();

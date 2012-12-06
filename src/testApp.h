@@ -4,7 +4,6 @@
 #include "ofxUI.h"
 #include "beatDetect.h"
 #include "ofxColourTheory.h"
-#include "MSABPMTapper.h"
 
 #include "alex/physicsMode.h"
 #include "alex/vidMode.h"
@@ -12,7 +11,6 @@
 #include "melissa/audMode.h"
 
 
-using namespace msa;
 
 class testApp : public ofBaseApp{
 
@@ -110,6 +108,8 @@ class testApp : public ofBaseApp{
 		
 		float cVol;
 		float pVol;
+		float lastBeatTime, startTime, lengthOfBeat, bpm;
+		int tapCount;
 
 		int AvgSetListBPM;
 
@@ -117,7 +117,6 @@ class testApp : public ofBaseApp{
 		ofxUIMovingGraph *audio;
 
 		beatDetect bd;
-		BPMTapper bpmTapper;
 
 	// 0 output channels, 
 	// 2 input channels
