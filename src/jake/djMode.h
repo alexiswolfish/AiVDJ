@@ -69,8 +69,11 @@ public:
 	ofMesh mesh;
 
 	vector<float> volHist;
+	vector<vector<float>> volHistVec;
 	ofColor smartColor;
-	float vol;
+	float volf;
+
+	void drawCircle(float radius, ofColor _color, vector<float> v);
 
 	ofxKinect kinect;
 
