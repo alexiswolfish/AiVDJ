@@ -26,7 +26,7 @@ void testApp::setup(){
 	pVol = 0.0;
 	cVol = 0.0;
 
-	AvgSetListBPM = externalBpm();
+	//AvgSetListBPM = externalBpm();
 
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
@@ -106,8 +106,8 @@ void testApp::update(){
 	switch(mode){
 		case DJ:
 			if (setAud) {
-				Aud.exit();
-				setAud = false;
+				//Aud.exit();
+				//setAud = false;
 			}
 			if (!setDJ){
 				setDJ = true;
@@ -124,10 +124,10 @@ void testApp::update(){
 				setDJ = false;
 			}
 			if (!setAud){
-				setAud = true;
-				Aud.setup();
+				//setAud = true;
+				//Aud.setup();
 			}
-			Aud.update(cVol);
+		//	Aud.update(cVol);
 			break;
 		default:
 		case PHYSICS:
@@ -160,8 +160,8 @@ void testApp::draw(){
 			break;
 			}
 		case AUD:
-			Aud.draw();
-			break;
+			//Aud.draw();
+		//	break;
 		case PHYSICS:
 			physics.render(bd,bpm);
 			break;
@@ -192,16 +192,14 @@ void testApp::draw(){
 		ofPopMatrix();
 	}
 	if(drawAudKinect){
-		ofPushMatrix();
+	/*	ofPushMatrix();
 		ofRect(audRect);
 		ofTranslate(audRect.x, audRect.y);
 		ofPushStyle();
 		Aud.kinect.drawDepth(0, 0, audRect.width, audRect.height);
 		Aud.kinect.draw(0, 0, audRect.width, audRect.height);
 		ofPopStyle();
-		ofPopMatrix();
-	}
-	
+		ofPopMatrix(); */
 	}
 }
 /*--------------------------------------------------*
@@ -553,7 +551,7 @@ void testApp::exit()
     delete gui; 
 
 	DJMODE.exit();
-	Aud.exit();
+	//Aud.exit();
 }
 
 //--------------------------------------------------------------

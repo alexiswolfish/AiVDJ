@@ -8,7 +8,7 @@
 #include "alex/physicsMode.h"
 #include "alex/vidMode.h"
 #include "jake/djMode.h"
-#include "melissa/audMode.h"
+//#include "melissa/audMode.h"
 
 
 
@@ -50,7 +50,7 @@ class testApp : public ofBaseApp{
 		ofxUICanvas *gui;
 		float guiWidth, guiHeight;
 		float slider1, slider2;
-		float slider2, DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
+		float DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
 		bool drawDJ, drawAud, drawDisplay, drawSound;
 
 		bool drawDJKinect, drawAudKinect;
@@ -83,7 +83,7 @@ class testApp : public ofBaseApp{
 		/*-----------Jake-----------*/
 		djMode DJMODE;
 		/*-----------Melissa-----------*/
-		audMode Aud;
+		//audMode Aud;
 
 
 		/*-----------Sound-----------*/

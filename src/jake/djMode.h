@@ -3,7 +3,6 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
-#include "../cloth/ofxKCloth.h"
 
 
 
@@ -32,15 +31,6 @@ public:
 	ofPoint palmCenter;
 
 	ofxCvContourFinder contourFinder;
-
-	// cloth vars
-	ClothController controller;
-    float oldMouseX,oldMouseY;
-    ofImage tex;
-    ofShader shader;
-	ofShader myShader;
-    int rows, cols;
-    ofLight directional;
 
 	void updatePoints();
 	void updateGlobals(ofColor c, bool changeColor, float volume);

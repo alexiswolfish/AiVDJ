@@ -19,13 +19,12 @@ void djMode::setup() {
 	noDJ = 0;
 	bDrawMeshCloud = false;
 	bDrawPointCloud = true;
-	bcloth = false;
 	tiltDegr = 15;
 
-	albumArt.loadImage("data/album_art/common_be.jpg");
+/*	albumArt.loadImage("data/album_art/common_be.jpg");
 	albumArt.setImageType(OF_IMAGE_GRAYSCALE);
 	BnW_image.setFromPixels(albumArt.getPixels(),albumArt.width,albumArt.height);
-	BnW_image.threshold(50);	
+	BnW_image.threshold(50);*/	
 
 	//// enable depth->video image calibration
 	kinect.setRegistration(true);
@@ -179,19 +178,9 @@ void djMode::draw() {
 		easyCam.end();
 				
 	} 
-	else if (bcloth){
-		ofPushMatrix();
-		glEnable(GL_DEPTH_TEST);
-		ofTranslate(ofGetWidth()/2-cols*CLOTH_RES/2, 100,0);
-		shader.begin();
-		shader.setUniformTexture("tex", tex.getTextureReference(), 0);
-		controller.drawMesh();
-		shader.end();
-		ofPopMatrix();
-	}
+
 	ofPopStyle();
 	ofPopMatrix();
-	fingers.clear();
 
 
 }
@@ -396,8 +385,6 @@ void djMode::DJmouseDragged(int x, int y, int button)
 void djMode::DJmousePressed(int x, int y, int button)
 {
     ofVec3f f = ofVec3f(0,0,50);
-    
-    controller.particles[200]->addForce(f);
 }
 
 //--------------------------------------------------------------
