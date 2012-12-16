@@ -38,12 +38,12 @@ void djMode::setup() {
 	//ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
-	angle = 10;
+	angle = 0;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	//easyCam.tilt(15);
 
-	maxLines = 5;
+	maxLines = 2;
 }
 
 //--------------------------------------------------------------
@@ -143,8 +143,13 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 
 
 //--------------------------------------------------------------
-void djMode::updateGlobals(ofColor c, bool changeColor, float volume) {
-	if (changeColor)smartColor = c;
+void djMode::updateGlobals(vector<ofColor> cols, bool changeColor, float volume) {
+	smartColors = cols;
+	smartDarkCol = colorGen.getDarkest(cols);
+	newColor = smartDarkCol;
+	newColor.setBrightness(smartDarkCol.getBrightness() - 20);
+	if (changeColor) smartColor =  colorGen.getRandom(cols);
+		
 	volf = volume;
 }
 
@@ -154,7 +159,8 @@ void djMode::updateGlobals(ofColor c, bool changeColor, float volume) {
 
 void djMode::draw() {
 
-	ofSetColor(95, 165);
+	//ofSetColor(95, 165);
+	ofSetColor(smartDarkCol);
 	ofRect(0,0,ofGetWidth(), ofGetHeight());
 	//ofBackground(95, 100);
 
@@ -200,7 +206,7 @@ void djMode::drawCircleBg(){
 		for (int i=0; i<points.size(); i+=25){
 			float dist = ofDist(0, points[i].y,0, bb.getMinY());
 			float rad = ofRandom(0, TWO_PI);
-			float r = (radius + (dist*.5));
+			float r = (radius + (dist*.25));
 			ofClamp(r, 0, 5);
 			ofVec3f loc;
 			loc.x = center.x + cos(rad)*r;
@@ -210,7 +216,7 @@ void djMode::drawCircleBg(){
 		}
 		circle.close();
 
-		ofSetColor(k);
+		ofSetColor(newColor);
 		ofBeginShape();
 		for (int i=0;i<circle.getVertices().size();i++){
 			 ofVertex(circle.getVertices().at(i).x, circle.getVertices().at(i).y, -1000); 
@@ -219,9 +225,10 @@ void djMode::drawCircleBg(){
 
 		radius -= 50;
 		k -= 10;
+		newColor.setBrightness(newColor.getBrightness() - 15);
 	}
 	ofPopStyle();
-	ofPushMatrix();
+	ofPopMatrix();
 	
 }
 
@@ -328,30 +335,7 @@ void djMode::DJkeyPressed (int key) {
 			//bDrawPointCloud = !bDrawPointCloud;			
 			//bDrawMeshCloud = !bDrawMeshCloud;			
 			break;
-		case '>':
-		case '.':
-			farThreshold ++;
-			if (farThreshold > 255) farThreshold = 255;
-			break;
-			
-		case '<':
-		case ',':
-			farThreshold --;
-			if (farThreshold < 0) farThreshold = 0;
-			break;
-		case '+':
-		case '=':
-			nearThreshold ++;
-			if (nearThreshold > 255) nearThreshold = 255;
-			break;
-			
-		case '-':
-			nearThreshold --;
-			if (nearThreshold < 0) nearThreshold = 0;
-			break;									
-		case 'w':
-			kinect.enableDepthNearValueWhite(!kinect.isDepthNearValueWhite());
-			break;
+
 			
 		case 'o':
 			kinect.setCameraTiltAngle(angle); // go back to prev tilt
@@ -361,6 +345,10 @@ void djMode::DJkeyPressed (int key) {
 		case 'c':
 			kinect.setCameraTiltAngle(0); // zero the tilt
 			kinect.close();
+			break;
+
+		case '=':
+			ofSaveFrame();
 			break;
 			
 		case OF_KEY_UP:

@@ -26,8 +26,6 @@ void testApp::setup(){
 	pVol = 0.0;
 	cVol = 0.0;
 
-	//AvgSetListBPM = externalBpm();
-
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
 
@@ -44,7 +42,7 @@ void testApp::setup(){
 	drawDJKinect = false;
 	drawAudKinect = false;
 	drawDisplay = true;
-	drawSound = false;
+	drawSound = true;
 	mode = PHYSICS;
 
 	/*--------setup booleans-----------*/
@@ -65,12 +63,11 @@ void testApp::setup(){
 	vid.setup();
 	physics.setup(100);
 	
-	//curShade = CT_SOFT;
 	generateColors(CT_WEAK);
 	numParticles = 9000;
 	/*-------Jake-------*/
 	//DJMODE.setup();
-	/*------Melissa-----*/
+	/*-------Melissa------*/
 	//Aud.setup();
 }
 
@@ -78,14 +75,14 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
 	/*-------Sound------*/
-//	audio->addPoint(scaledVol*100);
+	//	audio->addPoint(scaledVol*100);
 	//calculate average volume as a single float instead of per frequency
 	/*-------kinect side displays------*/
 	if(drawDJKinect){
 		DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh, bd.isKick() || bd.isSnare());
 	}
 	if(drawAudKinect){
-		//Aud.update(cVol);
+
 	}
 
 
@@ -106,8 +103,8 @@ void testApp::update(){
 	switch(mode){
 		case DJ:
 			if (setAud) {
-				//Aud.exit();
-				//setAud = false;
+				Aud.exit();
+				setAud = false;
 			}
 			if (!setDJ){
 				setDJ = true;
@@ -115,7 +112,7 @@ void testApp::update(){
 			}
 			DJMODE.update(left, DjDepthSliderLow, DjDepthSliderHigh, bd.isKick() || bd.isSnare());
 			//DJMODE.updateGlobals(colorGen.getRandom(colors), isChanged, cVol, bd.isKick() || bd.isSnare());
-			DJMODE.updateGlobals(colorGen.getRandom(colors), bd.isKick() || bd.isSnare(), cVol*5);
+			DJMODE.updateGlobals(colors, bd.isKick() || bd.isSnare(), cVol*5);
 			if (!DJMODE.WheresMyDj){mode = PHYSICS; setDJ = false;}
 			break;
 		case AUD:
@@ -124,10 +121,10 @@ void testApp::update(){
 				setDJ = false;
 			}
 			if (!setAud){
-				//setAud = true;
-				//Aud.setup();
+				setAud = true;
+				Aud.setup();
 			}
-		//	Aud.update(cVol);
+			Aud.update(bd);
 			break;
 		default:
 		case PHYSICS:
@@ -160,8 +157,8 @@ void testApp::draw(){
 			break;
 			}
 		case AUD:
-			//Aud.draw();
-		//	break;
+				Aud.draw();
+				break;
 		case PHYSICS:
 			physics.render(bd,bpm);
 			break;
@@ -224,8 +221,6 @@ bool testApp::trackBeats(int low, int high){
 		lengthOfBeat = (elapsedTime+1)/tapCount;
 		bpm = 60.0f / lengthOfBeat;
 		tapCount++;
-
-		//printf("BPM: %i %f %f\n", tapCount, bpm,  elapsedTime);
 	}
 
 	return tap;
@@ -454,7 +449,7 @@ void testApp::keyPressed(int key){
 	if( key == 's' ){
 		soundStream.start();
 	}
-	if( key == 'g' ){
+	if( key == '`' ){
 		if (bGui){gui->disable(); bGui = false;}
 		else {gui->enable(); bGui = true;}
 	}	
@@ -467,7 +462,7 @@ void testApp::keyPressed(int key){
 		curShade = colorGen.getColourConstraints(randomShade);
 		generateColors(randomShade);
 	}
-	if(key == 'q')
+	if(key == '/')
 		ofSaveFrame();
 }
 
@@ -551,7 +546,7 @@ void testApp::exit()
     delete gui; 
 
 	DJMODE.exit();
-	//Aud.exit();
+	Aud.exit();
 }
 
 //--------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxOpenCv.h"
 #include "ofxKinect.h"
+#include "ofxColourTheory.h"
 
 
 
@@ -33,11 +34,10 @@ public:
 	ofxCvContourFinder contourFinder;
 
 	void updatePoints();
-	void updateGlobals(ofColor c, bool changeColor, float volume);
+	void updateGlobals(vector<ofColor> cols, bool changeColor, float volume);
 	vector<ofPoint> getFingerTips( ofxCvGrayscaleImage input);
 	void drawPointCloud();
 	void drawMeshCloud();
-	void clothShit();
 
 	void drawImage();
 
@@ -60,8 +60,11 @@ public:
 
 	vector<float> volHist;
 	vector<vector<float>> volHistVec;
-	ofColor smartColor;
+	vector<ofColor> smartColors;
+	ofColor smartColor, newColor, smartDarkCol;
 	float volf;
+
+	ofxColourTheory colorGen;
 
 	void drawCircle(float radius, ofColor _color, vector<float> v);
 	void drawCircleBg();

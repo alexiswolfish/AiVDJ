@@ -247,8 +247,8 @@ void physicsMode::setColorScheme(int s, vector<ofColor> c){
 		particleTheme = CT_FRESH;
 		break;
 	case 6: //soft mauve
-		bg = ofColor(79, 55, 56);
-		particleMain = ofColor(255, 100, 90);
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_SOFT;
 		particleTheme = CT_LIGHT;
 		break;

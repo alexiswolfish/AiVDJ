@@ -5,7 +5,7 @@
 #include "ofxCvMain.h"
 #include "ofxKinect.h"
 #include "ofxCv.h"
-
+#include "..\beatDetect.h"
 // uncomment this to read from two kinects simultaneously
 //#define USE_TWO_KINECTS
 
@@ -13,7 +13,7 @@ class audMode : public ofBaseApp {
 public:
 	
 	void setup();
-	void update(float vol);
+	void update(beatDetect bd);
 	void draw();
 	void exit();
 	
@@ -45,6 +45,8 @@ public:
 	/*----------camera stuff----------------*/
 	int angle;
 	ofEasyCam easyCam; // used for viewing the point cloud
+	float moveCam;
+	ofCamera cam;
 	/*----------------------------------------*/
 	
 	
@@ -56,4 +58,9 @@ public:
 	int updates;
 	ofColor choicecolor; 
 	ofVec3f last_vec;
+	ofVec3f center;
+	int flipBit;
+	
+	//TEST
+	ofNode ofCamTarget;
 };

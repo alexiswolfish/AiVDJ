@@ -8,7 +8,7 @@
 #include "alex/physicsMode.h"
 #include "alex/vidMode.h"
 #include "jake/djMode.h"
-#include "melissa\audMode.h"
+
 
 
 class testApp : public ofBaseApp{
@@ -80,10 +80,11 @@ class testApp : public ofBaseApp{
 		void drawColorSwatches(int x, int y);
 		ColourShade IntelliColor();
 		/*-----------Jake-----------*/
-		djMode DJMODE;
+		djMode DJ;
 		
 		/*------------Melissa-----------*/
 		audMode Aud;
+		/*----------------------------*/
 
 		/*-----------Sound-----------*/
 		void audioIn(float * input, int bufferSize, int nChannels); 
