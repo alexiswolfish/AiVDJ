@@ -54,7 +54,7 @@ class testApp : public ofBaseApp{
 		bool drawDJ, drawAud, drawDisplay, drawSound;
 
 		bool drawDJKinect, drawAudKinect;
-		bool setDJ, setAud, setVid, setPhy;
+		bool setDJ, setAud, setVid, setPhy, bGui;
 		ofColor cmain, ccomp1, ccomp2, ccomp3, ccomp4, ccomp5, white;
 		ofRectangle displayRect, djRect, audRect, guiRect;
 

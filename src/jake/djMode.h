@@ -49,6 +49,8 @@ public:
 	void drawMeshCloud();
 	void clothShit();
 
+	void drawImage();
+
 	bool newBeat;
 
 	void DJkeyPressed(int key);
@@ -67,21 +69,34 @@ public:
 	ofMesh mesh;
 
 	vector<float> volHist;
+	vector<vector<float>> volHistVec;
 	ofColor smartColor;
-	float vol;
+	float volf;
+
+	void drawCircle(float radius, ofColor _color, vector<float> v);
+	void drawCircleBg();
 
 	ofxKinect kinect;
-	
+
+	//image shit
+	ofImage albumArt;
+	ofxCvGrayscaleImage BnW_image, wave_image;
+//	ofPixelsRef newPixs;
+	float waves(float x, float y, float w, float a, float t);
+	bool wave;
+	int wave_count;
+	//float new_img_height;
 	
 	bool bDrawPointCloud;
 	bool bDrawMeshCloud;
 	bool bcloth;
+	bool init_cloth;
 	
 	int angle;
 	
 	// used for viewing the point cloud
 	ofEasyCam easyCam;
 
-
+	float maxLines;
 };
 

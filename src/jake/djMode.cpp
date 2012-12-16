@@ -22,14 +22,10 @@ void djMode::setup() {
 	bcloth = false;
 	tiltDegr = 15;
 
-	//try running the hand detect with the example code
-	colorImg.allocate(kinect.width, kinect.height);
-	grayImage.allocate(kinect.width, kinect.height);
-	grayThreshNear.allocate(kinect.width, kinect.height);
-	grayThreshFar.allocate(kinect.width, kinect.height);
-	
-	nearThreshold = 255;
-	farThreshold = 70;
+	albumArt.loadImage("data/album_art/common_be.jpg");
+	albumArt.setImageType(OF_IMAGE_GRAYSCALE);
+	BnW_image.setFromPixels(albumArt.getPixels(),albumArt.width,albumArt.height);
+	BnW_image.threshold(50);	
 
 	//// enable depth->video image calibration
 	kinect.setRegistration(true);
@@ -43,22 +39,12 @@ void djMode::setup() {
 	//ofBackground(100, 100, 100);
 	ofSetFrameRate(60);
 
-
-		ofEnableSmoothing();
-		cols = 640 / CLOTH_RES;
-		rows = 480 / CLOTH_RES; 
-		controller.init(cols,rows);
-		controller.initMesh(); 
-		tex.loadImage("large_brown.png"); 
-		shader.load("shader");
-		directional.setDirectional();
-		oldMouseX = -999;
-		oldMouseY = -999;
-
 	angle = 10;
 	kinect.setCameraTiltAngle(angle);
 	//printf("serial:'%s'", kinect.getSerial());
 	//easyCam.tilt(15);
+
+	maxLines = 5;
 }
 
 //--------------------------------------------------------------
@@ -66,79 +52,83 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 
 	kinect.update();
 
+	//for (int i=0; i<=360; i++){
+	//	volHist.push_back(vol[i]);
+	//}
+
+	//volHistVec.push_back(volHist);
+	//for (int i=volHistVec.size(); i>0; i--){
+	//	if(i!=volHistVec.size()) volHistVec[i+1] = volHistVec[i];
+	//}
+	//if (volHistVec.size() > 10){
+	//	volHistVec.pop_back();
+	//}
+
+
+
 	Zlow = depthLow;
 	Zhigh = depthHigh;
 	newBeat = beat;
 
 	if(kinect.isFrameNew()) {
+		int w = 640;
+		int h = 480;
+		int step = 2;
+		bool thresh = false;
+		int points = 0;
+		//maxY = 0;
+		for(int y = 0; y < h; y += step*5) {
+			for(int x = 0; x < w; x += step) {
+				if(kinect.getDistanceAt(x, y) > 0) {
+					if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
+						points++;
+						ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
+						float addMe = (vol[x] * 800.0f);
+						if (addMe > 5) addMe = 5; 
+						else if (addMe < -5) addMe = -5;
 
-		//grayImage.setFromPixels(kinect.getDepthPixels(), kinect.width, kinect.height);
-		//grayThreshNear = grayImage;
-		//grayThreshFar = grayImage;
-		//grayThreshNear.threshold(nearThreshold, true);
-		//grayThreshFar.threshold(farThreshold);
-		//cvAnd(grayThreshNear.getCvImage(), grayThreshFar.getCvImage(), grayImage.getCvImage(), NULL);
-		//
-		//grayImage.flagImageChanged();
-		//contourFinder.findContours(grayImage, 10, (kinect.width*kinect.height)/2, 20, false);
-
-		//fingers = getFingerTips(grayImage);
-
-		if (bcloth) clothShit();
-		else if (bDrawPointCloud){
-			int w = 640;
-			int h = 480;
-			int step = 2;
-			bool thresh = false;
-			int points = 0;
-			//maxY = 0;
-			for(int y = 0; y < h; y += step*5) {
-				for(int x = 0; x < w; x += step) {
-					if(kinect.getDistanceAt(x, y) > 0) {
-						if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-							points++;
-							ofVec3f vec = kinect.getWorldCoordinateAt(x, y);
-							float addMe = (vol[x] * 800.0f);
-							if (addMe > 5) addMe = 5; 
-							else if (addMe < -5) addMe = -5;
-
-							if (vec.y > maxY) maxY = vec.y;
-							if (!thresh){
-								thresh = true;
-								ofPolyline p;
-								p.addVertex(vec.x, vec.y + addMe, vec.z);
-								lines.push_back(p);
-							}
-							else{
-								lines.back().addVertex(vec.x, vec.y + addMe, vec.z);
-							}
+						if (vec.y > maxY) maxY = vec.y;
+						if (!thresh){
+							thresh = true;
+							ofPolyline p;
+							p.addVertex(vec.x, vec.y + addMe, vec.z);
+							lines.push_back(p);
 						}
 						else{
-							thresh = false;
+							lines.back().addVertex(vec.x, vec.y + addMe, vec.z);
 						}
 					}
-				}
-			}
-			if (beat){
-				mesh.setMode(OF_PRIMITIVE_POINTS);
-				int rand1 = ofRandom(128.0, 255.0);
-				for(int y = 0; y < h; y += step*2) {
-					for(int x = 0; x < w; x += step*2) {
-						if(kinect.getDistanceAt(x, y) > 0) {
-							if (kinect.getWorldCoordinateAt(x, y).z > Zhigh){	
-								float sizeD = (vol[x] * 2000.0f);
-								if (sizeD > 5) sizeD = 5; 
-								else if (sizeD < -5) sizeD = -5;
-								mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-								mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-								//bg_points.point.push_back(kinect.getWorldCoordinateAt(x, y));
-								//bg_points.color.push_back(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-								//bg_points.size.push_back(sizeD);
-							}
-						}
+					else{
+						thresh = false;
 					}
 				}
+			
 			}
+		}
+		if(lines.size() > maxLines)
+			lines.erase(lines.begin());
+
+
+			//if (beat){
+			//	mesh.setMode(OF_PRIMITIVE_POINTS);
+			//	int rand1 = ofRandom(128.0, 255.0);
+			//	for(int y = 0; y < h; y += step*2) {
+			//		for(int x = 0; x < w; x += step*2) {
+			//			if(kinect.getDistanceAt(x, y) > 0) {
+			//				if (kinect.getWorldCoordinateAt(x, y).z > Zhigh){	
+			//					float sizeD = (vol[x] * 2000.0f);
+			//					if (sizeD > 5) sizeD = 5; 
+			//					else if (sizeD < -5) sizeD = -5;
+			//					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
+			//					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
+			//					//bg_points.point.push_back(kinect.getWorldCoordinateAt(x, y));
+			//					//bg_points.color.push_back(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
+			//					//bg_points.size.push_back(sizeD);
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
 
 			if (points < 750){
 				noDJ++;
@@ -149,36 +139,46 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 				noDJ = 0;
 			}
 		}
-	}
-
 }
+ 
+
 
 //--------------------------------------------------------------
 void djMode::updateGlobals(ofColor c, bool changeColor, float volume) {
 	if (changeColor)smartColor = c;
-	vol = volume;
+	volf = volume;
 }
+
 
 //--------------------------------------------------------------
 
 
 void djMode::draw() {
-	ofBackground(95, 100);
-	
+
+	ofSetColor(95, 165);
+	ofRect(0,0,ofGetWidth(), ofGetHeight());
+	//ofBackground(95, 100);
+
+	ofPushStyle();
+	ofPushMatrix();
 	if(bDrawPointCloud) {
+		drawCircleBg();
+		//drawImage();
+		//int k = 50;
+		//if (volHistVec.size() > 9){
+		//	int size = 9;
+		//	for (int i=750; i>200; i-= 50){
+		//		vector<float> h = volHistVec[size];
+		//		drawCircle(i,ofColor(k),h);
+		//		size--;
+		//		k += 10;
+		//	}
+		//}
 		easyCam.begin();
 		drawPointCloud();
 		easyCam.end();
-
-		//grayImage.draw(10, 320, 400, 300);
-		//contourFinder.draw(10, 320, 400, 300);
 				
 	} 
-	else if (bDrawMeshCloud){
-		easyCam.begin();
-		drawMeshCloud();
-		easyCam.end();
-	}
 	else if (bcloth){
 		ofPushMatrix();
 		glEnable(GL_DEPTH_TEST);
@@ -189,256 +189,132 @@ void djMode::draw() {
 		shader.end();
 		ofPopMatrix();
 	}
+	ofPopStyle();
+	ofPopMatrix();
 	fingers.clear();
+
+
 }
 
+void djMode::drawCircleBg(){
+	float radius = 700;
+	int k = 70;
+	ofVec2f center = ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
+	ofPushStyle();
+	ofPushMatrix();
+	for(int i=0; i< lines.size(); i++){
+		ofPolyline curLine = lines[i];
+		vector<ofPoint> points = curLine.getVertices();
+		ofRectangle bb = curLine.getBoundingBox();
+		
+		ofPolyline circle;
+		for (int i=0; i<points.size(); i+=25){
+			float dist = ofDist(0, points[i].y,0, bb.getMinY());
+			float rad = ofRandom(0, TWO_PI);
+			float r = (radius + (dist*.5));
+			ofClamp(r, 0, 5);
+			ofVec3f loc;
+			loc.x = center.x + cos(rad)*r;
+			loc.y = center.y + sin(rad)*r;
+			loc.z = 0;
+			circle.addVertex(loc);
+		}
+		circle.close();
 
+		ofSetColor(k);
+		ofBeginShape();
+		for (int i=0;i<circle.getVertices().size();i++){
+			 ofVertex(circle.getVertices().at(i).x, circle.getVertices().at(i).y, -1000); 
+		}
+		ofEndShape();
+
+		radius -= 50;
+		k -= 10;
+	}
+	ofPopStyle();
+	ofPushMatrix();
+	
+}
+
+void djMode::drawCircle(float radius, ofColor _color, vector<float> v){
+	const float DEG2RAD = 3.14159/180;
+	float centerx = ofGetWidth()/2;
+	float centery = ofGetHeight()/2;
+	ofPushStyle();
+	//ofSetLineWidth(1);
+	ofSetColor(_color);
+	//ofFill();
+	ofPolyline l;
+
+	for (int i=0; i<360; i++){
+		float addMe = (v[i] * 800.0f);
+		if (addMe > 10) addMe = 10; 
+		else if (addMe < -10) addMe = -10;
+		float deg_rad = i * DEG2RAD;
+		float r = radius + addMe;
+		l.addVertex(centerx + cos(deg_rad)*r, centery + sin(deg_rad)*r,0);
+	}
+	l.close();
+	ofBeginShape();
+	for (int i=0;i<l.getVertices().size();i++){
+		 ofVertex(l.getVertices().at(i).x, l.getVertices().at(i).y); 
+	}
+	ofEndShape();
+	ofPopStyle();
+}
+
+void djMode::drawImage(){
+	int k = 3;
+	ofPushStyle();
+	ofSetHexColor(0x000000);
+	//printf("\n chan %d",albumArt.getPixelsRef().getNumChannels());
+	unsigned char * pixels = albumArt.getPixels();
+	for (int x=0; x< albumArt.width; x+= 5){
+		for (int y=0; y< albumArt.height; y+= 5){
+			int loc = x + y*albumArt.width;
+			unsigned char r = pixels[loc];
+			float val = 1-((float)r / 255.0f);
+			//float test = waves(x,y,BnW_image.width,.7,1);
+			//float testt = sin(val);
+			ofSetColor(r,volf*50);
+			float limitVol = (volf);
+			if (limitVol > 4) limitVol = 4;
+			ofCircle((150 + x)*k,(20+y)*k, val + limitVol );
+
+		}
+	}
+
+	ofPopStyle();
+}
 
 void djMode::drawPointCloud() {
 	ofPushMatrix();
 	ofScale(1, -1, -1); 
 	ofTranslate(0, 0, -1000); // center the points a bit;
 
-	//ofBackground(95, 100);
 	ofPushStyle();
 	ofSetColor(smartColor);
 	for (int i=0; i<lines.size();i++){
 		ofSetLineWidth(2);
-	lines[i].draw();
-		//int subLines;
-		//vector<ofPoint> ps = lines[i].getVertices();
-		//subLines = lines[i].size()/4;
-		//for (int k=0; k<subLines; k++){
-		//	ps.
-		//}
+		lines[i].draw();
 	}
-	//int temp = (int)vol;
 	glPointSize(3);
-	//printf("\n vol: %f", vol);
 	glEnable(GL_DEPTH_TEST);
 	mesh.drawVertices();
 	glDisable(GL_DEPTH_TEST);
-	//for (int j=0; j<bg_points.point.size(); j++){
-	//	ofSetColor(bg_points.color[j]);
-	//	ofSphere(bg_points.point[j].x, bg_points.point[j].y, bg_points.point[j].z, bg_points.size[j]);
-	//}
 
 	ofPopStyle();
 	ofPopMatrix();
 	lines.clear();
-	//bg_points.color.clear();
-	//bg_points.point.clear();
-	//bg_points.size.clear();
 	mesh.clear();
 	
-
-	//ofPushMatrix();
-	//ofTranslate(10, 400, -1);
-	//ofScale(0.6, 0.6, 0);
-	//for(int i = 0; i < fingers.size(); i++){
-	//	ofSetColor(255,255,0);
-	//	//ofSetLineWidth(3);
-	//	ofCircle(fingers[i].x, fingers[i].y,5);
-	//	//ofLine(palmCenter.x, palmCenter.y, fingers[i].x, fingers[i].y);
-	//	//ofSetLineWidth(0);
-	//}
-	//ofPopMatrix();
-}
-
- 
-
-vector<ofPoint> djMode::getFingerTips( ofxCvGrayscaleImage input) {
-	CvMemStorage*	storage = cvCreateMemStorage(0);
-	CvSeq*			contours;
-	CvPoint*		PointArray;
-	
-	int* hull;
-	int hullsize;
-	
-	vector<ofPoint> fingerTips;
-	
-	//START TO FIND THE HULL POINTS
-	cvFindContours( input.getCvImage(), storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
-	
-	// If there is a contour it´ll make it more simple
-	if (contours)
-		contours = cvApproxPoly(contours, sizeof(CvContour), storage, CV_POLY_APPROX_DP, 20, 1 );
-	
-	
-	int i = 0;
-	int area = 0;
-	int selected = -1;
-	
-	CvSeq* first_contour = contours; // Remember the first contour address
-	for( ; contours != 0; contours = contours->h_next ){	// Search for the bigger countour
-		CvRect rect;
-		int count = contours->total;
-		rect = cvContourBoundingRect(contours, 1);
-		if( (rect.width*rect.height) > area ){
-			selected = i;
-			area = rect.width*rect.height;
-		}
-		i++;
-	}
-	
-	contours = first_contour;		// Go again to the first contour
-	int k = 0; 
-	for( ; contours != 0; contours = contours->h_next ){		
-		int i; // Indicator of cycles.
-		int count = contours->total; // This is number point in contour
-		CvPoint center;
-		CvSize size;
-		CvRect rect;
-		
-		rect = cvContourBoundingRect( contours, 1);
-		
-		if ( (k==selected) ){		// Analize the bigger contour
-			palmCenter.x = rect.x + rect.width/2;
-			palmCenter.y = rect.y + rect.height/2;
-			
-			fingerTips.clear();
-			
-			PointArray = (CvPoint*)malloc( count*sizeof(CvPoint) ); // Alloc memory for contour point set.
-			hull = (int*)malloc(sizeof(int)*count);	// Alloc memory for indices of convex hull vertices.
-			
-			cvCvtSeqToArray(contours, PointArray, CV_WHOLE_SEQ); // Get contour point set.
-			
-			// Find convex hull for curent contour.
-			cvConvexHull( PointArray,
-						count,
-						 NULL,
-						 CV_COUNTER_CLOCKWISE,
-						 hull,
-						 &hullsize);
-			
-			int upper = 640, lower = 0;
-			for	(int j=0; j<hullsize; j++) {
-				int idx = hull[j]; // corner index
-				if (PointArray[idx].y < upper) upper = PointArray[idx].y;
-				if (PointArray[idx].y > lower) lower = PointArray[idx].y;
-			}
-			float cutoff = lower - (lower - upper) * 0.1f;
-			
-			// find interior angles of hull corners
-			for (int j=0; j<hullsize; j++) {
-				int idx = hull[j]; // corner index
-				int pdx = idx == 0 ? count - 1 : idx - 1; //  predecessor of idx
-				int sdx = idx == count - 1 ? 0 : idx + 1; // successor of idx
-				
-				cv::Point v1 = cv::Point(PointArray[sdx].x - PointArray[idx].x, PointArray[sdx].y - PointArray[idx].y);
-				cv::Point v2 = cv::Point(PointArray[pdx].x - PointArray[idx].x, PointArray[pdx].y - PointArray[idx].y);
-				
-				float angle = acos( (v1.x*v2.x + v1.y*v2.y) / (norm(v1) * norm(v2)) );
-				
-				// low interior angle + within upper 90% of region -> we got a finger
-				if (angle < 1 && PointArray[idx].y < cutoff) {
-					int u = PointArray[idx].x;
-					int v = PointArray[idx].y;
-					
-					fingerTips.push_back(ofPoint(u,v));
-				}
-			}
-			
-			// Free memory.
-			free(PointArray);
-			free(hull);
-			
-		}
-		k++;
-	}
-	
-	
-	cvClearMemStorage( storage );
-	//if (seqhull)
-		//cvClearSeq(seqhull);
-	
-	
-	return fingerTips;
 }
 
 
-void djMode::drawMeshCloud() {
-	int w = 640;
-	int h = 480;
-	ofMesh mesh;
-	//float maxY = 0;
-	float minX = 0;
-	float maxX = 0;
-	mesh.setMode(OF_PRIMITIVE_POINTS);
-	int step = 4; 
-	int rand1 = ofRandom(128.0, 255.0);
-	for(int y = 0; y < h; y += step*1.5) {
-		for(int x = 0; x < w; x += step) {
-			if(kinect.getDistanceAt(x, y) > 0) {
-				if (kinect.getWorldCoordinateAt(x, y).z < Zhigh && kinect.getWorldCoordinateAt(x, y).z > Zlow){	
-					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-				}
-			}
-		}
-	}
-
-	ofBackground(95, 100);
-	glPointSize(3);
-	ofPushMatrix();
-	// the projected points are 'upside down' and 'backwards' 
-	ofScale(1, -1, -1);
-	ofTranslate(0, 0, -1000); // center the points a bit
-	glEnable(GL_DEPTH_TEST);
-	mesh.drawVertices();
-	if (mesh.getVertices().size() < 750){
-		noDJ++;
-		//printf("\nnodj %d\n", noDJ);
-	}
-	if (noDJ > 10){
-		WheresMyDj = false;
-		noDJ = 0;
-	}
-
-	glDisable(GL_DEPTH_TEST);
-	ofPopMatrix();
-	
-}
-
-void djMode::clothShit(){
-	for(int i=0;i<cols*rows;i++) {
- 
-			int x = int(i) % cols;
-			int y = int(i) / cols;
-        
-			if(y == cols-1) continue;
-              
-			float d = kinect.getDistanceAt(x*CLOTH_RES, y*CLOTH_RES);
-
-			if(d >0 && d < 1000) {
-            
-				d = ofMap(d,0,4000,0,30);
-                            
-				ofVec3f ff = ofVec3f(0,0.0,d);
-				ff.normalize();
-				ff *= 3.0;
-                  
-				controller.particles[i]->addForce(ff);
-				
-		   }
-				if (controller.particles.size() < 500){
-					noDJ++;
-					//printf("\nnodj %d\n", noDJ);
-				}
-				if (noDJ > 10){
-					WheresMyDj = false;
-					noDJ = 0;
-				}
-		}
-   
-		controller.update();
-		controller.updateMesh();
-		controller.updateMeshNormals();
-}
 
 //--------------------------------------------------------------
 void djMode::exit() {
-	kinect.setCameraTiltAngle(0); // zero the tilt on exit
+	//kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 }
 
@@ -450,16 +326,16 @@ void djMode::DJkeyPressed (int key) {
 			bDrawPointCloud = false;			
 			bDrawMeshCloud = false;			break;
 
-		case'p':
-			if (bDrawPointCloud){
-				//bDrawPointCloud=false;
-				bcloth = true;
-				bDrawPointCloud = false;
-			}
-			else{
-				bcloth = false;
-				bDrawPointCloud = true;
-			}
+		//case'p':
+		//	if (bDrawPointCloud){
+		//		//bDrawPointCloud=false;
+		//		bcloth = true;
+		//		bDrawPointCloud = false;
+		//	}
+		//	else{
+		//		bcloth = false;
+		//		bDrawPointCloud = true;
+		//	}
 			//bDrawPointCloud = !bDrawPointCloud;			
 			//bDrawMeshCloud = !bDrawMeshCloud;			
 			break;
@@ -533,7 +409,7 @@ void djMode::DJwindowResized(int w, int h)
 {}
 
 void djMode::mouseMoved(int x, int y ){
-    directional.setPosition(x, y, 100);
+    //directional.setPosition(x, y, 100);
     
 }
 
