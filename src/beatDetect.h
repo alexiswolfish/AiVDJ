@@ -13,6 +13,15 @@
 
 using namespace std;
 
+/*
+	sub bass : 0 > 100hz
+	mid bass : 80 > 500hz
+	mid range: 400 > 2khz
+	upper mid: 1k > 6khz
+	high freq: 4k > 12khz
+	Very high freq: 10k > 20khz and above
+*/
+
 class beatDetect
 {
 protected:

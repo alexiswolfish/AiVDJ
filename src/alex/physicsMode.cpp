@@ -51,7 +51,7 @@ void physicsMode::Particle::update(beatDetect bd, float bpm){
 	oPos.z = cos( theta.x ) * sin( theta.y );
 	oPos *= 100;
 
-	pos = oPos * bd.getVolume()*30;
+	pos = oPos * bd.getVolume()*20;
 
 }
 
@@ -62,10 +62,10 @@ physicsMode::physicsMode(){
 
 void physicsMode::setup(int numParticles){
 	//ofBackgroundHex(0x000000);
-	setColorScheme(0);
-
-	ofBackground(bg);
-	generateColors(centerTheme);
+	generateColors(CT_SOFT);
+	setColorScheme(6, colors);
+	//ofBackground(bg);
+	
 	
 	// load the texure
 	ofDisableArbTex();
@@ -118,7 +118,7 @@ void physicsMode::update(beatDetect bd, float bpm){
 	for (int i=0; i<sources.size(); i++){
 		if(bd.isSnare())
 			sources[i].c = colorGen.getRandom(colors);
-		sources[i].radius = bd.magnitude_average[0]*90;
+		sources[i].radius = bd.magnitude_average[0]*110;
 	}
 
 	updateShaderArrays();
@@ -163,7 +163,7 @@ void physicsMode::render(beatDetect bd, float bpm){
 		Source curS = sources[s];
 		//render sources
 		curS.render();
-		float rad =  curS.radius*1.5;
+		float rad =  curS.radius*1.9;
 		srcTexture.draw(curS.pos - rad/2, rad, rad);
 
 		//render rays;
@@ -203,39 +203,87 @@ void physicsMode::keyPressed(int key){
 		camDist += 10;
 	}
 	camera.setDistance(camDist);
-	if(key == '0'){
-		setColorScheme(0);
-	}
-	if(key == '1')
-		setColorScheme(1);
-	if(key == '2')
-		setColorScheme(2);
+
 	ofBackground(bg);
 	generateColors(centerTheme);
 }
 
-void physicsMode::setColorScheme(int s){
+void physicsMode::setColorScheme(int s, vector<ofColor> c){
+	// light,dark,bright,weak,neutral,fresh,soft,hard,warm,cool,intense
 	switch(s){
-	case 0:  //soft mauve
+	case 0: //light
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_LIGHT;
+		particleTheme = CT_LIGHT;
+		break;
+	case 1:
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_DARK;
+		particleTheme = CT_BRIGHT;
+		break;
+	case 2: //bright
+		bg = ofColor(0,130,255);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_BRIGHT;
+		particleTheme = CT_WARM;
+	case 3:
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_WEAK;
+		particleTheme = CT_SOFT;
+		break;
+	case 4:
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_NEUTRAL;
+		particleTheme = CT_WEAK;
+		break;
+	case 5:
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_FRESH;
+		particleTheme = CT_FRESH;
+		break;
+	case 6: //soft mauve
 		bg = ofColor(79, 55, 56);
 		particleMain = ofColor(255, 100, 90);
 		centerTheme = CT_SOFT;
 		particleTheme = CT_LIGHT;
 		break;
-	case 1: //black
+	case 7: //hard
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_HARD;
+		particleTheme = CT_HARD;
+		break;
+	case 8: //warm
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_WARM;
+		particleTheme = CT_WARM;
+		break;
+	case 9: //cool
+		bg = colorGen.getDarkest(c);
+		particleMain = colorGen.getLightest(c);
+		centerTheme = CT_COOL;
+		particleTheme = CT_COOL;
+		break;
+	case 10: //intense
 		bg = ofColor(0,0,0);
 		particleMain = ofColor(255,100,90);
-		centerTheme = CT_FRESH;
+		centerTheme = CT_INTENSE;
 		particleTheme = CT_BRIGHT;
 		break;
-	case 2: //blue
-		bg = ofColor(0,130,255);
-		particleMain = ofColor(255,191,97);
-		centerTheme = CT_BRIGHT;
-		particleTheme = CT_WARM;
 	default:
-		break;
-	}
+		bg = ofColor(79, 55, 56);
+		particleMain = ofColor(255, 100, 90);
+		centerTheme = CT_SOFT;
+		particleTheme = CT_LIGHT;
+	};
+	ofBackground(bg);
+	generateColors(centerTheme);
 }
 
 

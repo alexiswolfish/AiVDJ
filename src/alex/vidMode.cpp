@@ -100,8 +100,8 @@ void vidMode::setup()
 	seedY = ofRandom(100, 1000);
 
 	/*---------------Video----------------*/
-	curVid.loadMovie("vid/nicki.mp4");
-	curVid.setFrame(100);
+	curVid.loadMovie("vid/blockhead.mp4");
+	curVid.setFrame(800);
 	curVid.setVolume(0);
 	curVid.play();
 
@@ -226,11 +226,16 @@ void vidMode::keyPressed(int key){
 		maskFbo.begin();
 		ofClear(0,0,0,30);
 		maskFbo.end();
+
+		seedX = ofRandom(100, 1900);
+		seedY = ofRandom(100, 1000);
 	}
 	if(key == '3'){
 		seedX = ofRandom(100, 1900);
 		seedY = ofRandom(100, 1000);
 	}
+	if(key == 'w')
+		ofSaveFrame();
 }
 
 void vidMode::updateSpeed(){
