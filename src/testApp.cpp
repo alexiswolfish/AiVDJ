@@ -337,6 +337,8 @@ void testApp::changeColorScheme(string d){
 			foundMatch = true;
 		}
 	}
+	if(d.length() < 2 || !d.compare("describe your set"))
+		foundMatch = true;
 	if(!foundMatch){ //if unsupported description, pick one at random
 		int r = (int)ofRandom(0,10);
 		generateColors(color_options[r].first);

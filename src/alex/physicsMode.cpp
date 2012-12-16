@@ -213,19 +213,19 @@ void physicsMode::setColorScheme(int s, vector<ofColor> c){
 	switch(s){
 	case 0: //light
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_LIGHT;
 		particleTheme = CT_LIGHT;
 		break;
 	case 1:
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_DARK;
 		particleTheme = CT_BRIGHT;
 		break;
 	case 2: //bright
 		bg = ofColor(0,130,255);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_BRIGHT;
 		particleTheme = CT_WARM;
 	case 3:
@@ -236,13 +236,13 @@ void physicsMode::setColorScheme(int s, vector<ofColor> c){
 		break;
 	case 4:
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_NEUTRAL;
 		particleTheme = CT_WEAK;
 		break;
 	case 5:
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_FRESH;
 		particleTheme = CT_FRESH;
 		break;
@@ -254,19 +254,19 @@ void physicsMode::setColorScheme(int s, vector<ofColor> c){
 		break;
 	case 7: //hard
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_HARD;
 		particleTheme = CT_HARD;
 		break;
 	case 8: //warm
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_WARM;
 		particleTheme = CT_WARM;
 		break;
 	case 9: //cool
 		bg = colorGen.getDarkest(c);
-		particleMain = colorGen.getLightest(c);
+		particleMain = colorGen.getRandom(c);
 		centerTheme = CT_COOL;
 		particleTheme = CT_COOL;
 		break;
