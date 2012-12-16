@@ -2,6 +2,12 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	//initialize color options array
+	pair<ColourShade,string> c[11] = {make_pair(CT_LIGHT, "light"), make_pair(CT_DARK, "dark"), make_pair(CT_BRIGHT, "bright"),
+										make_pair(CT_WEAK, "weak"), make_pair(CT_NEUTRAL, "neutral"), make_pair(CT_FRESH, "fresh"),
+										make_pair(CT_SOFT, "soft"), make_pair(CT_HARD, "hard"), make_pair(CT_WARM, "warm"), 
+										make_pair(CT_COOL, "cool"), make_pair(CT_INTENSE, "intense")};
+	color_options = std::vector<pair<ColourShade, string>> (c, c + sizeof(c) / sizeof(pair<ColourShade,string>));
 
 	//init color palette
 	cmain.setHex(0xe6e6e6); //background grey
@@ -12,10 +18,9 @@ void testApp::setup(){
 	ccomp5.setHex(0x5f5f5f); //dark grey
 	white = ofColor(255,255,255);
 
-	/*-------Sound------*/
 	ofSetVerticalSync(true);
 	ofSetCircleResolution(80);
-	soundStream.listDevices();
+	/*-------Sound------*/
 
 	int bufferSize = 1024;
 	pVol = 0.0;
@@ -25,9 +30,7 @@ void testApp::setup(){
 
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
-	//volHistory.assign(400, 0.0);
 
-	//soundStream.setup(this, 0, 2, 44100, bufferSize, 4);
 	ofSoundStreamSetup(0, 2, this, 44100, bufferSize, 4);
 
 	startTime = ofGetElapsedTimef();
@@ -35,12 +38,14 @@ void testApp::setup(){
 	lengthOfBeat = 1;
 	bpm = 1;
 	tapCount = 1;
+
 	/*--------GUI-----------*/
+
 	drawDJKinect = false;
 	drawAudKinect = false;
 	drawDisplay = true;
 	drawSound = true;
-	mode = VID;
+	mode = PHYSICS;
 
 	/*--------setup booleans-----------*/
 	setDJ = false;
@@ -57,9 +62,8 @@ void testApp::setup(){
 	/*-------Alex-------*/
 	ofEnableAlphaBlending();
 	ofBackground(80);
-	physics.setup();
 	vid.setup();
-	
+	physics.setup(100);
 	
 	//curShade = CT_SOFT;
 	generateColors(CT_WEAK);
@@ -157,7 +161,7 @@ void testApp::draw(){
 			Aud.draw();
 			break;
 		case PHYSICS:
-		//	physics.render(bd,bpm);
+			physics.render(bd,bpm);
 			break;
 		case VID:
 			ofSetBackgroundAuto(false);
@@ -360,11 +364,8 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		DjDepthSliderLow = slider->getScaledValueLow(); 
 	}
 
- //   else if(name == "dJ testt")
-	//{
-	//	ofxUISlider *slider = (ofxUISlider *) e.widget; 
-	//	testItt = slider->getScaledValue(); 
-	//}
+
+
     else if(name == "aud depth threshold")
 	{
 		ofxUISlider *slider = (ofxUISlider *) e.widget; 
@@ -375,18 +376,99 @@ void testApp::guiEvent(ofxUIEventArgs &e){
 		 drawSound = toggle->getValue();
 	}
 	/*----Particle Sliders-----*/
-	else if (name == "particle rebirth")
-	{
+	else if (name == "volume radius scale"){
 		ofxUIRotarySlider *r = (ofxUIRotarySlider *)e.widget;
 		numParticles = r->getScaledValue();
 	}
+	else if(name=="input"){
+		ofxUITextInput *i = (ofxUITextInput *)e.widget;
+		std::string textInput = i->getTextString();
+		changeColorScheme(textInput);
+	}
+
 }
+
+/*-------------------------------------------------------------*
+Color Generation
+options: light,dark,bright,weak,neutral,fresh,soft,hard,warm,cool,intense
+ *-------------------------------------------------------------*/
+
+void testApp::changeColorScheme(string d){
+	d = ofToLower(d);
+	bool foundMatch = false;
+	for(int i=0; i<11; i++){
+		if (d.compare(color_options[i].second) == 0){ //if it matches one of the premade color descriptions
+			generateColors(color_options[i].first);
+			if(mode == PHYSICS)
+				physics.setColorScheme(i, colors);
+			foundMatch = true;
+		}
+	}
+	if(d.length() < 2 || !d.compare("describe your set"))
+		foundMatch = true;
+	if(!foundMatch){ //if unsupported description, pick one at random
+		int r = (int)ofRandom(0,10);
+		generateColors(color_options[r].first);
+		physics.setColorScheme(r, colors);
+	}
+}
+
+void testApp::generateColors(ColourShade cs){
+	colors.clear();
+	for(int i=0; i<100; i++){
+		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
+	}
+}
+
+void testApp::drawColorSwatches(int x, int y){
+	ofPushMatrix();
+	ofPushStyle();
+	ofTranslate(x,y,0);
+	for(int i=0; i<colors.size(); i++){
+		ofSetColor(colors[i]);
+		ofRect(i*4,0,0,3,10);
+	}
+	ofSetColor(white);
+	ofDrawBitmapString(curShade.name, colors.size()*4 + 20, 10, 0);
+	ofPopStyle();
+	ofPopMatrix();
+}
+
 void testApp::guiColors(ofxUIWidget *w){
 	/*w->setColorBack(ccomp1);
 	w->setColorFill(ccomp2);
 	w->setColorFillHighlight(ccomp4);
 	w->setColorOutline(ccomp2);*/
 }
+//--------------------------------------------------------------
+
+void testApp::keyPressed(int key){
+	if(drawDJ){
+		DJMODE.DJkeyPressed(key);
+	}
+	if(mode == VID){
+		vid.keyPressed(key);
+	}
+	if(mode == PHYSICS)
+		physics.keyPressed(key);
+	if( key == 's' ){
+		soundStream.start();
+	}
+	
+	if( key == 'e' ){
+		soundStream.stop();
+	}
+	if(key == ' '){
+		//change the color range
+		ColourShade randomShade =  (ColourShade) ((int)(ofRandom(0,10)));
+		curShade = colorGen.getColourConstraints(randomShade);
+		generateColors(randomShade);
+	}
+	if(key == 'q')
+		ofSaveFrame();
+}
+
+//--------------------------------------------------------------
 void testApp::guiSetup(){
 
     float dim = 16;
@@ -421,74 +503,17 @@ void testApp::guiSetup(){
     w = gui->addWidgetDown(new ofxUIToggle( "RENDER", drawDisplay, dim, dim));guiColors(w);
     
     //Sliders for style
-	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 0, 1100, dim*25, dim),"RENDER"); guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRangeSlider("dJ depth threshold", 0, 5000, 440, 1400, dim*25, dim),"RENDER"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIRangeSlider("aud depth threshold", 0, 5000, 440, 4000, dim*25, dim),"dJ depth threshold"); guiColors(w);
-	//w = gui->addWidgetSouthOf(new ofxUISlider("dJ testt", 1, 100, 40, dim*25, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUIToggle("DJ", drawDJKinect, dim, dim),"aud depth threshold"); guiColors(w);
 	w = gui->addWidgetEastOf(new ofxUIToggle("AUDIENCE", drawAudKinect, dim, dim), "DJ"); guiColors(w);
 	w = gui->addWidgetSouthOf(new ofxUITextInput("input", "describe your set", dim*12, dim*2),"AUDIENCE");guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 12000, numParticles, "particle rebirth"),"input");guiColors(w);
-	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"particle rebirth" );guiColors(w); 
+	w = gui->addWidgetEastOf(new ofxUIRotarySlider(dim*8, 0, 12000, numParticles, "volume radius scale"),"input");guiColors(w);
+	w = gui->addWidgetEastOf(new ofxUIRadio("source", particleModes, OFX_UI_ORIENTATION_VERTICAL,dim,dim,0,0),"volume radius scale" );guiColors(w); 
     audio = (ofxUIMovingGraph *) gui->addWidgetSouthOf(new ofxUIMovingGraph(dim*12, 64, volHistory, buffersize, -100, 100, "Volume"),"input"); 
 	w = gui->addWidgetSouthOf(new ofxUIToggle("beat debug", drawSound, dim, dim),"Volume");guiColors(w);
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
-//--------------------------------------------------------------
-
-/*-------------------------------------------------------------*
-Color Generation
-options: light,dark,bright,weak,neutral,fresh,soft,hard,warm,cool,intense
- *-------------------------------------------------------------*/
-
-void testApp::generateColors(ColourShade cs){
-	colors.clear();
-	for(int i=0; i<100; i++){
-		colors.push_back(colorGen.getColor(50, colorGen.getColourConstraints(cs)));
-	}
-}
-
-void testApp::drawColorSwatches(int x, int y){
-	ofPushMatrix();
-	ofPushStyle();
-	ofTranslate(x,y,0);
-	for(int i=0; i<colors.size(); i++){
-		ofSetColor(colors[i]);
-		ofRect(i*4,0,0,3,10);
-	}
-	ofSetColor(white);
-	ofDrawBitmapString(curShade.name, colors.size()*4 + 20, 10, 0);
-	ofPopStyle();
-	ofPopMatrix();
-}
-
-
-
-
-void testApp::keyPressed(int key){
-	if(drawDJ){
-		DJMODE.DJkeyPressed(key);
-	}
-	if(mode == VID){
-		vid.keyPressed(key);
-	}
-	if(mode == PHYSICS)
-		physics.keyPressed(key);
-	if( key == 's' ){
-		soundStream.start();
-	}
-	
-	if( key == 'e' ){
-		soundStream.stop();
-	}
-	if(key == ' '){
-		//change the color range
-		ColourShade randomShade =  (ColourShade) ((int)(ofRandom(0,10)));
-		curShade = colorGen.getColourConstraints(randomShade);
-		generateColors(randomShade);
-	}
-}
-
-//--------------------------------------------------------------
 void testApp::keyReleased(int key){
 
 }

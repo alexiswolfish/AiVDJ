@@ -32,7 +32,7 @@ class testApp : public ofBaseApp{
 		/*-----------util-----------*/
 		int mouseX, mouseY;
 
-		/*-----------gui-----------*/
+		/*-----------GUI-----------*/
 		enum MODE{
 			DJ,
 			AUD,
@@ -44,12 +44,12 @@ class testApp : public ofBaseApp{
 		void guiColors(ofxUIWidget *w);
 		void guiEvent(ofxUIEventArgs &e);
 		void initRects();
-		int externalBpm();
+		void changeColorScheme(std::string d);
 		void exit();
 
 		ofxUICanvas *gui;
 		float guiWidth, guiHeight;
-
+		float slider1, slider2;
 		float slider2, DjDepthSliderHigh, DjDepthSliderLow; //change these after you decide what they're for
 		bool drawDJ, drawAud, drawDisplay, drawSound;
 
@@ -59,7 +59,6 @@ class testApp : public ofBaseApp{
 		ofRectangle displayRect, djRect, audRect, guiRect;
 
 		MODE mode;
-		//int nearThresh, int farThresh;
 
 		/*-----------Alex-----------*/
 		//Physics
@@ -76,6 +75,8 @@ class testApp : public ofBaseApp{
 		ofxColourTheory colorGen;
 		ColourConstraints curShade;
 
+		vector<pair<ColourShade,string>> color_options;
+
 		void generateColors(ColourShade seed);
 		void drawColorSwatches(int x, int y);
 		ColourShade IntelliColor();
@@ -86,15 +87,6 @@ class testApp : public ofBaseApp{
 
 
 		/*-----------Sound-----------*/
-		/*
-			sub bass : 0 > 100hz
-			mid bass : 80 > 500hz
-			mid range: 400 > 2khz
-			upper mid: 1k > 6khz
-			high freq: 4k > 12khz
-			Very high freq: 10k > 20khz and above
-		*/
-
 		void audioIn(float * input, int bufferSize, int nChannels); 
 
 		void drawVolGraphs();
@@ -117,6 +109,7 @@ class testApp : public ofBaseApp{
 
 		beatDetect bd;
 
+		
 	// 0 output channels, 
 	// 2 input channels
 	// 44100 samples per second
@@ -124,8 +117,5 @@ class testApp : public ofBaseApp{
 	// 4 num buffers (latency)
 
 
-		/*-----------Test Variables-----------*/
-	int r,g,b;
-
-
 };
+

@@ -70,7 +70,7 @@ class physicsMode {
 
 		void addParticle(float x, float y, float z);
 
-		void setColorScheme(int s);
+		void setColorScheme(int s, vector<ofColor> colors);
 
 		vector<ofVec3f> locs;
 		vector<ofVec3f> sizes;
