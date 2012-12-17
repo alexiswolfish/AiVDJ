@@ -44,26 +44,17 @@ void djMode::setup() {
 	//easyCam.tilt(15);
 
 	maxLines = 2;
+
+	texture.loadImage("large_brown.png");
+	imgWidth = texture.width * (float)((float)ofGetWidth()/texture.width);
+	imgHeight = texture.height * (float)((float)ofGetHeight()/texture.height);
+
 }
 
 //--------------------------------------------------------------
 void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool beat) {
 
 	kinect.update();
-
-	//for (int i=0; i<=360; i++){
-	//	volHist.push_back(vol[i]);
-	//}
-
-	//volHistVec.push_back(volHist);
-	//for (int i=volHistVec.size(); i>0; i--){
-	//	if(i!=volHistVec.size()) volHistVec[i+1] = volHistVec[i];
-	//}
-	//if (volHistVec.size() > 10){
-	//	volHistVec.pop_back();
-	//}
-
-
 
 	Zlow = depthLow;
 	Zhigh = depthHigh;
@@ -107,28 +98,6 @@ void djMode::update(vector<float> &vol, float depthLow, float depthHigh, bool be
 		if(lines.size() > maxLines)
 			lines.erase(lines.begin());
 
-
-			//if (beat){
-			//	mesh.setMode(OF_PRIMITIVE_POINTS);
-			//	int rand1 = ofRandom(128.0, 255.0);
-			//	for(int y = 0; y < h; y += step*2) {
-			//		for(int x = 0; x < w; x += step*2) {
-			//			if(kinect.getDistanceAt(x, y) > 0) {
-			//				if (kinect.getWorldCoordinateAt(x, y).z > Zhigh){	
-			//					float sizeD = (vol[x] * 2000.0f);
-			//					if (sizeD > 5) sizeD = 5; 
-			//					else if (sizeD < -5) sizeD = -5;
-			//					mesh.addColor(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-			//					mesh.addVertex(kinect.getWorldCoordinateAt(x, y));
-			//					//bg_points.point.push_back(kinect.getWorldCoordinateAt(x, y));
-			//					//bg_points.color.push_back(ofColor(rand1, 0, (kinect.getWorldCoordinateAt(x, y).z*-1) / (Zhigh/255) + 128));
-			//					//bg_points.size.push_back(sizeD);
-			//				}
-			//			}
-			//		}
-			//	}
-			//}
-
 			if (points < 750){
 				noDJ++;
 				//printf("\nnodj %d\n", noDJ);
@@ -147,7 +116,7 @@ void djMode::updateGlobals(vector<ofColor> cols, bool changeColor, float volume)
 	smartColors = cols;
 	smartDarkCol = colorGen.getDarkest(cols);
 	newColor = smartDarkCol;
-	newColor.setBrightness(smartDarkCol.getBrightness() - 20);
+//	newColor.setBrightness(smartDarkCol.getBrightness() - 20);
 	if (changeColor) smartColor =  colorGen.getRandom(cols);
 		
 	volf = volume;
@@ -168,46 +137,37 @@ void djMode::draw() {
 	ofPushMatrix();
 	if(bDrawPointCloud) {
 		drawCircleBg();
-		//drawImage();
-		//int k = 50;
-		//if (volHistVec.size() > 9){
-		//	int size = 9;
-		//	for (int i=750; i>200; i-= 50){
-		//		vector<float> h = volHistVec[size];
-		//		drawCircle(i,ofColor(k),h);
-		//		size--;
-		//		k += 10;
-		//	}
-		//}
 		easyCam.begin();
 		drawPointCloud();
 		easyCam.end();
 				
 	} 
-
 	ofPopStyle();
 	ofPopMatrix();
 
-
+	ofSetColor(255, 255, 255, 140);
+    ofEnableBlendMode(OF_BLENDMODE_MULTIPLY);
+    texture.draw(0,0, imgWidth, imgHeight);
+    ofDisableBlendMode();
 }
 
 void djMode::drawCircleBg(){
-	float radius = 700;
+	float radius = 300;
 	int k = 70;
 	ofVec2f center = ofVec2f(ofGetWidth()/2, ofGetHeight()/2);
 	ofPushStyle();
 	ofPushMatrix();
-	for(int i=0; i< lines.size(); i++){
+	for(int i=0; i< lines.size(); i++){ //look at each volume line stored in the vol history array;
 		ofPolyline curLine = lines[i];
 		vector<ofPoint> points = curLine.getVertices();
 		ofRectangle bb = curLine.getBoundingBox();
 		
 		ofPolyline circle;
-		for (int i=0; i<points.size(); i+=25){
-			float dist = ofDist(0, points[i].y,0, bb.getMinY());
+		for (int i=0; i<points.size(); i+=10){ //draw a circle of radius r 
+			float dist = ofDist(0, points[i].y,0, bb.getMaxY());
 			float rad = ofRandom(0, TWO_PI);
-			float r = (radius + (dist*.25));
-			ofClamp(r, 0, 5);
+			float r = radius*.7;
+
 			ofVec3f loc;
 			loc.x = center.x + cos(rad)*r;
 			loc.y = center.y + sin(rad)*r;
@@ -216,8 +176,11 @@ void djMode::drawCircleBg(){
 		}
 		circle.close();
 
-		ofSetColor(newColor);
+		ofColor c = newColor;
+		c.setBrightness(newColor.getBrightness() - i*2);
+		ofSetColor(c);
 		ofBeginShape();
+
 		for (int i=0;i<circle.getVertices().size();i++){
 			 ofVertex(circle.getVertices().at(i).x, circle.getVertices().at(i).y, -1000); 
 		}
@@ -225,7 +188,6 @@ void djMode::drawCircleBg(){
 
 		radius -= 50;
 		k -= 10;
-		newColor.setBrightness(newColor.getBrightness() - 15);
 	}
 	ofPopStyle();
 	ofPopMatrix();

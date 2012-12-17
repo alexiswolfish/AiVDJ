@@ -20,6 +20,10 @@ public:
 	void draw();
 	void exit();
 
+	
+	ofImage texture;
+	float imgWidth,imgHeight;
+
 	//CV shit 
 	ofxCvColorImage colorImg;
 	
